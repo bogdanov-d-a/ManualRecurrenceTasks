@@ -259,15 +259,16 @@ public class AddRecordActivity extends AppCompatActivity {
 
                 Button deleteButton = new Button(AddRecordActivity.this);
                 deleteButton.setText("Delete");
-                deleteButton.setOnClickListener(new View.OnClickListener() {
+                deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
-                    public void onClick(View v) {
-                        // TODO: prompt for delete
+                    public boolean onLongClick(View v) {
                         DatabaseHelper.getInstance(getApplicationContext()).deleteRecord(editRecordId);
                         NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecordId);
 
                         setResult(1);
                         finish();
+
+                        return true;
                     }
                 });
                 buttonPanel.addView(deleteButton);
