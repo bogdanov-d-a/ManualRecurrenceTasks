@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import adapter.TagListAdapter;
 import data.TagData;
 import database.DatabaseHelper;
+import notification.NotificationUtils;
 
 public class TagsActivity extends AppCompatActivity {
     private ListView tagListView;
@@ -57,7 +58,7 @@ public class TagsActivity extends AppCompatActivity {
                 TagDeleteDialogFragment.newInstance(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // TODO: unregister alarms for records
+                        NotificationUtils.unregisterTagRecords(TagsActivity.this, pressedTagId);
                         DatabaseHelper.getInstance(getApplicationContext()).deleteTag(pressedTagId);
                         refreshTags();
                         mySetResult(1);

@@ -109,16 +109,21 @@ public class NotificationUtils {
         }
     }
 
+    public static void unregisterTagRecords(Context context, long tagId)
+    {
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tagId, Long.MIN_VALUE);
+        for (RecordData record : records)
+        {
+            unregisterRecord(context, record.id);
+        }
+    }
+
     public static void unregisterAllRecords(Context context)
     {
         ArrayList<TagData> tags = DatabaseHelper.getInstance(context).getTags();
         for (TagData tag : tags)
         {
-            ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE);
-            for (RecordData record : records)
-            {
-                unregisterRecord(context, record.id);
-            }
+            unregisterTagRecords(context, tag.id);
         }
     }
 }
