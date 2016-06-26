@@ -20,8 +20,6 @@ import data.RecordData;
 import data.TagData;
 import database.DatabaseHelper;
 
-// TODO: register notification alarms on boot
-// TODO: tidy up manifest
 // TODO: fix DB locking
 
 public class MainActivity extends AppCompatActivity {
