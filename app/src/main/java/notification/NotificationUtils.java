@@ -26,7 +26,6 @@ public class NotificationUtils {
                         .setContentTitle(tagName)
                         .setContentText(recordLabel)
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                        .setAutoCancel(true)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(recordLabel));
 

@@ -20,7 +20,7 @@ import data.RecordData;
 import data.TagData;
 import database.DatabaseHelper;
 
-// TODO: fix DB locking
+// TODO: lock database once for operation series
 
 public class MainActivity extends AppCompatActivity {
     public static final int ADD_RECORD_REQUEST = 0;
