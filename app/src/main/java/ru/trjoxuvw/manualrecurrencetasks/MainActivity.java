@@ -21,6 +21,8 @@ import data.TagData;
 import database.DatabaseHelper;
 
 // TODO: register notification alarms on boot
+// TODO: tidy up manifest
+// TODO: fix DB locking
 
 public class MainActivity extends AppCompatActivity {
     public static final int ADD_RECORD_REQUEST = 0;
@@ -104,6 +106,16 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, TagsActivity.class);
                 startActivityForResult(intent, OPTIONS_REQUEST);
+            }
+        });
+
+        Button debugButton = (Button) findViewById(R.id.debugButton);
+        assert debugButton != null;
+        debugButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, DebugActivity.class);
+                startActivity(intent);
             }
         });
 

@@ -16,13 +16,15 @@
             </intent-filter>
         </activity>
         <activity android:name=".TagsActivity" />
-        <activity android:name=".AddRecordActivity"/>
+        <activity android:name=".AddRecordActivity" />
 
         <receiver android:name="notification.NotificationBroadcastReceiver">
             <intent-filter>
                 <action android:name="ru.trjoxuvw.manualrecurrencetasks.SHOW" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".DebugActivity"></activity>
     </application>
 
 </manifest>

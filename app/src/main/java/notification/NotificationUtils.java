@@ -9,6 +9,12 @@ import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import data.RecordData;
+import data.TagData;
+import database.DatabaseHelper;
 import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
 
 public class NotificationUtils {
@@ -44,6 +50,13 @@ public class NotificationUtils {
         mNotificationManager.notify((int)recordRowid, mBuilder.build());
     }
 
+    public static void hide(Context context, long recordRowid)
+    {
+        NotificationManager mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancel((int)recordRowid);
+    }
+
     private static PendingIntent createAlarmIntent(Context context, long recordRowid)
     {
         Intent intent = new Intent(context, NotificationBroadcastReceiver.class);
@@ -52,15 +65,60 @@ public class NotificationUtils {
         return PendingIntent.getBroadcast(context, (int)recordRowid, intent, 0);
     }
 
-    public static void schedule(Context context, long recordRowid, long time)
+    private static void schedule(Context context, long recordRowid, long time)
     {
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmMgr.set(AlarmManager.RTC_WAKEUP, time, createAlarmIntent(context, recordRowid));
     }
 
-    public static void unschedule(Context context, long recordRowid)
+    private static void unschedule(Context context, long recordRowid)
     {
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmMgr.cancel(createAlarmIntent(context, recordRowid));
+    }
+
+    public static void registerRecord(Context context, RecordData data, String tagName)
+    {
+        if (data.needNotice)
+        {
+            Calendar calendarNow = Calendar.getInstance();
+
+            if (data.nextAppear < calendarNow.getTimeInMillis())
+                show(context, tagName, data.label, data.id);
+            else
+                schedule(context, data.id, data.nextAppear);
+        }
+    }
+
+    public static void unregisterRecord(Context context, long recordRowid)
+    {
+        unschedule(context, recordRowid);
+        hide(context, recordRowid);
+    }
+
+    public static void registerAllRecords(Context context)
+    {
+        ArrayList<TagData> tags = DatabaseHelper.getInstance(context).getTags();
+        for (TagData tag : tags)
+        {
+            ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE);
+            for (RecordData record : records)
+            {
+                registerRecord(context, record, tag.name);
+            }
+        }
+    }
+
+    public static void unregisterAllRecords(Context context)
+    {
+        ArrayList<TagData> tags = DatabaseHelper.getInstance(context).getTags();
+        for (TagData tag : tags)
+        {
+            ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE);
+            for (RecordData record : records)
+            {
+                unregisterRecord(context, record.id);
+            }
+        }
     }
 }

@@ -214,23 +214,16 @@ public class AddRecordActivity extends AppCompatActivity {
                 addButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        long addRowid = DatabaseHelper.getInstance(getApplicationContext()).addRecord(new RecordData(
+                        RecordData newRecord = new RecordData(
                                 0,
                                 tags.get(selectedTagPosition).id,
                                 labelEditText.getText().toString(),
                                 calendar.getTimeInMillis(),
                                 notificationCheckBox.isChecked()
-                        ));
+                        );
+                        newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).addRecord(newRecord);
 
-                        if (notificationCheckBox.isChecked())
-                        {
-                            Calendar calendarNow = Calendar.getInstance();
-
-                            if (calendar.getTimeInMillis() < calendarNow.getTimeInMillis())
-                                NotificationUtils.show(AddRecordActivity.this, tags.get(selectedTagPosition).name, labelEditText.getText().toString(), addRowid);
-                            else
-                                NotificationUtils.schedule(AddRecordActivity.this, addRowid, calendar.getTimeInMillis());
-                        }
+                        NotificationUtils.registerRecord(AddRecordActivity.this, newRecord, tags.get(selectedTagPosition).name);
 
                         setResult(1);
                         finish();
@@ -246,24 +239,17 @@ public class AddRecordActivity extends AppCompatActivity {
                 updateButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        DatabaseHelper.getInstance(getApplicationContext()).updateRecord(new RecordData(
+                        RecordData editRecord = new RecordData(
                                 editRecordId,
                                 tags.get(selectedTagPosition).id,
                                 labelEditText.getText().toString(),
                                 calendar.getTimeInMillis(),
                                 notificationCheckBox.isChecked()
-                        ));
+                        );
+                        DatabaseHelper.getInstance(getApplicationContext()).updateRecord(editRecord);
 
-                        NotificationUtils.unschedule(AddRecordActivity.this, editRecordId);
-                        if (notificationCheckBox.isChecked())
-                        {
-                            Calendar calendarNow = Calendar.getInstance();
-
-                            if (calendar.getTimeInMillis() < calendarNow.getTimeInMillis())
-                                NotificationUtils.show(AddRecordActivity.this, tags.get(selectedTagPosition).name, labelEditText.getText().toString(), editRecordId);
-                            else
-                                NotificationUtils.schedule(AddRecordActivity.this, editRecordId, calendar.getTimeInMillis());
-                        }
+                        NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecordId);
+                        NotificationUtils.registerRecord(AddRecordActivity.this, editRecord, tags.get(selectedTagPosition).name);
 
                         setResult(1);
                         finish();
@@ -278,7 +264,7 @@ public class AddRecordActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         // TODO: prompt for delete
                         DatabaseHelper.getInstance(getApplicationContext()).deleteRecord(editRecordId);
-                        NotificationUtils.unschedule(AddRecordActivity.this, editRecordId);
+                        NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecordId);
 
                         setResult(1);
                         finish();
