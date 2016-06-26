@@ -50,6 +50,7 @@ public class TagsActivity extends AppCompatActivity {
         tagListView = (ListView) findViewById(R.id.tagListView);
         assert tagListView != null;
         tagListView.setAdapter(new TagListAdapter(this));
+        // TODO: add tag rename
         tagListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {

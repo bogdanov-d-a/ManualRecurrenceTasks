@@ -21,6 +21,13 @@ import data.TagData;
 import database.DatabaseHelper;
 
 // TODO: lock database once for operation series
+// TODO: show notification state in list
+// TODO: update view on every show
+// TODO: use black text everywhere
+// TODO: fix borders for activities and list items
+// TODO: place date and time buttons on the same row
+// TODO: action buttons should be always visible
+// TODO: add cancel button
 
 public class MainActivity extends AppCompatActivity {
     public static final int ADD_RECORD_REQUEST = 0;
