@@ -23,7 +23,6 @@ import database.DatabaseHelper;
 // TODO: lock database once for operation series
 // TODO: update view on every show
 // TODO: use black text everywhere
-// TODO: fix borders for activities and list items
 
 public class MainActivity extends AppCompatActivity {
     public static final int ADD_RECORD_REQUEST = 0;
