@@ -21,7 +21,6 @@ import data.TagData;
 import database.DatabaseHelper;
 
 // TODO: lock database once for operation series
-// TODO: show notification state in list
 // TODO: update view on every show
 // TODO: use black text everywhere
 // TODO: fix borders for activities and list items

@@ -58,7 +58,10 @@ public class RecordListAdapter extends BaseAdapter {
 
         final RecordData record = (RecordData) getItem(position);
         holder.label.setText(record.label);
-        holder.nextAppear.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(record.nextAppear)));
+        holder.nextAppear.setText(
+                SimpleDateFormat.getDateTimeInstance().format(new Date(record.nextAppear)) +
+                (record.needNotice ? " (notification)" : "")
+        );
 
         return convertView;
     }
