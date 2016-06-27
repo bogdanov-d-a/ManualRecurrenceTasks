@@ -11,10 +11,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/label" />
+        android:id="@+id/label"
+        android:textColor="#000000" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/nextAppear" />
+        android:id="@+id/nextAppear"
+        android:textColor="#000000" />
 </LinearLayout>
