@@ -30,15 +30,24 @@
                 android:id="@+id/labelEditText"
                 android:hint="Label" />
 
-            <Button
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/pickDateButton" />
+                android:weightSum="2">
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/pickTimeButton" />
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/pickDateButton" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/pickTimeButton" />
+            </LinearLayout>
 
             <CheckBox
                 android:layout_width="match_parent"
