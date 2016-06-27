@@ -278,6 +278,16 @@ public class AddRecordActivity extends AppCompatActivity {
                 break;
         }
 
+        Button cancelButton = new Button(AddRecordActivity.this);
+        cancelButton.setText("Cancel");
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        buttonPanel.addView(cancelButton);
+
         updateDateTimeText();
         setResult(0);
     }

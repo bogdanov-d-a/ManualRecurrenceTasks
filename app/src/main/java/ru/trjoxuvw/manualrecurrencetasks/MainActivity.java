@@ -25,7 +25,6 @@ import database.DatabaseHelper;
 // TODO: use black text everywhere
 // TODO: fix borders for activities and list items
 // TODO: place date and time buttons on the same row
-// TODO: add cancel button
 
 public class MainActivity extends AppCompatActivity {
     public static final int ADD_RECORD_REQUEST = 0;
