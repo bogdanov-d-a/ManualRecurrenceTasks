@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -29,6 +30,7 @@ public class TagsActivity extends AppCompatActivity {
 
     private ArrayList<TagData> tags;
     private long pressedTagId;
+    private String pressedTagName;
 
     private void mySetResult(int code)
     {
@@ -50,7 +52,16 @@ public class TagsActivity extends AppCompatActivity {
         tagListView = (ListView) findViewById(R.id.tagListView);
         assert tagListView != null;
         tagListView.setAdapter(new TagListAdapter(this));
-        // TODO: add tag rename
+
+        tagListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                pressedTagId = tags.get(position).id;
+                pressedTagName = tags.get(position).name;
+                TagRenameDialogFragment.newInstance(TagsActivity.this).show(getSupportFragmentManager(), "tagRenamer");
+            }
+        });
+
         tagListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -97,6 +108,48 @@ public class TagsActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(RESULT_CODE_TAG, resultCode);
+    }
+
+    public static class TagRenameDialogFragment extends DialogFragment {
+        private TagsActivity parentActivity;
+        private EditText tagRenameEditText;
+
+        public static TagRenameDialogFragment newInstance(TagsActivity parentActivity) {
+            TagRenameDialogFragment pickerFragment = new TagRenameDialogFragment();
+            pickerFragment.parentActivity = parentActivity;
+            return pickerFragment;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            View view = inflater.inflate(R.layout.tag_rename, null);
+
+            tagRenameEditText = (EditText) view.findViewById(R.id.tagRenameEditText);
+            tagRenameEditText.setText(parentActivity.pressedTagName);
+
+            builder.setView(view)
+                    .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            TagData newTag = new TagData(parentActivity.pressedTagId, tagRenameEditText.getText().toString());
+
+                            NotificationUtils.unregisterTagRecords(parentActivity, parentActivity.pressedTagId);
+                            DatabaseHelper.getInstance(parentActivity.getApplicationContext()).updateTag(newTag);
+                            NotificationUtils.registerTagRecords(parentActivity, newTag);
+
+                            parentActivity.refreshTags();
+                            parentActivity.mySetResult(1);
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dismiss();
+                        }
+                    });
+            return builder.create();
+        }
     }
 
     public static class TagDeleteDialogFragment extends DialogFragment {

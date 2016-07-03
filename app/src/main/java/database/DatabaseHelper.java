@@ -253,6 +253,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public void updateTag(TagData data)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("update " + TAGS_TABLE + " set " +
+                TagsRows.NAME + "=" + escapeStr(data.name) +
+                " where " + ID_ROW + "=" + escapeStr(Long.toString(data.id)) + ";");
+        db.close();
+    }
+
     public void updateRecord(RecordData data)
     {
         SQLiteDatabase db = getWritableDatabase();

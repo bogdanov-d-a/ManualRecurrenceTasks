@@ -96,16 +96,21 @@ public class NotificationUtils {
         hide(context, recordRowid);
     }
 
+    public static void registerTagRecords(Context context, TagData tag)
+    {
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE);
+        for (RecordData record : records)
+        {
+            registerRecord(context, record, tag.name);
+        }
+    }
+
     public static void registerAllRecords(Context context)
     {
         ArrayList<TagData> tags = DatabaseHelper.getInstance(context).getTags();
         for (TagData tag : tags)
         {
-            ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE);
-            for (RecordData record : records)
-            {
-                registerRecord(context, record, tag.name);
-            }
+            registerTagRecords(context, tag);
         }
     }
 
