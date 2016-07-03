@@ -21,7 +21,6 @@ import data.TagData;
 import database.DatabaseHelper;
 
 // TODO: lock database once for operation series
-// TODO: update view on every show
 // TODO: notify time countdown + show day of week
 
 public class MainActivity extends AppCompatActivity {
@@ -168,5 +167,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         refreshTags();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshRecords(selectedTagPosition);
     }
 }
