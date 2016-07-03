@@ -17,8 +17,6 @@ import data.TagData;
 import database.DatabaseHelper;
 import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
 
-// TODO: persistent notification
-
 public class NotificationUtils {
     public static void show(Context context, String tagName, String recordLabel, long recordRowid)
     {
@@ -29,7 +27,8 @@ public class NotificationUtils {
                         .setContentText(recordLabel)
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(recordLabel));
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(recordLabel))
+                        .setOngoing(true);
 
         Intent resultIntent = new Intent(context, AddRecordActivity.class);
         resultIntent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_EDIT);
