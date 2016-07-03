@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import data.RecordData;
 import data.TagData;
 
-// TODO: fix SQL injection
-
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "Tasks.db";
@@ -106,6 +104,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    private static String escapeStr(String str)
+    {
+        StringBuilder result = new StringBuilder();
+        result.append('\'');
+
+        for (char c : str.toCharArray()) {
+            if (c == '\'')
+                result.append('\'');
+            result.append(c);
+        }
+
+        result.append('\'');
+        return result.toString();
+    }
+
     public ArrayList<RecordData> getRecords(long tagId, long maxDate)
     {
         ArrayList<RecordData> result = new ArrayList<>();
@@ -115,11 +128,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         {
             String tagIdExpr = "1";
             if (tagId != Long.MIN_VALUE)
-                tagIdExpr = RecordsRows.TAG_ID + "='" + tagId + "'";
+                tagIdExpr = RecordsRows.TAG_ID + "=" + escapeStr(Long.toString(tagId));
 
             String maxDateExpr = "1";
             if (maxDate > Long.MIN_VALUE)
-                maxDateExpr = RecordsRows.NEXT_APPEAR + "<'" + maxDate + "'";
+                maxDateExpr = RecordsRows.NEXT_APPEAR + "<" + escapeStr(Long.toString(maxDate));
 
             cursor = db.rawQuery("select * from " + RECORDS_TABLE + " where (" + tagIdExpr + ") and (" + maxDateExpr + ") order by " + RecordsRows.NEXT_APPEAR + " asc;", null);
         }
@@ -148,8 +161,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("insert into " + TAGS_TABLE + " (" +
-                TagsRows.NAME + ") values ('" +
-                data.name + "');");
+                TagsRows.NAME + ") values (" +
+                escapeStr(data.name) + ");");
         long id = getLastInsertRowid(db);
         db.close();
         return id;
@@ -162,11 +175,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 RecordsRows.TAG_ID + "," +
                 RecordsRows.LABEL + "," +
                 RecordsRows.NEXT_APPEAR + "," +
-                RecordsRows.NOTIFICATION + ") values ('" +
-                data.tagId + "','" +
-                data.label + "','" +
-                data.nextAppear + "','" +
-                (data.needNotice ? 1 : 0) + "');");
+                RecordsRows.NOTIFICATION + ") values (" +
+                escapeStr(Long.toString(data.tagId)) + "," +
+                escapeStr(data.label) + "," +
+                escapeStr(Long.toString(data.nextAppear)) + "," +
+                escapeStr(Long.toString(data.needNotice ? 1 : 0)) + ");");
         long id = getLastInsertRowid(db);
         db.close();
         return id;
@@ -175,15 +188,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteTag(long id)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("delete from " + RECORDS_TABLE + " where " + RecordsRows.TAG_ID + "=" + id + ";");
-        db.execSQL("delete from " + TAGS_TABLE + " where " + ID_ROW + "=" + id + ";");
+        db.execSQL("delete from " + RECORDS_TABLE + " where " + RecordsRows.TAG_ID + "=" + escapeStr(Long.toString(id)) + ";");
+        db.execSQL("delete from " + TAGS_TABLE + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";");
         db.close();
     }
 
     public RecordData getRecord(long id)
     {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + RECORDS_TABLE + " where " + ID_ROW + "=" + id + ";", null);
+        Cursor cursor = db.rawQuery("select * from " + RECORDS_TABLE + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";", null);
 
         try
         {
@@ -220,7 +233,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public RecordDataMin getRecordMin(long id)
     {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + RECORDS_TABLE + " inner join " + TAGS_TABLE + " on " + RecordsRows.TAG_ID + "=" + TAGS_TABLE + "." + ID_ROW + " where " + RECORDS_TABLE + "." + ID_ROW + "=" + id + ";", null);
+        Cursor cursor = db.rawQuery("select * from " + RECORDS_TABLE + " inner join " + TAGS_TABLE + " on " + RecordsRows.TAG_ID + "=" + TAGS_TABLE + "." + ID_ROW + " where " + RECORDS_TABLE + "." + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";", null);
 
         try
         {
@@ -244,18 +257,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("update " + RECORDS_TABLE + " set " +
-                RecordsRows.TAG_ID + "='" + data.tagId + "'," +
-                RecordsRows.LABEL + "='" + data.label + "'," +
-                RecordsRows.NEXT_APPEAR + "='" + data.nextAppear + "'," +
-                RecordsRows.NOTIFICATION + "='" + (data.needNotice ? 1 : 0) + "'" +
-                " where " + ID_ROW + "=" + data.id + ";");
+                RecordsRows.TAG_ID + "=" + escapeStr(Long.toString(data.tagId)) + "," +
+                RecordsRows.LABEL + "=" + escapeStr(data.label) + "," +
+                RecordsRows.NEXT_APPEAR + "=" + escapeStr(Long.toString(data.nextAppear)) + "," +
+                RecordsRows.NOTIFICATION + "=" + escapeStr(Long.toString(data.needNotice ? 1 : 0)) +
+                " where " + ID_ROW + "=" + escapeStr(Long.toString(data.id)) + ";");
         db.close();
     }
 
     public void deleteRecord(long id)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("delete from " + RECORDS_TABLE + " where " + ID_ROW + "=" + id + ";");
+        db.execSQL("delete from " + RECORDS_TABLE + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";");
         db.close();
     }
 }
