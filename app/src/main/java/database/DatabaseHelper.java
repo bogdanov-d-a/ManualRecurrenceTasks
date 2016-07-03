@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import data.RecordData;
 import data.TagData;
 
+// TODO: fix SQL injection
+
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "Tasks.db";

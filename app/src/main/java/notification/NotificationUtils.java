@@ -17,6 +17,8 @@ import data.TagData;
 import database.DatabaseHelper;
 import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
 
+// TODO: persistent notification
+
 public class NotificationUtils {
     public static void show(Context context, String tagName, String recordLabel, long recordRowid)
     {
