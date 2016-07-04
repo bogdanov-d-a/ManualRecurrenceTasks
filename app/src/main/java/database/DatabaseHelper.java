@@ -119,7 +119,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result.toString();
     }
 
-    public ArrayList<RecordData> getRecords(long tagId, long maxDate)
+    public ArrayList<RecordData> getRecords(long tagId, long maxDate, boolean notificationOnly)
     {
         ArrayList<RecordData> result = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -134,7 +134,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (maxDate > Long.MIN_VALUE)
                 maxDateExpr = RecordsRows.NEXT_APPEAR + "<" + escapeStr(Long.toString(maxDate));
 
-            cursor = db.rawQuery("select * from " + RECORDS_TABLE + " where (" + tagIdExpr + ") and (" + maxDateExpr + ") order by " + RecordsRows.NEXT_APPEAR + " asc;", null);
+            String notificationOnlyExpr = "1";
+            if (notificationOnly)
+                notificationOnlyExpr = RecordsRows.NOTIFICATION + "=" + escapeStr(Long.toString(1));
+
+            cursor = db.rawQuery("select * from " + RECORDS_TABLE + " where (" + tagIdExpr + ") and (" + maxDateExpr + ") and (" + notificationOnlyExpr + ") order by " + RecordsRows.NEXT_APPEAR + " asc;", null);
         }
 
         if (cursor.moveToFirst())

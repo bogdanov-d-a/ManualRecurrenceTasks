@@ -98,7 +98,7 @@ public class NotificationUtils {
 
     public static void registerTagRecords(Context context, TagData tag)
     {
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE, false);
         for (RecordData record : records)
         {
             registerRecord(context, record, tag.name);
@@ -116,7 +116,7 @@ public class NotificationUtils {
 
     public static void unregisterTagRecords(Context context, long tagId)
     {
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tagId, Long.MIN_VALUE);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tagId, Long.MIN_VALUE, false);
         for (RecordData record : records)
         {
             unregisterRecord(context, record.id);

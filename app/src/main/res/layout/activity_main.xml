@@ -15,19 +15,35 @@
         android:id="@+id/tagSpinner"
         android:layout_alignParentTop="true" />
 
-    <CheckBox
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Active only"
-        android:checked="true"
-        android:id="@+id/activeOnlyCheckBox"
-        android:layout_below="@+id/tagSpinner" />
+        android:id="@+id/filterCheckBoxes"
+        android:layout_below="@+id/tagSpinner"
+        android:weightSum="2">
+
+        <CheckBox
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Active only"
+            android:checked="true"
+            android:id="@+id/activeOnlyCheckBox" />
+
+        <CheckBox
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Notification only"
+            android:id="@+id/notificationOnlyCheckBox" />
+    </LinearLayout>
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/recordListView"
-        android:layout_below="@+id/activeOnlyCheckBox"
+        android:layout_below="@+id/filterCheckBoxes"
         android:layout_above="@+id/bottomLinearLayout" />
 
     <LinearLayout
