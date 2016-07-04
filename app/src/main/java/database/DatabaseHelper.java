@@ -86,7 +86,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<TagData> result = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + TAGS_TABLE + ";", null);
+        Cursor cursor = db.rawQuery("select * from " + TAGS_TABLE + " order by " + TagsRows.NAME + " asc;", null);
         if (cursor.moveToFirst())
         {
             do
