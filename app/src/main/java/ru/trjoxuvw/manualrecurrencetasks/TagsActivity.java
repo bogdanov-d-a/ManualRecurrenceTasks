@@ -170,15 +170,13 @@ public class TagsActivity extends AppCompatActivity {
             builder.setView(view)
                     .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            TagData editTag = parentActivity.pressedTagData;
-
-                            editTag.name = tagRenameEditText.getText().toString();
-                            editTag.timeMode = TagData.LongToTimeMode(tagRenameTypeSpinnerPosition);
-                            editTag.isChecklist = tagRenameIsChecklist.isChecked();
+                            parentActivity.pressedTagData.name = tagRenameEditText.getText().toString();
+                            parentActivity.pressedTagData.timeMode = TagData.LongToTimeMode(tagRenameTypeSpinnerPosition);
+                            parentActivity.pressedTagData.isChecklist = tagRenameIsChecklist.isChecked();
 
                             NotificationUtils.unregisterTagRecords(parentActivity, parentActivity.pressedTagData.id);
-                            DatabaseHelper.getInstance(parentActivity.getApplicationContext()).update(editTag);
-                            NotificationUtils.registerTagRecords(parentActivity, editTag);
+                            DatabaseHelper.getInstance(parentActivity.getApplicationContext()).update(parentActivity.pressedTagData);
+                            NotificationUtils.registerTagRecords(parentActivity, parentActivity.pressedTagData);
 
                             parentActivity.refreshTags();
                             parentActivity.mySetResult(1);
