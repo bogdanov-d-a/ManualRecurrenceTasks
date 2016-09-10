@@ -7,31 +7,78 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 
-import data.RecordData;
-import data.TagData;
-
-// TODO: add QueryGen
-
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "Tasks.db";
 
-    private static final String TAGS_TABLE = "tags";
-    private static final String RECORDS_TABLE = "records";
+    protected static final String ID_ROW = "id";
 
-    private static final String ID_ROW = "id";
+    private static String createGen(String name, ArrayList<String> rows, ArrayList<String> types) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("create table " + name + " (");
 
-    private static class TagsRows {
-        public static final String NAME = "name";
-        public static final String IS_CHECKLIST = "is_checklist";
-        public static final String TIME_MODE = "time_mode";
+        sb.append(ID_ROW + " integer primary key");
+
+        for (int i = 0; i < rows.size(); ++i)
+        {
+            sb.append(",");
+            sb.append(rows.get(i) + " " + types.get(i));
+        }
+
+        sb.append(");");
+        return sb.toString();
     }
 
-    private static class RecordsRows {
-        public static final String TAG_ID = "tag_id";
-        public static final String LABEL = "label";
-        public static final String NEXT_APPEAR = "next_appear";
-        public static final String NOTIFICATION = "notification";
+    private static String insertGen(String name, ArrayList<String> rows, ArrayList<String> data) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("insert into " + name + " (");
+
+        for (int i = 0; i < rows.size(); ++i)
+        {
+            if (i != 0) {
+                sb.append(",");
+            }
+            sb.append(rows.get(i));
+        }
+
+        sb.append(") values (");
+
+        for (int i = 0; i < data.size(); ++i)
+        {
+            if (i != 0) {
+                sb.append(",");
+            }
+            sb.append(escapeStr(data.get(i)));
+        }
+
+        sb.append(");");
+        return sb.toString();
+    }
+
+    private static String updateGen(String name, ArrayList<String> rows, long id, ArrayList<String> data) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("update " + name + " set ");
+
+        for (int i = 0; i < rows.size(); ++i)
+        {
+            if (i != 0) {
+                sb.append(",");
+            }
+            sb.append(rows.get(i) + "=" + escapeStr(data.get(i)));
+        }
+
+        sb.append(" where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";");
+        return sb.toString();
+    }
+
+    private static RecordData createRecordDataFromCursor(Cursor cursor) {
+        return new RecordData(
+                cursor.getLong(cursor.getColumnIndexOrThrow(ID_ROW)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.TAG_ID)),
+                cursor.getString(cursor.getColumnIndexOrThrow(RecordData.Rows.LABEL)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.NEXT_APPEAR)),
+                cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.NOTIFICATION)) != 0
+        );
     }
 
     private static DatabaseHelper instance = null;
@@ -53,18 +100,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table " + TAGS_TABLE + " (" +
-                ID_ROW + " integer primary key," +
-                TagsRows.NAME + " text," +
-                TagsRows.IS_CHECKLIST + " integer," +
-                TagsRows.TIME_MODE + " integer);");
-
-        db.execSQL("create table " + RECORDS_TABLE + " (" +
-                ID_ROW + " integer primary key," +
-                RecordsRows.TAG_ID + " integer references " + TAGS_TABLE + "(" + ID_ROW + ")," +
-                RecordsRows.LABEL + " text," +
-                RecordsRows.NEXT_APPEAR + " integer," +
-                RecordsRows.NOTIFICATION + " integer);");
+        db.execSQL(createGen(TagData.getTableNameStatic(), TagData.getTableRowsStatic(), TagData.getTableRowsTypes()));
+        db.execSQL(createGen(RecordData.getTableNameStatic(), RecordData.getTableRowsStatic(), RecordData.getTableRowsTypes()));
     }
 
     @Override
@@ -93,16 +130,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<TagData> result = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + TAGS_TABLE + " order by " + TagsRows.NAME + " asc;", null);
+        Cursor cursor = db.rawQuery("select * from " + TagData.getTableNameStatic() + " order by " + TagData.Rows.NAME + " asc;", null);
         if (cursor.moveToFirst())
         {
             do
             {
                 result.add(new TagData(
                         cursor.getLong(cursor.getColumnIndexOrThrow(ID_ROW)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(TagsRows.NAME)),
-                        cursor.getLong(cursor.getColumnIndexOrThrow(TagsRows.IS_CHECKLIST)) != 0,
-                        TagData.LongToTimeMode(cursor.getLong(cursor.getColumnIndexOrThrow(TagsRows.TIME_MODE)))
+                        cursor.getString(cursor.getColumnIndexOrThrow(TagData.Rows.NAME)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_CHECKLIST)) != 0,
+                        TagData.LongToTimeMode(cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.TIME_MODE)))
                 ));
             }
             while (cursor.moveToNext());
@@ -137,30 +174,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         {
             String tagIdExpr = "1";
             if (tagId != Long.MIN_VALUE)
-                tagIdExpr = RecordsRows.TAG_ID + "=" + escapeStr(Long.toString(tagId));
+                tagIdExpr = RecordData.Rows.TAG_ID + "=" + escapeStr(Long.toString(tagId));
 
             String maxDateExpr = "1";
             if (maxDate > Long.MIN_VALUE)
-                maxDateExpr = RecordsRows.NEXT_APPEAR + "<" + escapeStr(Long.toString(maxDate));
+                maxDateExpr = RecordData.Rows.NEXT_APPEAR + "<" + escapeStr(Long.toString(maxDate));
 
             String notificationOnlyExpr = "1";
             if (notificationOnly)
-                notificationOnlyExpr = RecordsRows.NOTIFICATION + "=" + escapeStr(Long.toString(1));
+                notificationOnlyExpr = RecordData.Rows.NOTIFICATION + "=" + escapeStr(Long.toString(1));
 
-            cursor = db.rawQuery("select * from " + RECORDS_TABLE + " where (" + tagIdExpr + ") and (" + maxDateExpr + ") and (" + notificationOnlyExpr + ") order by " + RecordsRows.NEXT_APPEAR + " asc;", null);
+            cursor = db.rawQuery("select * from " + RecordData.getTableNameStatic() + " where (" + tagIdExpr + ") and (" + maxDateExpr + ") and (" + notificationOnlyExpr + ") order by " + RecordData.Rows.NEXT_APPEAR + " asc;", null);
         }
 
         if (cursor.moveToFirst())
         {
             do
             {
-                result.add(new RecordData(
-                        cursor.getLong(cursor.getColumnIndexOrThrow(ID_ROW)),
-                        cursor.getLong(cursor.getColumnIndexOrThrow(RecordsRows.TAG_ID)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(RecordsRows.LABEL)),
-                        cursor.getLong(cursor.getColumnIndexOrThrow(RecordsRows.NEXT_APPEAR)),
-                        cursor.getLong(cursor.getColumnIndexOrThrow(RecordsRows.NOTIFICATION)) != 0
-                ));
+                result.add(createRecordDataFromCursor(cursor));
             }
             while (cursor.moveToNext());
         }
@@ -170,29 +201,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public long addTag(TagData data)
+    public long add(AbstractData data)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("insert into " + TAGS_TABLE + " (" +
-                TagsRows.NAME + ") values (" +
-                escapeStr(data.name) + ");");
-        long id = getLastInsertRowid(db);
-        db.close();
-        return id;
-    }
-
-    public long addRecord(RecordData data)
-    {
-        SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("insert into " + RECORDS_TABLE + " (" +
-                RecordsRows.TAG_ID + "," +
-                RecordsRows.LABEL + "," +
-                RecordsRows.NEXT_APPEAR + "," +
-                RecordsRows.NOTIFICATION + ") values (" +
-                escapeStr(Long.toString(data.tagId)) + "," +
-                escapeStr(data.label) + "," +
-                escapeStr(Long.toString(data.nextAppear)) + "," +
-                escapeStr(Long.toString(data.needNotice ? 1 : 0)) + ");");
+        db.execSQL(insertGen(data.getTableName(), data.getTableRows(), data.getStringList()));
         long id = getLastInsertRowid(db);
         db.close();
         return id;
@@ -201,27 +213,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteTag(long id)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("delete from " + RECORDS_TABLE + " where " + RecordsRows.TAG_ID + "=" + escapeStr(Long.toString(id)) + ";");
-        db.execSQL("delete from " + TAGS_TABLE + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";");
+        db.execSQL("delete from " + RecordData.getTableNameStatic() + " where " + RecordData.Rows.TAG_ID + "=" + escapeStr(Long.toString(id)) + ";");
+        db.execSQL("delete from " + TagData.getTableNameStatic() + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";");
         db.close();
     }
 
     public RecordData getRecord(long id)
     {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + RECORDS_TABLE + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";", null);
+        Cursor cursor = db.rawQuery("select * from " + RecordData.getTableNameStatic() + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";", null);
 
         try
         {
             if (cursor.moveToFirst())
             {
-                return new RecordData(
-                        cursor.getLong(cursor.getColumnIndexOrThrow(ID_ROW)),
-                        cursor.getLong(cursor.getColumnIndexOrThrow(RecordsRows.TAG_ID)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(RecordsRows.LABEL)),
-                        cursor.getLong(cursor.getColumnIndexOrThrow(RecordsRows.NEXT_APPEAR)),
-                        cursor.getLong(cursor.getColumnIndexOrThrow(RecordsRows.NOTIFICATION)) != 0
-                );
+                return createRecordDataFromCursor(cursor);
             }
             return null;
         }
@@ -246,15 +252,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public RecordDataMin getRecordMin(long id)
     {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + RECORDS_TABLE + " inner join " + TAGS_TABLE + " on " + RecordsRows.TAG_ID + "=" + TAGS_TABLE + "." + ID_ROW + " where " + RECORDS_TABLE + "." + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";", null);
+        Cursor cursor = db.rawQuery("select * from " + RecordData.getTableNameStatic() + " inner join " + TagData.getTableNameStatic() + " on " + RecordData.Rows.TAG_ID + "=" + TagData.getTableNameStatic() + "." + ID_ROW + " where " + RecordData.getTableNameStatic() + "." + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";", null);
 
         try
         {
             if (cursor.moveToFirst())
             {
                 return new RecordDataMin(
-                        cursor.getString(cursor.getColumnIndexOrThrow(TagsRows.NAME)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(RecordsRows.LABEL))
+                        cursor.getString(cursor.getColumnIndexOrThrow(TagData.Rows.NAME)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(RecordData.Rows.LABEL))
                 );
             }
             return null;
@@ -266,33 +272,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void updateTag(TagData data)
+    public void update(AbstractData data)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("update " + TAGS_TABLE + " set " +
-                TagsRows.NAME + "=" + escapeStr(data.name) + "," +
-                TagsRows.IS_CHECKLIST + "=" + escapeStr(Long.toString(data.isChecklist ? 1 : 0)) + "," +
-                TagsRows.TIME_MODE + "=" + escapeStr(Long.toString(TagData.TimeModeToLong(data.timeMode))) +
-                " where " + ID_ROW + "=" + escapeStr(Long.toString(data.id)) + ";");
-        db.close();
-    }
-
-    public void updateRecord(RecordData data)
-    {
-        SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("update " + RECORDS_TABLE + " set " +
-                RecordsRows.TAG_ID + "=" + escapeStr(Long.toString(data.tagId)) + "," +
-                RecordsRows.LABEL + "=" + escapeStr(data.label) + "," +
-                RecordsRows.NEXT_APPEAR + "=" + escapeStr(Long.toString(data.nextAppear)) + "," +
-                RecordsRows.NOTIFICATION + "=" + escapeStr(Long.toString(data.needNotice ? 1 : 0)) +
-                " where " + ID_ROW + "=" + escapeStr(Long.toString(data.id)) + ";");
+        db.execSQL(updateGen(data.getTableName(), data.getTableRows(), data.getId(), data.getStringList()));
         db.close();
     }
 
     public void deleteRecord(long id)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("delete from " + RECORDS_TABLE + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";");
+        db.execSQL("delete from " + RecordData.getTableNameStatic() + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";");
         db.close();
     }
 }

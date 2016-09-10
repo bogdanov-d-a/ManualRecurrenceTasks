@@ -12,8 +12,8 @@ import android.support.v4.app.TaskStackBuilder;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import data.RecordData;
-import data.TagData;
+import database.RecordData;
+import database.TagData;
 import database.DatabaseHelper;
 import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
 

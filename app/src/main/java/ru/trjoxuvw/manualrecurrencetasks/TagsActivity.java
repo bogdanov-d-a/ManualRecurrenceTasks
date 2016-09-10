@@ -20,7 +20,7 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 
 import adapter.TagListAdapter;
-import data.TagData;
+import database.TagData;
 import database.DatabaseHelper;
 import notification.NotificationUtils;
 
@@ -92,7 +92,7 @@ public class TagsActivity extends AppCompatActivity {
         addTagButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseHelper.getInstance(getApplicationContext()).addTag(new TagData(
+                DatabaseHelper.getInstance(getApplicationContext()).add(new TagData(
                         0,
                         tagNameEditText.getText().toString(),
                         false,
@@ -177,7 +177,7 @@ public class TagsActivity extends AppCompatActivity {
                             editTag.isChecklist = tagRenameIsChecklist.isChecked();
 
                             NotificationUtils.unregisterTagRecords(parentActivity, parentActivity.pressedTagData.id);
-                            DatabaseHelper.getInstance(parentActivity.getApplicationContext()).updateTag(editTag);
+                            DatabaseHelper.getInstance(parentActivity.getApplicationContext()).update(editTag);
                             NotificationUtils.registerTagRecords(parentActivity, editTag);
 
                             parentActivity.refreshTags();

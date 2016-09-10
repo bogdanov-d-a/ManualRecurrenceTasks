@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import data.RecordData;
-import data.TagData;
+import database.RecordData;
+import database.TagData;
 import database.DatabaseHelper;
 import notification.NotificationUtils;
 
@@ -221,7 +221,7 @@ public class AddRecordActivity extends AppCompatActivity {
                                 calendar.getTimeInMillis(),
                                 notificationCheckBox.isChecked()
                         );
-                        newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).addRecord(newRecord);
+                        newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).add(newRecord);
 
                         NotificationUtils.registerRecord(AddRecordActivity.this, newRecord, tags.get(selectedTagPosition).name);
 
@@ -246,7 +246,7 @@ public class AddRecordActivity extends AppCompatActivity {
                                 calendar.getTimeInMillis(),
                                 notificationCheckBox.isChecked()
                         );
-                        DatabaseHelper.getInstance(getApplicationContext()).updateRecord(editRecord);
+                        DatabaseHelper.getInstance(getApplicationContext()).update(editRecord);
 
                         NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecordId);
                         NotificationUtils.registerRecord(AddRecordActivity.this, editRecord, tags.get(selectedTagPosition).name);

@@ -11,7 +11,7 @@ import ru.trjoxuvw.manualrecurrencetasks.R;
 
 import java.util.ArrayList;
 
-import data.TagData;
+import database.TagData;
 
 public class TagListAdapter extends BaseAdapter {
     private final LayoutInflater mInflater;

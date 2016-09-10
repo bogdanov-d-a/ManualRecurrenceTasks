@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import data.RecordData;
+import database.RecordData;
 
 public class RecordListAdapter extends BaseAdapter {
     private final LayoutInflater mInflater;

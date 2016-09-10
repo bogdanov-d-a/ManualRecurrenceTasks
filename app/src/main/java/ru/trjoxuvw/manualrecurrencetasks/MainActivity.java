@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import adapter.RecordListAdapter;
-import data.RecordData;
-import data.TagData;
+import database.RecordData;
+import database.TagData;
 import database.DatabaseHelper;
 
 // TODO: lock database once for operation series
