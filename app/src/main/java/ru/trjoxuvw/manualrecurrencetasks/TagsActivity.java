@@ -10,9 +10,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 
@@ -29,8 +32,7 @@ public class TagsActivity extends AppCompatActivity {
     private int resultCode;
 
     private ArrayList<TagData> tags;
-    private long pressedTagId;
-    private String pressedTagName;
+    private TagData pressedTagData;
 
     private void mySetResult(int code)
     {
@@ -56,8 +58,7 @@ public class TagsActivity extends AppCompatActivity {
         tagListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                pressedTagId = tags.get(position).id;
-                pressedTagName = tags.get(position).name;
+                pressedTagData = tags.get(position);
                 TagRenameDialogFragment.newInstance(TagsActivity.this).show(getSupportFragmentManager(), "tagRenamer");
             }
         });
@@ -65,13 +66,13 @@ public class TagsActivity extends AppCompatActivity {
         tagListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                pressedTagId = tags.get(position).id;
+                pressedTagData = tags.get(position);
 
                 TagDeleteDialogFragment.newInstance(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        NotificationUtils.unregisterTagRecords(TagsActivity.this, pressedTagId);
-                        DatabaseHelper.getInstance(getApplicationContext()).deleteTag(pressedTagId);
+                        NotificationUtils.unregisterTagRecords(TagsActivity.this, pressedTagData.id);
+                        DatabaseHelper.getInstance(getApplicationContext()).deleteTag(pressedTagData.id);
                         refreshTags();
                         mySetResult(1);
                     }
@@ -91,7 +92,12 @@ public class TagsActivity extends AppCompatActivity {
         addTagButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseHelper.getInstance(getApplicationContext()).addTag(new TagData(0, tagNameEditText.getText().toString()));
+                DatabaseHelper.getInstance(getApplicationContext()).addTag(new TagData(
+                        0,
+                        tagNameEditText.getText().toString(),
+                        false,
+                        TagData.TimeMode.NO_TIMES)
+                );
                 tagNameEditText.setText("");
                 refreshTags();
                 mySetResult(1);
@@ -113,6 +119,9 @@ public class TagsActivity extends AppCompatActivity {
     public static class TagRenameDialogFragment extends DialogFragment {
         private TagsActivity parentActivity;
         private EditText tagRenameEditText;
+        private Spinner tagRenameTypeSpinner;
+        private int tagRenameTypeSpinnerPosition;
+        private CheckBox tagRenameIsChecklist;
 
         public static TagRenameDialogFragment newInstance(TagsActivity parentActivity) {
             TagRenameDialogFragment pickerFragment = new TagRenameDialogFragment();
@@ -128,16 +137,48 @@ public class TagsActivity extends AppCompatActivity {
             View view = inflater.inflate(R.layout.tag_rename, null);
 
             tagRenameEditText = (EditText) view.findViewById(R.id.tagRenameEditText);
-            tagRenameEditText.setText(parentActivity.pressedTagName);
+            tagRenameEditText.setText(parentActivity.pressedTagData.name);
+
+            tagRenameTypeSpinner = (Spinner) view.findViewById(R.id.tagRenameTypeSpinner);
+            tagRenameTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    tagRenameTypeSpinnerPosition = position;
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    tagRenameTypeSpinnerPosition = -1;
+                }
+            });
+            {
+                ArrayList<String> tagStrings = new ArrayList<>();
+
+                tagStrings.add("No times");
+                tagStrings.add("Due times only");
+                tagStrings.add("Notifications");
+
+                ArrayAdapter<String> tagStringsAdapter = new ArrayAdapter<>(parentActivity, android.R.layout.simple_spinner_item, tagStrings);
+                tagStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                tagRenameTypeSpinner.setAdapter(tagStringsAdapter);
+            }
+            tagRenameTypeSpinner.setSelection((int)TagData.TimeModeToLong(parentActivity.pressedTagData.timeMode));
+
+            tagRenameIsChecklist = (CheckBox) view.findViewById(R.id.tagRenameIsChecklist);
+            tagRenameIsChecklist.setChecked(parentActivity.pressedTagData.isChecklist);
 
             builder.setView(view)
-                    .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            TagData newTag = new TagData(parentActivity.pressedTagId, tagRenameEditText.getText().toString());
+                            TagData editTag = parentActivity.pressedTagData;
 
-                            NotificationUtils.unregisterTagRecords(parentActivity, parentActivity.pressedTagId);
-                            DatabaseHelper.getInstance(parentActivity.getApplicationContext()).updateTag(newTag);
-                            NotificationUtils.registerTagRecords(parentActivity, newTag);
+                            editTag.name = tagRenameEditText.getText().toString();
+                            editTag.timeMode = TagData.LongToTimeMode(tagRenameTypeSpinnerPosition);
+                            editTag.isChecklist = tagRenameIsChecklist.isChecked();
+
+                            NotificationUtils.unregisterTagRecords(parentActivity, parentActivity.pressedTagData.id);
+                            DatabaseHelper.getInstance(parentActivity.getApplicationContext()).updateTag(editTag);
+                            NotificationUtils.registerTagRecords(parentActivity, editTag);
 
                             parentActivity.refreshTags();
                             parentActivity.mySetResult(1);

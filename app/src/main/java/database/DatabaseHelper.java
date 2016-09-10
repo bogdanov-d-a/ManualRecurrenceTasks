@@ -10,8 +10,10 @@ import java.util.ArrayList;
 import data.RecordData;
 import data.TagData;
 
+// TODO: add QueryGen
+
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "Tasks.db";
 
     private static final String TAGS_TABLE = "tags";
@@ -21,6 +23,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static class TagsRows {
         public static final String NAME = "name";
+        public static final String IS_CHECKLIST = "is_checklist";
+        public static final String TIME_MODE = "time_mode";
     }
 
     private static class RecordsRows {
@@ -51,7 +55,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create table " + TAGS_TABLE + " (" +
                 ID_ROW + " integer primary key," +
-                TagsRows.NAME + " text);");
+                TagsRows.NAME + " text," +
+                TagsRows.IS_CHECKLIST + " integer," +
+                TagsRows.TIME_MODE + " integer);");
 
         db.execSQL("create table " + RECORDS_TABLE + " (" +
                 ID_ROW + " integer primary key," +
@@ -63,6 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // TODO: add upgrade code
     }
 
     private static long getLastInsertRowid(SQLiteDatabase db)
@@ -93,7 +100,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             {
                 result.add(new TagData(
                         cursor.getLong(cursor.getColumnIndexOrThrow(ID_ROW)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(TagsRows.NAME))
+                        cursor.getString(cursor.getColumnIndexOrThrow(TagsRows.NAME)),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(TagsRows.IS_CHECKLIST)) != 0,
+                        TagData.LongToTimeMode(cursor.getLong(cursor.getColumnIndexOrThrow(TagsRows.TIME_MODE)))
                 ));
             }
             while (cursor.moveToNext());
@@ -261,7 +270,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("update " + TAGS_TABLE + " set " +
-                TagsRows.NAME + "=" + escapeStr(data.name) +
+                TagsRows.NAME + "=" + escapeStr(data.name) + "," +
+                TagsRows.IS_CHECKLIST + "=" + escapeStr(Long.toString(data.isChecklist ? 1 : 0)) + "," +
+                TagsRows.TIME_MODE + "=" + escapeStr(Long.toString(TagData.TimeModeToLong(data.timeMode))) +
                 " where " + ID_ROW + "=" + escapeStr(Long.toString(data.id)) + ";");
         db.close();
     }
