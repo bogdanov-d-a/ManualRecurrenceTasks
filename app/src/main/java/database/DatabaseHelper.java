@@ -107,7 +107,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // TODO: add upgrade code
+        int curVersion = oldVersion;
+
+        while (curVersion != newVersion) {
+            switch (curVersion) {
+                case 1:
+                    db.execSQL("alter table " + TagData.getTableNameStatic() + " add column " + TagData.Rows.IS_CHECKLIST + " integer;");
+                    db.execSQL("alter table " + RecordData.getTableNameStatic() + " add column " + RecordData.Rows.IS_CHECKED + " integer;");
+                    break;
+
+                default:
+                    break;
+            }
+
+            ++curVersion;
+        }
     }
 
     private static long getLastInsertRowid(SQLiteDatabase db)
