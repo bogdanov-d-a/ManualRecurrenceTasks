@@ -23,20 +23,15 @@ import database.RecordData;
 
 public class RecordListAdapter extends BaseAdapter {
     private final MainActivity parentActivity;
+    private final ArrayList<RecordData> recordsList;
     private final boolean showCheckboxes;
     private final LayoutInflater mInflater;
-    private ArrayList<RecordData> recordsList = new ArrayList<>();
 
-    public RecordListAdapter(MainActivity parentActivity, boolean showCheckboxes) {
+    public RecordListAdapter(MainActivity parentActivity, ArrayList<RecordData> recordsList, boolean showCheckboxes) {
         this.parentActivity = parentActivity;
+        this.recordsList = recordsList;
         this.showCheckboxes = showCheckboxes;
         mInflater = LayoutInflater.from(parentActivity);
-    }
-
-    public void ResetList(ArrayList<RecordData> recordsList)
-    {
-        this.recordsList = recordsList;
-        notifyDataSetChanged();
     }
 
     @Override
@@ -59,11 +54,10 @@ public class RecordListAdapter extends BaseAdapter {
         final ViewHolder holder;
 
         if (convertView == null) {
-            if (showCheckboxes) {
-                convertView = mInflater.inflate(R.layout.record_checklist_item, null);
-            } else {
-                convertView = mInflater.inflate(R.layout.record_list_item, null);
-            }
+            convertView = mInflater.inflate(
+                    showCheckboxes ? R.layout.record_checklist_item : R.layout.record_list_item,
+                    null
+            );
 
             holder = new ViewHolder(
                     (LinearLayout) convertView.findViewById(R.id.textLinearLayout),

@@ -87,7 +87,7 @@ public class TagsActivity extends AppCompatActivity {
         tagNameEditText = (EditText) findViewById(R.id.tagNameEditText);
         assert tagNameEditText != null;
 
-        Button addTagButton = (Button) findViewById(R.id.addTagButton);
+        final Button addTagButton = (Button) findViewById(R.id.addTagButton);
         assert addTagButton != null;
         addTagButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,10 +118,7 @@ public class TagsActivity extends AppCompatActivity {
 
     public static class TagRenameDialogFragment extends DialogFragment {
         private TagsActivity parentActivity;
-        private EditText tagRenameEditText;
-        private Spinner tagRenameTypeSpinner;
         private int tagRenameTypeSpinnerPosition;
-        private CheckBox tagRenameIsChecklist;
 
         public static TagRenameDialogFragment newInstance(TagsActivity parentActivity) {
             TagRenameDialogFragment pickerFragment = new TagRenameDialogFragment();
@@ -136,10 +133,10 @@ public class TagsActivity extends AppCompatActivity {
             LayoutInflater inflater = getActivity().getLayoutInflater();
             View view = inflater.inflate(R.layout.tag_rename, null);
 
-            tagRenameEditText = (EditText) view.findViewById(R.id.tagRenameEditText);
+            final EditText tagRenameEditText = (EditText) view.findViewById(R.id.tagRenameEditText);
             tagRenameEditText.setText(parentActivity.pressedTagData.name);
 
-            tagRenameTypeSpinner = (Spinner) view.findViewById(R.id.tagRenameTypeSpinner);
+            final Spinner tagRenameTypeSpinner = (Spinner) view.findViewById(R.id.tagRenameTypeSpinner);
             tagRenameTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -164,7 +161,7 @@ public class TagsActivity extends AppCompatActivity {
             }
             tagRenameTypeSpinner.setSelection((int)TagData.TimeModeToLong(parentActivity.pressedTagData.timeMode));
 
-            tagRenameIsChecklist = (CheckBox) view.findViewById(R.id.tagRenameIsChecklist);
+            final CheckBox tagRenameIsChecklist = (CheckBox) view.findViewById(R.id.tagRenameIsChecklist);
             tagRenameIsChecklist.setChecked(parentActivity.pressedTagData.isChecklist);
 
             builder.setView(view)

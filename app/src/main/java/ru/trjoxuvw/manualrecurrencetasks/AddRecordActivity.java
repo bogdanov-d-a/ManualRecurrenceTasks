@@ -71,6 +71,17 @@ public class AddRecordActivity extends AppCompatActivity {
         return -1;
     }
 
+    private RecordData layoutDataToRecordData(long id) {
+        return new RecordData(
+                id,
+                tags.get(selectedTagPosition).id,
+                labelEditText.getText().toString(),
+                calendar.getTimeInMillis(),
+                notificationCheckBox.isChecked(),
+                checkedCheckBox.isChecked()
+        );
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,7 +99,7 @@ public class AddRecordActivity extends AppCompatActivity {
         assert notificationCheckBox != null;
         assert checkedCheckBox != null;
 
-        Spinner tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
+        final Spinner tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
         assert tagSpinner != null;
         tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -156,7 +167,7 @@ public class AddRecordActivity extends AppCompatActivity {
             }
         });
 
-        LinearLayout buttonPanel = (LinearLayout) findViewById(R.id.buttonPanel);
+        final LinearLayout buttonPanel = (LinearLayout) findViewById(R.id.buttonPanel);
         assert buttonPanel != null;
 
         if (savedInstanceState == null)
@@ -213,21 +224,13 @@ public class AddRecordActivity extends AppCompatActivity {
         switch (operation)
         {
             case OPERATION_ADD:
-                Button addButton = new Button(this);
+                final Button addButton = new Button(this);
                 addButton.setText("Add");
                 addButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        RecordData newRecord = new RecordData(
-                                0,
-                                tags.get(selectedTagPosition).id,
-                                labelEditText.getText().toString(),
-                                calendar.getTimeInMillis(),
-                                notificationCheckBox.isChecked(),
-                                checkedCheckBox.isChecked()
-                        );
+                        RecordData newRecord = layoutDataToRecordData(0);
                         newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).add(newRecord);
-
                         NotificationUtils.registerRecord(AddRecordActivity.this, newRecord, tags.get(selectedTagPosition).name);
 
                         setResult(1);
@@ -239,19 +242,12 @@ public class AddRecordActivity extends AppCompatActivity {
                 break;
 
             case OPERATION_EDIT:
-                Button updateButton = new Button(AddRecordActivity.this);
+                final Button updateButton = new Button(AddRecordActivity.this);
                 updateButton.setText("Update");
                 updateButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        RecordData editRecord = new RecordData(
-                                editRecordId,
-                                tags.get(selectedTagPosition).id,
-                                labelEditText.getText().toString(),
-                                calendar.getTimeInMillis(),
-                                notificationCheckBox.isChecked(),
-                                checkedCheckBox.isChecked()
-                        );
+                        RecordData editRecord = layoutDataToRecordData(editRecordId);
                         DatabaseHelper.getInstance(getApplicationContext()).update(editRecord);
 
                         NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecordId);
@@ -263,7 +259,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 });
                 buttonPanel.addView(updateButton);
 
-                Button deleteButton = new Button(AddRecordActivity.this);
+                final Button deleteButton = new Button(AddRecordActivity.this);
                 deleteButton.setText("Delete");
                 deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
@@ -284,7 +280,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 break;
         }
 
-        Button cancelButton = new Button(AddRecordActivity.this);
+        final Button cancelButton = new Button(AddRecordActivity.this);
         cancelButton.setText("Cancel");
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override

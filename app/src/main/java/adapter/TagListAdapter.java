@@ -54,8 +54,8 @@ public class TagListAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        final TagData task = (TagData) getItem(position);
-        holder.name.setText(task.name);
+        final TagData tag = (TagData) getItem(position);
+        holder.name.setText(tag.name);
 
         return convertView;
     }

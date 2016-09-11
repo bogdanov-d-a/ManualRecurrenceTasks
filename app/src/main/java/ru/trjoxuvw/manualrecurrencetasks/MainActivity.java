@@ -36,8 +36,6 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<TagData> tags;
     private int selectedTagPosition;
 
-    private ArrayList<RecordData> records;
-
     private void refreshTags()
     {
         tags = DatabaseHelper.getInstance(getApplicationContext()).getTags();
@@ -72,9 +70,8 @@ public class MainActivity extends AppCompatActivity {
             maxTime = calendar.getTimeInMillis();
         }
 
-        records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : tags.get(position - 1).id, maxTime, notificationOnlyCheckBox.isChecked());
-        recordListView.setAdapter(new RecordListAdapter(this, position == 0 ? true : tags.get(position - 1).isChecklist));
-        ((RecordListAdapter)recordListView.getAdapter()).ResetList(records);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : tags.get(position - 1).id, maxTime, notificationOnlyCheckBox.isChecked());
+        recordListView.setAdapter(new RecordListAdapter(this, records, position == 0 || tags.get(position - 1).isChecklist));
     }
 
     @Override
@@ -100,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button optionsButton = (Button) findViewById(R.id.optionsButton);
+        final Button optionsButton = (Button) findViewById(R.id.optionsButton);
         assert optionsButton != null;
         optionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button debugButton = (Button) findViewById(R.id.debugButton);
+        final Button debugButton = (Button) findViewById(R.id.debugButton);
         assert debugButton != null;
         debugButton.setOnClickListener(new View.OnClickListener() {
             @Override
