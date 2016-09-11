@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : tags.get(position - 1).id, maxTime, notificationOnlyCheckBox.isChecked());
+        recordListView.setAdapter(new RecordListAdapter(this, position == 0 ? true : tags.get(position - 1).isChecklist));
         ((RecordListAdapter)recordListView.getAdapter()).ResetList(records);
     }
 
@@ -165,16 +166,6 @@ public class MainActivity extends AppCompatActivity {
 
         recordListView = (ListView) findViewById(R.id.recordListView);
         assert recordListView != null;
-        recordListView.setAdapter(new RecordListAdapter(this));
-        recordListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(MainActivity.this, AddRecordActivity.class);
-                intent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_EDIT);
-                intent.putExtra(AddRecordActivity.EDIT_RECORD_ID, records.get(position).id);
-                startActivityForResult(intent, ADD_RECORD_REQUEST);
-            }
-        });
 
         refreshTags();
     }
