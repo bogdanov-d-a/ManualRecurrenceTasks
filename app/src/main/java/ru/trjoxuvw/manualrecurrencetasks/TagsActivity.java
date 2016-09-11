@@ -28,11 +28,11 @@ public class TagsActivity extends AppCompatActivity {
     private ListView tagListView;
     private EditText tagNameEditText;
 
+    private static final String TAG_INDEX_TAG = "TAG_INDEX_TAG";
     private static final String RESULT_CODE_TAG = "RESULT_CODE_TAG";
     private int resultCode;
 
     private ArrayList<TagData> tags;
-    private TagData pressedTagData;
 
     private void mySetResult(int code)
     {
@@ -58,26 +58,14 @@ public class TagsActivity extends AppCompatActivity {
         tagListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                pressedTagData = tags.get(position);
-                TagRenameDialogFragment.newInstance(TagsActivity.this).show(getSupportFragmentManager(), "tagRenamer");
+                TagRenameDialogFragment.newInstance(position).show(getSupportFragmentManager(), "tagRenamer");
             }
         });
 
         tagListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                pressedTagData = tags.get(position);
-
-                TagDeleteDialogFragment.newInstance(new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        NotificationUtils.unregisterTagRecords(TagsActivity.this, pressedTagData.id);
-                        DatabaseHelper.getInstance(getApplicationContext()).deleteTag(pressedTagData.id);
-                        refreshTags();
-                        mySetResult(1);
-                    }
-                }).show(getSupportFragmentManager(), "tagDeleter");
-
+                TagDeleteDialogFragment.newInstance(position).show(getSupportFragmentManager(), "tagDeleter");
                 return true;
             }
         });
@@ -117,24 +105,33 @@ public class TagsActivity extends AppCompatActivity {
     }
 
     public static class TagRenameDialogFragment extends DialogFragment {
-        private TagsActivity parentActivity;
         private int tagRenameTypeSpinnerPosition;
 
-        public static TagRenameDialogFragment newInstance(TagsActivity parentActivity) {
+        public static TagRenameDialogFragment newInstance(int tagIndex) {
             TagRenameDialogFragment pickerFragment = new TagRenameDialogFragment();
-            pickerFragment.parentActivity = parentActivity;
+
+            Bundle bundle = new Bundle();
+            bundle.putInt(TAG_INDEX_TAG, tagIndex);
+            pickerFragment.setArguments(bundle);
+
             return pickerFragment;
         }
 
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            LayoutInflater inflater = getActivity().getLayoutInflater();
+            super.onCreateDialog(savedInstanceState);
+
+            final Bundle bundle = getArguments();
+            final TagsActivity parent = (TagsActivity) getActivity();
+            final TagData pressedTagData = parent.tags.get(bundle.getInt(TAG_INDEX_TAG));
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(parent);
+            LayoutInflater inflater = parent.getLayoutInflater();
             View view = inflater.inflate(R.layout.tag_rename, null);
 
             final EditText tagRenameEditText = (EditText) view.findViewById(R.id.tagRenameEditText);
-            tagRenameEditText.setText(parentActivity.pressedTagData.name);
+            tagRenameEditText.setText(pressedTagData.name);
 
             final Spinner tagRenameTypeSpinner = (Spinner) view.findViewById(R.id.tagRenameTypeSpinner);
             tagRenameTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -155,28 +152,28 @@ public class TagsActivity extends AppCompatActivity {
                 tagStrings.add("Due times only");
                 tagStrings.add("Notifications");
 
-                ArrayAdapter<String> tagStringsAdapter = new ArrayAdapter<>(parentActivity, android.R.layout.simple_spinner_item, tagStrings);
+                ArrayAdapter<String> tagStringsAdapter = new ArrayAdapter<>(parent, android.R.layout.simple_spinner_item, tagStrings);
                 tagStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 tagRenameTypeSpinner.setAdapter(tagStringsAdapter);
             }
-            tagRenameTypeSpinner.setSelection((int)TagData.TimeModeToLong(parentActivity.pressedTagData.timeMode));
+            tagRenameTypeSpinner.setSelection((int)TagData.TimeModeToLong(pressedTagData.timeMode));
 
             final CheckBox tagRenameIsChecklist = (CheckBox) view.findViewById(R.id.tagRenameIsChecklist);
-            tagRenameIsChecklist.setChecked(parentActivity.pressedTagData.isChecklist);
+            tagRenameIsChecklist.setChecked(pressedTagData.isChecklist);
 
             builder.setView(view)
                     .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            parentActivity.pressedTagData.name = tagRenameEditText.getText().toString();
-                            parentActivity.pressedTagData.timeMode = TagData.LongToTimeMode(tagRenameTypeSpinnerPosition);
-                            parentActivity.pressedTagData.isChecklist = tagRenameIsChecklist.isChecked();
+                            pressedTagData.name = tagRenameEditText.getText().toString();
+                            pressedTagData.timeMode = TagData.LongToTimeMode(tagRenameTypeSpinnerPosition);
+                            pressedTagData.isChecklist = tagRenameIsChecklist.isChecked();
 
-                            NotificationUtils.unregisterTagRecords(parentActivity, parentActivity.pressedTagData.id);
-                            DatabaseHelper.getInstance(parentActivity.getApplicationContext()).update(parentActivity.pressedTagData);
-                            NotificationUtils.registerTagRecords(parentActivity, parentActivity.pressedTagData);
+                            NotificationUtils.unregisterTagRecords(parent, pressedTagData.id);
+                            DatabaseHelper.getInstance(parent.getApplicationContext()).update(pressedTagData);
+                            NotificationUtils.registerTagRecords(parent, pressedTagData);
 
-                            parentActivity.refreshTags();
-                            parentActivity.mySetResult(1);
+                            parent.refreshTags();
+                            parent.mySetResult(1);
                         }
                     })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -189,20 +186,35 @@ public class TagsActivity extends AppCompatActivity {
     }
 
     public static class TagDeleteDialogFragment extends DialogFragment {
-        private DialogInterface.OnClickListener onDeleteClickListener;
-
-        public static TagDeleteDialogFragment newInstance(DialogInterface.OnClickListener onDeleteClickListener) {
+        public static TagDeleteDialogFragment newInstance(int tagIndex) {
             TagDeleteDialogFragment pickerFragment = new TagDeleteDialogFragment();
-            pickerFragment.onDeleteClickListener = onDeleteClickListener;
+
+            Bundle bundle = new Bundle();
+            bundle.putInt(TAG_INDEX_TAG, tagIndex);
+            pickerFragment.setArguments(bundle);
+
             return pickerFragment;
         }
 
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage("Delete tag with all its records?")
-                    .setPositiveButton("Delete", onDeleteClickListener)
+            super.onCreateDialog(savedInstanceState);
+
+            final Bundle bundle = getArguments();
+            final TagsActivity parent = (TagsActivity) getActivity();
+            final TagData pressedTagData = parent.tags.get(bundle.getInt(TAG_INDEX_TAG));
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(parent);
+            builder.setMessage("Delete tag " + pressedTagData.name + " with all its records?")
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            NotificationUtils.unregisterTagRecords(parent, pressedTagData.id);
+                            DatabaseHelper.getInstance(parent.getApplicationContext()).deleteTag(pressedTagData.id);
+                            parent.refreshTags();
+                            parent.mySetResult(1);
+                        }
+                    })
                     .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             dismiss();

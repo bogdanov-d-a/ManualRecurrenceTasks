@@ -133,16 +133,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 DialogFragment newFragment = DatePickerFragment.newInstance(
                         calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DAY_OF_MONTH),
-                        new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                calendar.set(Calendar.YEAR, year);
-                                calendar.set(Calendar.MONTH, monthOfYear);
-                                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                                updateDateTimeText();
-                            }
-                        }
+                        calendar.get(Calendar.DAY_OF_MONTH)
                 );
                 newFragment.show(getSupportFragmentManager(), "datePicker");
             }
@@ -153,15 +144,7 @@ public class AddRecordActivity extends AppCompatActivity {
             public void onClick(View v) {
                 DialogFragment newFragment = TimePickerFragment.newInstance(
                         calendar.get(Calendar.HOUR_OF_DAY),
-                        calendar.get(Calendar.MINUTE),
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                calendar.set(Calendar.MINUTE, minute);
-                                updateDateTimeText();
-                            }
-                        }
+                        calendar.get(Calendar.MINUTE)
                 );
                 newFragment.show(getSupportFragmentManager(), "timePicker");
             }
@@ -310,11 +293,8 @@ public class AddRecordActivity extends AppCompatActivity {
     }
 
     public static class DatePickerFragment extends DialogFragment {
-        private DatePickerDialog.OnDateSetListener onDateSetListener;
-
-        public static DatePickerFragment newInstance(int year, int monthOfYear, int dayOfMonth, DatePickerDialog.OnDateSetListener onDateSetListener) {
+        public static DatePickerFragment newInstance(int year, int monthOfYear, int dayOfMonth) {
             DatePickerFragment pickerFragment = new DatePickerFragment();
-            pickerFragment.onDateSetListener = onDateSetListener;
 
             Bundle bundle = new Bundle();
             bundle.putInt(YEAR_TAG, year);
@@ -330,18 +310,30 @@ public class AddRecordActivity extends AppCompatActivity {
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             super.onCreateDialog(savedInstanceState);
 
-            Bundle bundle = getArguments();
-            return new DatePickerDialog(getActivity(), onDateSetListener,
-                    bundle.getInt(YEAR_TAG), bundle.getInt(MONTH_TAG), bundle.getInt(DAY_TAG));
+            final Bundle bundle = getArguments();
+            final AddRecordActivity parent = (AddRecordActivity) getActivity();
+
+            return new DatePickerDialog(
+                    parent,
+                    new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            parent.calendar.set(Calendar.YEAR, year);
+                            parent.calendar.set(Calendar.MONTH, monthOfYear);
+                            parent.calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                            parent.updateDateTimeText();
+                        }
+                    },
+                    bundle.getInt(YEAR_TAG),
+                    bundle.getInt(MONTH_TAG),
+                    bundle.getInt(DAY_TAG)
+            );
         }
     }
 
     public static class TimePickerFragment extends DialogFragment {
-        private TimePickerDialog.OnTimeSetListener onTimeSetListener;
-
-        public static TimePickerFragment newInstance(int hourOfDay, int minute, TimePickerDialog.OnTimeSetListener onTimeSetListener) {
+        public static TimePickerFragment newInstance(int hourOfDay, int minute) {
             TimePickerFragment pickerFragment = new TimePickerFragment();
-            pickerFragment.onTimeSetListener = onTimeSetListener;
 
             Bundle bundle = new Bundle();
             bundle.putInt(HOUR_TAG, hourOfDay);
@@ -356,9 +348,23 @@ public class AddRecordActivity extends AppCompatActivity {
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             super.onCreateDialog(savedInstanceState);
 
-            Bundle bundle = getArguments();
-            return new TimePickerDialog(getActivity(), onTimeSetListener,
-                    bundle.getInt(HOUR_TAG), bundle.getInt(MINUTE_TAG), DateFormat.is24HourFormat(getActivity()));
+            final Bundle bundle = getArguments();
+            final AddRecordActivity parent = (AddRecordActivity) getActivity();
+
+            return new TimePickerDialog(
+                    parent,
+                    new TimePickerDialog.OnTimeSetListener() {
+                        @Override
+                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                            parent.calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                            parent.calendar.set(Calendar.MINUTE, minute);
+                            parent.updateDateTimeText();
+                        }
+                    },
+                    bundle.getInt(HOUR_TAG),
+                    bundle.getInt(MINUTE_TAG),
+                    DateFormat.is24HourFormat(getActivity())
+            );
         }
     }
 }
