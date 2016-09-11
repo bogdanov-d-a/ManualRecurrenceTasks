@@ -6,10 +6,11 @@ public class TagData implements AbstractData {
     public enum TimeMode {
         NO_TIMES,
         DUE_TIMES_ONLY,
-        NOTIFICATIONS
+        NOTIFICATIONS,
+        FORCE_NOTIFICATIONS,
     }
 
-    public static TimeMode LongToTimeMode(long tm)
+    public static TimeMode longToTimeMode(long tm)
     {
         if (tm == 0)
             return TimeMode.NO_TIMES;
@@ -17,12 +18,14 @@ public class TagData implements AbstractData {
             return TimeMode.DUE_TIMES_ONLY;
         if (tm == 2)
             return TimeMode.NOTIFICATIONS;
+        if (tm == 3)
+            return TimeMode.FORCE_NOTIFICATIONS;
 
         // TODO: report error here
         return TimeMode.NO_TIMES;
     }
 
-    public static long TimeModeToLong(TimeMode tm)
+    public static long timeModeToLong(TimeMode tm)
     {
         switch (tm)
         {
@@ -32,10 +35,21 @@ public class TagData implements AbstractData {
                 return 1;
             case NOTIFICATIONS:
                 return 2;
+            case FORCE_NOTIFICATIONS:
+                return 3;
             default:
                 // TODO: report error here
                 return -1;
         }
+    }
+
+    public static ArrayList<String> getTagNames() {
+        ArrayList<String> result = new ArrayList<>();
+        result.add("No times");
+        result.add("Due times only");
+        result.add("Notifications");
+        result.add("Force notifications");
+        return result;
     }
 
     public long id;
@@ -55,7 +69,7 @@ public class TagData implements AbstractData {
         ArrayList<String> result = new ArrayList<>();
         result.add(name);
         result.add(Long.toString(isChecklist ? 1 : 0));
-        result.add(Long.toString(TagData.TimeModeToLong(timeMode)));
+        result.add(Long.toString(TagData.timeModeToLong(timeMode)));
         return result;
     }
 

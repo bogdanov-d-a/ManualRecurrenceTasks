@@ -146,17 +146,11 @@ public class TagsActivity extends AppCompatActivity {
                 }
             });
             {
-                ArrayList<String> tagStrings = new ArrayList<>();
-
-                tagStrings.add("No times");
-                tagStrings.add("Due times only");
-                tagStrings.add("Notifications");
-
-                ArrayAdapter<String> tagStringsAdapter = new ArrayAdapter<>(parent, android.R.layout.simple_spinner_item, tagStrings);
+                ArrayAdapter<String> tagStringsAdapter = new ArrayAdapter<>(parent, android.R.layout.simple_spinner_item, TagData.getTagNames());
                 tagStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 tagRenameTypeSpinner.setAdapter(tagStringsAdapter);
             }
-            tagRenameTypeSpinner.setSelection((int)TagData.TimeModeToLong(pressedTagData.timeMode));
+            tagRenameTypeSpinner.setSelection((int)TagData.timeModeToLong(pressedTagData.timeMode));
 
             final CheckBox tagRenameIsChecklist = (CheckBox) view.findViewById(R.id.tagRenameIsChecklist);
             tagRenameIsChecklist.setChecked(pressedTagData.isChecklist);
@@ -165,7 +159,7 @@ public class TagsActivity extends AppCompatActivity {
                     .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             pressedTagData.name = tagRenameEditText.getText().toString();
-                            pressedTagData.timeMode = TagData.LongToTimeMode(tagRenameTypeSpinnerPosition);
+                            pressedTagData.timeMode = TagData.longToTimeMode(tagRenameTypeSpinnerPosition);
                             pressedTagData.isChecklist = tagRenameIsChecklist.isChecked();
 
                             NotificationUtils.unregisterTagRecords(parent, pressedTagData.id);

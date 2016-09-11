@@ -140,7 +140,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getLong(cursor.getColumnIndexOrThrow(ID_ROW)),
                         cursor.getString(cursor.getColumnIndexOrThrow(TagData.Rows.NAME)),
                         cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_CHECKLIST)) != 0,
-                        TagData.LongToTimeMode(cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.TIME_MODE)))
+                        TagData.longToTimeMode(cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.TIME_MODE)))
                 ));
             }
             while (cursor.moveToNext());
