@@ -77,7 +77,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.TAG_ID)),
                 cursor.getString(cursor.getColumnIndexOrThrow(RecordData.Rows.LABEL)),
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.NEXT_APPEAR)),
-                cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.NOTIFICATION)) != 0
+                cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.NOTIFICATION)) != 0,
+                cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.IS_CHECKED)) != 0
         );
     }
 

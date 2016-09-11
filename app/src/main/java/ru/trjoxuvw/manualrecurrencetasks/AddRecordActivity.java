@@ -46,6 +46,7 @@ public class AddRecordActivity extends AppCompatActivity {
     private EditText labelEditText;
     private Button pickDateButton, pickTimeButton;
     private CheckBox notificationCheckBox;
+    private CheckBox checkedCheckBox;
 
     private ArrayList<TagData> tags;
     private int selectedTagPosition;
@@ -79,11 +80,13 @@ public class AddRecordActivity extends AppCompatActivity {
         pickDateButton = (Button) findViewById(R.id.pickDateButton);
         pickTimeButton = (Button) findViewById(R.id.pickTimeButton);
         notificationCheckBox = (CheckBox) findViewById(R.id.notificationCheckBox);
+        checkedCheckBox = (CheckBox) findViewById(R.id.checkedCheckBox);
 
         assert labelEditText != null;
         assert pickDateButton != null;
         assert pickTimeButton != null;
         assert notificationCheckBox != null;
+        assert checkedCheckBox != null;
 
         Spinner tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
         assert tagSpinner != null;
@@ -202,6 +205,7 @@ public class AddRecordActivity extends AppCompatActivity {
                     tagSpinner.setSelection(getTagPositionById(editRecord.tagId));
                     labelEditText.setText(editRecord.label);
                     notificationCheckBox.setChecked(editRecord.needNotice);
+                    checkedCheckBox.setChecked(editRecord.isChecked);
                     break;
             }
         }
@@ -219,7 +223,8 @@ public class AddRecordActivity extends AppCompatActivity {
                                 tags.get(selectedTagPosition).id,
                                 labelEditText.getText().toString(),
                                 calendar.getTimeInMillis(),
-                                notificationCheckBox.isChecked()
+                                notificationCheckBox.isChecked(),
+                                checkedCheckBox.isChecked()
                         );
                         newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).add(newRecord);
 
@@ -244,7 +249,8 @@ public class AddRecordActivity extends AppCompatActivity {
                                 tags.get(selectedTagPosition).id,
                                 labelEditText.getText().toString(),
                                 calendar.getTimeInMillis(),
-                                notificationCheckBox.isChecked()
+                                notificationCheckBox.isChecked(),
+                                checkedCheckBox.isChecked()
                         );
                         DatabaseHelper.getInstance(getApplicationContext()).update(editRecord);
 

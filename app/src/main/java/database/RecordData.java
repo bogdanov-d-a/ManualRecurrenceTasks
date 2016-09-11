@@ -8,13 +8,15 @@ public class RecordData implements AbstractData {
     public String label;
     public long nextAppear;
     public boolean needNotice;
+    public boolean isChecked;
 
-    public RecordData(long id, long tagId, String label, long nextAppear, boolean needNotice) {
+    public RecordData(long id, long tagId, String label, long nextAppear, boolean needNotice, boolean isChecked) {
         this.id = id;
         this.tagId = tagId;
         this.label = label;
         this.nextAppear = nextAppear;
         this.needNotice = needNotice;
+        this.isChecked = isChecked;
     }
 
     @Override
@@ -24,6 +26,7 @@ public class RecordData implements AbstractData {
         result.add(label);
         result.add(Long.toString(nextAppear));
         result.add(Long.toString(needNotice ? 1 : 0));
+        result.add(Long.toString(isChecked ? 1 : 0));
         return result;
     }
 
@@ -41,6 +44,7 @@ public class RecordData implements AbstractData {
         public static final String LABEL = "label";
         public static final String NEXT_APPEAR = "next_appear";
         public static final String NOTIFICATION = "notification";
+        public static final String IS_CHECKED = "is_checked";
     }
 
     protected static ArrayList<String> getTableRowsStatic() {
@@ -49,6 +53,7 @@ public class RecordData implements AbstractData {
         result.add(Rows.LABEL);
         result.add(Rows.NEXT_APPEAR);
         result.add(Rows.NOTIFICATION);
+        result.add(Rows.IS_CHECKED);
         return result;
     }
 
@@ -67,6 +72,7 @@ public class RecordData implements AbstractData {
         ArrayList<String> result = new ArrayList<>();
         result.add("integer references " + TagData.getTableNameStatic() + "(" + DatabaseHelper.ID_ROW + ")");
         result.add("text");
+        result.add("integer");
         result.add("integer");
         result.add("integer");
         return result;

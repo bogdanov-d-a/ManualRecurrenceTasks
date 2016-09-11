@@ -54,6 +54,12 @@
                 android:layout_height="wrap_content"
                 android:text="Notification"
                 android:id="@+id/notificationCheckBox" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Checked"
+                android:id="@+id/checkedCheckBox" />
         </LinearLayout>
     </ScrollView>
 
