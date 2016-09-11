@@ -21,11 +21,6 @@
         android:hint="Tag name"
         android:singleLine="true" />
 
-    <Spinner
-        android:id="@+id/tagRenameTypeSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <CheckBox
         android:id="@+id/tagRenameIsChecklist"
         android:layout_width="match_parent"

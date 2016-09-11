@@ -10,12 +10,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Spinner;
 
 import java.util.ArrayList;
 
@@ -83,9 +81,8 @@ public class TagsActivity extends AppCompatActivity {
                 DatabaseHelper.getInstance(getApplicationContext()).add(new TagData(
                         0,
                         tagNameEditText.getText().toString(),
-                        false,
-                        TagData.TimeMode.NO_TIMES)
-                );
+                        false
+                ));
                 tagNameEditText.setText("");
                 refreshTags();
                 mySetResult(1);
@@ -105,8 +102,6 @@ public class TagsActivity extends AppCompatActivity {
     }
 
     public static class TagRenameDialogFragment extends DialogFragment {
-        private int tagRenameTypeSpinnerPosition;
-
         public static TagRenameDialogFragment newInstance(int tagIndex) {
             TagRenameDialogFragment pickerFragment = new TagRenameDialogFragment();
 
@@ -133,25 +128,6 @@ public class TagsActivity extends AppCompatActivity {
             final EditText tagRenameEditText = (EditText) view.findViewById(R.id.tagRenameEditText);
             tagRenameEditText.setText(pressedTagData.name);
 
-            final Spinner tagRenameTypeSpinner = (Spinner) view.findViewById(R.id.tagRenameTypeSpinner);
-            tagRenameTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    tagRenameTypeSpinnerPosition = position;
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                    tagRenameTypeSpinnerPosition = -1;
-                }
-            });
-            {
-                ArrayAdapter<String> tagStringsAdapter = new ArrayAdapter<>(parent, android.R.layout.simple_spinner_item, TagData.getTagNames());
-                tagStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                tagRenameTypeSpinner.setAdapter(tagStringsAdapter);
-            }
-            tagRenameTypeSpinner.setSelection((int)TagData.timeModeToLong(pressedTagData.timeMode));
-
             final CheckBox tagRenameIsChecklist = (CheckBox) view.findViewById(R.id.tagRenameIsChecklist);
             tagRenameIsChecklist.setChecked(pressedTagData.isChecklist);
 
@@ -159,7 +135,6 @@ public class TagsActivity extends AppCompatActivity {
                     .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             pressedTagData.name = tagRenameEditText.getText().toString();
-                            pressedTagData.timeMode = TagData.longToTimeMode(tagRenameTypeSpinnerPosition);
                             pressedTagData.isChecklist = tagRenameIsChecklist.isChecked();
 
                             NotificationUtils.unregisterTagRecords(parent, pressedTagData.id);
