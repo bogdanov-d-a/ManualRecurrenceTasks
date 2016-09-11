@@ -10,7 +10,9 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import database.AbstractData;
 import database.DatabaseHelper;
+import database.TagData;
 import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
 import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
 import ru.trjoxuvw.manualrecurrencetasks.R;
@@ -20,15 +22,18 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import database.RecordData;
+import utils.Utils;
 
 public class RecordListAdapter extends BaseAdapter {
     private final MainActivity parentActivity;
     private final ArrayList<RecordData> recordsList;
+    private final ArrayList<TagData> tagsList;
     private final boolean showCheckboxes;
     private final LayoutInflater mInflater;
 
-    public RecordListAdapter(MainActivity parentActivity, ArrayList<RecordData> recordsList, boolean showCheckboxes) {
+    public RecordListAdapter(MainActivity parentActivity, ArrayList<TagData> tagsList, ArrayList<RecordData> recordsList, boolean showCheckboxes) {
         this.parentActivity = parentActivity;
+        this.tagsList = tagsList;
         this.recordsList = recordsList;
         this.showCheckboxes = showCheckboxes;
         mInflater = LayoutInflater.from(parentActivity);
@@ -90,14 +95,18 @@ public class RecordListAdapter extends BaseAdapter {
         );
 
         if (holder.checkBox != null) {
-            holder.checkBox.setChecked(record.isChecked);
-            holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    record.isChecked = isChecked;
-                    DatabaseHelper.getInstance(parentActivity).update(record);
-                }
-            });
+            if (Utils.recordCanBeChecked(tagsList, record.tagId)) {
+                holder.checkBox.setChecked(record.isChecked);
+                holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        record.isChecked = isChecked;
+                        DatabaseHelper.getInstance(parentActivity).update(record);
+                    }
+                });
+            } else {
+                holder.checkBox.setEnabled(false);
+            }
         }
 
         return convertView;

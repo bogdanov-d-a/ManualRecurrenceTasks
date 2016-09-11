@@ -24,10 +24,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import database.AbstractData;
 import database.RecordData;
 import database.TagData;
 import database.DatabaseHelper;
 import notification.NotificationUtils;
+import utils.Utils;
 
 public class AddRecordActivity extends AppCompatActivity {
     private static final String YEAR_TAG = "year";
@@ -50,6 +52,7 @@ public class AddRecordActivity extends AppCompatActivity {
 
     private ArrayList<TagData> tags;
     private int selectedTagPosition;
+    private boolean useCheckbox;
 
     private Calendar calendar;
     private int operation;
@@ -62,13 +65,10 @@ public class AddRecordActivity extends AppCompatActivity {
         pickTimeButton.setText(SimpleDateFormat.getTimeInstance().format(date));
     }
 
-    private int getTagPositionById(long id) {
-        for (int pos = 0; pos < tags.size(); ++pos)
-        {
-            if (tags.get(pos).id == id)
-                return pos;
-        }
-        return -1;
+    private void switchTag(int position) {
+        selectedTagPosition = position;
+        useCheckbox = tags.get(position).isChecklist;
+        checkedCheckBox.setEnabled(useCheckbox);
     }
 
     private RecordData layoutDataToRecordData(long id) {
@@ -78,7 +78,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 labelEditText.getText().toString(),
                 calendar.getTimeInMillis(),
                 notificationCheckBox.isChecked(),
-                checkedCheckBox.isChecked()
+                useCheckbox && checkedCheckBox.isChecked()
         );
     }
 
@@ -104,12 +104,12 @@ public class AddRecordActivity extends AppCompatActivity {
         tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedTagPosition = position;
+                switchTag(position);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                selectedTagPosition = -1;
+                switchTag(0);
             }
         });
 
@@ -196,7 +196,19 @@ public class AddRecordActivity extends AppCompatActivity {
                     break;
 
                 case OPERATION_EDIT:
-                    tagSpinner.setSelection(getTagPositionById(editRecord.tagId));
+                    tagSpinner.setSelection(Utils.getPositionById(
+                        new Utils.AbstractDataSource() {
+                            @Override
+                            public int size() {
+                                return tags.size();
+                            }
+                            @Override
+                            public AbstractData get(int pos) {
+                                return tags.get(pos);
+                            }
+                        },
+                        editRecord.tagId
+                    ));
                     labelEditText.setText(editRecord.label);
                     notificationCheckBox.setChecked(editRecord.needNotice);
                     checkedCheckBox.setChecked(editRecord.isChecked);

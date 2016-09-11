@@ -21,6 +21,7 @@ import adapter.TagListAdapter;
 import database.TagData;
 import database.DatabaseHelper;
 import notification.NotificationUtils;
+import utils.Utils;
 
 public class TagsActivity extends AppCompatActivity {
     private ListView tagListView;
@@ -130,6 +131,7 @@ public class TagsActivity extends AppCompatActivity {
 
             final CheckBox tagRenameIsChecklist = (CheckBox) view.findViewById(R.id.tagRenameIsChecklist);
             tagRenameIsChecklist.setChecked(pressedTagData.isChecklist);
+            tagRenameIsChecklist.setEnabled(!Utils.tagHasCheckedRecords(parent.getApplicationContext(), pressedTagData.id));
 
             builder.setView(view)
                     .setPositiveButton("Edit", new DialogInterface.OnClickListener() {

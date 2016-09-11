@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ArrayList<RecordData> records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : tags.get(position - 1).id, maxTime, notificationOnlyCheckBox.isChecked());
-        recordListView.setAdapter(new RecordListAdapter(this, records, position == 0 || tags.get(position - 1).isChecklist));
+        recordListView.setAdapter(new RecordListAdapter(this, tags, records, position == 0 || tags.get(position - 1).isChecklist));
     }
 
     @Override
