@@ -10,7 +10,6 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import database.AbstractData;
 import database.DatabaseHelper;
 import database.TagData;
 import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
@@ -54,25 +53,34 @@ public class RecordListAdapter extends BaseAdapter {
         return position;
     }
 
+    private View createView() {
+        View convertView = mInflater.inflate(
+                showCheckboxes ? R.layout.record_checklist_item : R.layout.record_list_item,
+                null
+        );
+
+        ViewHolder holder = new ViewHolder(
+                (LinearLayout) convertView.findViewById(R.id.textLinearLayout),
+                (TextView) convertView.findViewById(R.id.label),
+                (TextView) convertView.findViewById(R.id.nextAppear),
+                showCheckboxes ? (CheckBox) convertView.findViewById(R.id.checkBox) : null
+        );
+
+        convertView.setTag(holder);
+
+        return convertView;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final ViewHolder holder;
+        if (convertView == null || !(convertView.getTag() instanceof ViewHolder)) {
+            convertView = createView();
+        }
 
-        if (convertView == null) {
-            convertView = mInflater.inflate(
-                    showCheckboxes ? R.layout.record_checklist_item : R.layout.record_list_item,
-                    null
-            );
+        ViewHolder holder = (ViewHolder) convertView.getTag();
 
-            holder = new ViewHolder(
-                    (LinearLayout) convertView.findViewById(R.id.textLinearLayout),
-                    (TextView) convertView.findViewById(R.id.label),
-                    (TextView) convertView.findViewById(R.id.nextAppear),
-                    showCheckboxes ? (CheckBox) convertView.findViewById(R.id.checkBox) : null
-            );
-
-            convertView.setTag(holder);
-        } else {
+        if ((holder.checkBox != null) != showCheckboxes) {
+            convertView = createView();
             holder = (ViewHolder) convertView.getTag();
         }
 
@@ -95,8 +103,14 @@ public class RecordListAdapter extends BaseAdapter {
         );
 
         if (holder.checkBox != null) {
-            if (Utils.recordCanBeChecked(tagsList, record.tagId)) {
-                holder.checkBox.setChecked(record.isChecked);
+            holder.checkBox.setOnCheckedChangeListener(null);
+
+            final boolean canBeChecked = Utils.recordCanBeChecked(tagsList, record.tagId);
+
+            holder.checkBox.setEnabled(canBeChecked);
+            holder.checkBox.setChecked(record.isChecked);
+
+            if (canBeChecked) {
                 holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -104,8 +118,6 @@ public class RecordListAdapter extends BaseAdapter {
                         DatabaseHelper.getInstance(parentActivity).update(record);
                     }
                 });
-            } else {
-                holder.checkBox.setEnabled(false);
             }
         }
 
