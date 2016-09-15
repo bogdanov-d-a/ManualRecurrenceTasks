@@ -115,6 +115,7 @@ public class RecordListAdapter extends BaseAdapter {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         record.isChecked = isChecked;
+                        // TODO: tag inbox state may change here
                         DatabaseHelper.getInstance(parentActivity).update(record);
                     }
                 });

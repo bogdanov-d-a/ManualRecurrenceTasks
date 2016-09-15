@@ -16,6 +16,7 @@ import database.RecordData;
 import database.TagData;
 import database.DatabaseHelper;
 import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
+import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
 
 public class NotificationUtils {
     public static void show(Context context, String tagName, String recordLabel, long recordRowid)
@@ -50,11 +51,50 @@ public class NotificationUtils {
         mNotificationManager.notify((int)recordRowid, mBuilder.build());
     }
 
+    public static void showInbox(Context context, TagData tag, long recordCount)
+    {
+        int uid = -1 * (int)tag.id;
+        String fullText = tag.name + " has " + recordCount + " pending records in it.";
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(android.R.drawable.ic_menu_info_details)
+                        .setContentTitle(recordCount + " records in " + tag.name)
+                        .setContentText(fullText)
+                        .setPriority(NotificationCompat.PRIORITY_LOW)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(fullText))
+                        .setOngoing(true);
+
+        Intent resultIntent = new Intent(context, MainActivity.class);
+        // TODO: switch to needed tag here
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        uid,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+        mBuilder.setContentIntent(resultPendingIntent);
+
+        NotificationManager mNotificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify((int)uid, mBuilder.build());
+    }
+
     public static void hide(Context context, long recordRowid)
     {
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel((int)recordRowid);
+    }
+
+    public static void hideInbox(Context context, long tagRowid)
+    {
+        int uid = -1 * (int)tagRowid;
+        hide(context, uid);
     }
 
     private static PendingIntent createAlarmIntent(Context context, long recordRowid)
@@ -96,8 +136,10 @@ public class NotificationUtils {
         hide(context, recordRowid);
     }
 
-    public static void registerTagRecords(Context context, TagData tag)
+    public static void registerTagData(Context context, TagData tag)
     {
+        registerTag(context, tag);
+
         ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE, false);
         for (RecordData record : records)
         {
@@ -105,30 +147,48 @@ public class NotificationUtils {
         }
     }
 
-    public static void registerAllRecords(Context context)
+    public static void registerAllData(Context context)
     {
         ArrayList<TagData> tags = DatabaseHelper.getInstance(context).getTags();
         for (TagData tag : tags)
         {
-            registerTagRecords(context, tag);
+            registerTagData(context, tag);
         }
     }
 
-    public static void unregisterTagRecords(Context context, long tagId)
+    public static void unregisterTagData(Context context, TagData tag)
     {
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tagId, Long.MIN_VALUE, false);
+        unregisterTag(context, tag);
+
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE, false);
         for (RecordData record : records)
         {
             unregisterRecord(context, record.id);
         }
     }
 
-    public static void unregisterAllRecords(Context context)
+    public static void unregisterAllData(Context context)
     {
         ArrayList<TagData> tags = DatabaseHelper.getInstance(context).getTags();
         for (TagData tag : tags)
         {
-            unregisterTagRecords(context, tag.id);
+            unregisterTagData(context, tag);
         }
+    }
+
+    public static void registerTag(Context context, TagData tag) {
+        if (tag.isInbox) {
+            ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE, false);
+            // TODO: count checked records only
+            if (records.size() > 0) {
+                showInbox(context, tag, records.size());
+            } else {
+                hideInbox(context, tag.id);
+            }
+        }
+    }
+
+    public static void unregisterTag(Context context, TagData tag) {
+        hideInbox(context, tag.id);
     }
 }

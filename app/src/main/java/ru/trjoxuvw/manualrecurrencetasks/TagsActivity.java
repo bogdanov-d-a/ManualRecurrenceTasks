@@ -144,9 +144,9 @@ public class TagsActivity extends AppCompatActivity {
                             pressedTagData.isChecklist = tagRenameIsChecklist.isChecked();
                             pressedTagData.isInbox = tagRenameIsInbox.isChecked();
 
-                            NotificationUtils.unregisterTagRecords(parent, pressedTagData.id);
+                            NotificationUtils.unregisterTagData(parent, pressedTagData);
                             DatabaseHelper.getInstance(parent.getApplicationContext()).update(pressedTagData);
-                            NotificationUtils.registerTagRecords(parent, pressedTagData);
+                            NotificationUtils.registerTagData(parent, pressedTagData);
 
                             parent.refreshTags();
                             parent.mySetResult(1);
@@ -185,7 +185,7 @@ public class TagsActivity extends AppCompatActivity {
             builder.setMessage("Delete tag " + pressedTagData.name + " with all its records?")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            NotificationUtils.unregisterTagRecords(parent, pressedTagData.id);
+                            NotificationUtils.unregisterTagData(parent, pressedTagData);
                             DatabaseHelper.getInstance(parent.getApplicationContext()).deleteTag(pressedTagData.id);
                             parent.refreshTags();
                             parent.mySetResult(1);

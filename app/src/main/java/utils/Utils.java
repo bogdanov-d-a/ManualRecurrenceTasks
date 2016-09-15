@@ -24,8 +24,8 @@ public class Utils {
         return -1;
     }
 
-    public static boolean recordCanBeChecked(final ArrayList<TagData> tags, long recordTagId) {
-        TagData tagData = tags.get(Utils.getPositionById(
+    public static int getPositionById(final ArrayList<TagData> tags, long id) {
+        return Utils.getPositionById(
                 new Utils.AbstractDataSource() {
                     @Override
                     public int size() {
@@ -36,9 +36,12 @@ public class Utils {
                         return tags.get(pos);
                     }
                 },
-                recordTagId
-        ));
-        return tagData.isChecklist;
+                id
+        );
+    }
+
+    public static boolean recordCanBeChecked(final ArrayList<TagData> tags, long recordTagId) {
+        return tags.get(getPositionById(tags, recordTagId)).isChecklist;
     }
 
     public static boolean tagHasCheckedRecords(Context context, long tagId) {

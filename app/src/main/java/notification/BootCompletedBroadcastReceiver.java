@@ -7,6 +7,6 @@ import android.content.Intent;
 public class BootCompletedBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        NotificationUtils.registerAllRecords(context);
+        NotificationUtils.registerAllData(context);
     }
 }

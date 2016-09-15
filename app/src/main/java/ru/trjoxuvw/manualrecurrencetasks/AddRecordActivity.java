@@ -166,9 +166,11 @@ public class AddRecordActivity extends AppCompatActivity {
                 editRecordId = savedInstanceState.getLong(EDIT_RECORD_ID);
         }
 
-        RecordData editRecord = null;
+        final RecordData editRecord;
         if (savedInstanceState == null && operation == OPERATION_EDIT)
             editRecord = DatabaseHelper.getInstance(getApplicationContext()).getRecord(editRecordId);
+        else
+            editRecord = null;
 
         calendar = Calendar.getInstance();
         calendar.set(Calendar.SECOND, 0);
@@ -196,19 +198,7 @@ public class AddRecordActivity extends AppCompatActivity {
                     break;
 
                 case OPERATION_EDIT:
-                    tagSpinner.setSelection(Utils.getPositionById(
-                        new Utils.AbstractDataSource() {
-                            @Override
-                            public int size() {
-                                return tags.size();
-                            }
-                            @Override
-                            public AbstractData get(int pos) {
-                                return tags.get(pos);
-                            }
-                        },
-                        editRecord.tagId
-                    ));
+                    tagSpinner.setSelection(Utils.getPositionById(tags, editRecord.tagId));
                     labelEditText.setText(editRecord.label);
                     notificationCheckBox.setChecked(editRecord.needNotice);
                     checkedCheckBox.setChecked(editRecord.isChecked);
@@ -224,9 +214,13 @@ public class AddRecordActivity extends AppCompatActivity {
                 addButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+
                         RecordData newRecord = layoutDataToRecordData(0);
                         newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).add(newRecord);
                         NotificationUtils.registerRecord(AddRecordActivity.this, newRecord, tags.get(selectedTagPosition).name);
+
+                        NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
 
                         setResult(1);
                         finish();
@@ -242,11 +236,19 @@ public class AddRecordActivity extends AppCompatActivity {
                 updateButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        RecordData editRecord = layoutDataToRecordData(editRecordId);
-                        DatabaseHelper.getInstance(getApplicationContext()).update(editRecord);
+                        TagData oldTag = tags.get(Utils.getPositionById(tags, editRecord.tagId));
+
+                        RecordData newEditRecord = layoutDataToRecordData(editRecordId);
+                        DatabaseHelper.getInstance(getApplicationContext()).update(newEditRecord);
+
+                        NotificationUtils.unregisterTag(AddRecordActivity.this, oldTag);
+                        NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
 
                         NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecordId);
-                        NotificationUtils.registerRecord(AddRecordActivity.this, editRecord, tags.get(selectedTagPosition).name);
+                        NotificationUtils.registerRecord(AddRecordActivity.this, newEditRecord, tags.get(selectedTagPosition).name);
+
+                        NotificationUtils.registerTag(AddRecordActivity.this, oldTag);
+                        NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
 
                         setResult(1);
                         finish();
@@ -259,8 +261,12 @@ public class AddRecordActivity extends AppCompatActivity {
                 deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
+                        NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+
                         DatabaseHelper.getInstance(getApplicationContext()).deleteRecord(editRecordId);
                         NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecordId);
+
+                        NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
 
                         setResult(1);
                         finish();
