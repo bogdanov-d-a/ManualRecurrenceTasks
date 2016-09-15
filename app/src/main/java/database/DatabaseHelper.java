@@ -220,6 +220,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
+    public long getUndoneTasksCount(TagData tag) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select count(" + ID_ROW + ") from " + RecordData.getTableNameStatic() + " where (" + RecordData.Rows.TAG_ID + "='" + tag.id + "') and (" + RecordData.Rows.IS_CHECKED + "='0');", null);
+
+        cursor.moveToFirst();
+        long result = cursor.getLong(0);
+
+        cursor.close();
+        db.close();
+        return result;
+    }
+
     public long add(AbstractData data)
     {
         SQLiteDatabase db = getWritableDatabase();

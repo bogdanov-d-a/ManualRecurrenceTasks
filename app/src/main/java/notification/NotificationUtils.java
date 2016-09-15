@@ -178,10 +178,9 @@ public class NotificationUtils {
 
     public static void registerTag(Context context, TagData tag) {
         if (tag.isInbox) {
-            ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE, false);
-            // TODO: count checked records only
-            if (records.size() > 0) {
-                showInbox(context, tag, records.size());
+            long count = DatabaseHelper.getInstance(context).getUndoneTasksCount(tag);
+            if (count > 0) {
+                showInbox(context, tag, count);
             } else {
                 hideInbox(context, tag.id);
             }

@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import database.DatabaseHelper;
 import database.TagData;
+import notification.NotificationUtils;
 import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
 import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
 import ru.trjoxuvw.manualrecurrencetasks.R;
@@ -114,9 +115,13 @@ public class RecordListAdapter extends BaseAdapter {
                 holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        TagData tag = tagsList.get(Utils.getPositionById(tagsList, record.tagId));
+                        NotificationUtils.unregisterTag(parentActivity, tag);
+
                         record.isChecked = isChecked;
-                        // TODO: tag inbox state may change here
                         DatabaseHelper.getInstance(parentActivity).update(record);
+
+                        NotificationUtils.registerTag(parentActivity, tag);
                     }
                 });
             }
