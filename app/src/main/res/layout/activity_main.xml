@@ -28,7 +28,6 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text="Active only"
-            android:checked="true"
             android:id="@+id/activeOnlyCheckBox" />
 
         <CheckBox

@@ -19,11 +19,14 @@ import adapter.RecordListAdapter;
 import database.RecordData;
 import database.TagData;
 import database.DatabaseHelper;
+import utils.Utils;
 
 // TODO: lock database once for operation series
 // TODO: notify time countdown + show day of week
 
 public class MainActivity extends AppCompatActivity {
+    public static final String TAG_ID_TAG = "TAG_ID_TAG";
+
     public static final int ADD_RECORD_REQUEST = 0;
     public static final int OPTIONS_REQUEST = 1;
 
@@ -165,6 +168,15 @@ public class MainActivity extends AppCompatActivity {
         assert recordListView != null;
 
         refreshTags();
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            long tagId = getIntent().getExtras().getLong(TAG_ID_TAG, -1);
+            getIntent().getExtras().remove(TAG_ID_TAG);
+            if (tagId != -1) {
+                tagSpinner.setSelection(Utils.getPositionById(tags, tagId) + 1);
+            }
+        }
     }
 
     @Override

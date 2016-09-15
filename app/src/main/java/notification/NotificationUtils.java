@@ -66,7 +66,7 @@ public class NotificationUtils {
                         .setOngoing(true);
 
         Intent resultIntent = new Intent(context, MainActivity.class);
-        // TODO: switch to needed tag here
+        resultIntent.putExtra(MainActivity.TAG_ID_TAG, tag.id);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addParentStack(MainActivity.class);
