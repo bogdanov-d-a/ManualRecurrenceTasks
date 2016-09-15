@@ -119,7 +119,7 @@ public class AddRecordActivity extends AppCompatActivity {
             ArrayList<String> tagStrings = new ArrayList<>();
             for (TagData tag : tags)
             {
-                tagStrings.add(tag.name);
+                tagStrings.add(tag.getLabel());
             }
 
             ArrayAdapter<String> tagStringsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tagStrings);

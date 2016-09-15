@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         tagStrings.add("All tags");
         for (TagData tag : tags)
         {
-            tagStrings.add(tag.name);
+            tagStrings.add(tag.getLabel());
         }
 
         ArrayAdapter<String> tagStringsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tagStrings);

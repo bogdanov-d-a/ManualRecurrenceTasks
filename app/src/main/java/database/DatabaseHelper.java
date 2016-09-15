@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "Tasks.db";
 
     protected static final String ID_ROW = "id";
@@ -116,6 +116,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     db.execSQL("alter table " + RecordData.getTableNameStatic() + " add column " + RecordData.Rows.IS_CHECKED + " integer;");
                     break;
 
+                case 2:
+                    // TODO: upgrade db
+                    break;
+
                 default:
                     break;
             }
@@ -153,7 +157,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 result.add(new TagData(
                         cursor.getLong(cursor.getColumnIndexOrThrow(ID_ROW)),
                         cursor.getString(cursor.getColumnIndexOrThrow(TagData.Rows.NAME)),
-                        cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_CHECKLIST)) != 0
+                        cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_CHECKLIST)) != 0,
+                        cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_INBOX)) != 0
                 ));
             }
             while (cursor.moveToNext());
