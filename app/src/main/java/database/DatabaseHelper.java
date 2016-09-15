@@ -117,7 +117,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     break;
 
                 case 2:
-                    // TODO: upgrade db
+                    db.execSQL("alter table " + TagData.getTableNameStatic() + " add column " + TagData.Rows.IS_INBOX + " integer;");
                     break;
 
                 default:
