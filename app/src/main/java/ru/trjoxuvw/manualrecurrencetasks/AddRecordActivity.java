@@ -261,12 +261,14 @@ public class AddRecordActivity extends AppCompatActivity {
                 deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+                        TagData oldTag = tags.get(Utils.getPositionById(tags, editRecord.tagId));
+
+                        NotificationUtils.unregisterTag(AddRecordActivity.this, oldTag);
 
                         DatabaseHelper.getInstance(getApplicationContext()).deleteRecord(editRecordId);
                         NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecordId);
 
-                        NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+                        NotificationUtils.registerTag(AddRecordActivity.this, oldTag);
 
                         setResult(1);
                         finish();
