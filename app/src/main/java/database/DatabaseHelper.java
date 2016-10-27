@@ -120,7 +120,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     break;
 
                 case 3:
-                    // TODO: upgrade db
+                    db.execSQL("alter table " + TagData.getTableNameStatic() + " add column " + TagData.Rows.IS_NOTIFICATION + " integer;");
+
+                    db.execSQL("alter table " + RecordData.getTableNameStatic() + " rename to " + RecordData.getTableNameStatic() + "_old;");
+                    db.execSQL(createGen(RecordData.getTableNameStatic(), RecordData.getTableRowsStatic(), RecordData.getTableRowsTypes()));
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("insert into " + RecordData.getTableNameStatic() + " select ");
+
+                        sb.append(ID_ROW);
+
+                        ArrayList<String> rows = RecordData.getTableRowsStatic();
+                        for (int i = 0; i < rows.size(); ++i)
+                        {
+                            sb.append(",");
+                            sb.append(rows.get(i));
+                        }
+
+                        sb.append(" from " + RecordData.getTableNameStatic() + "_old;");
+                        db.execSQL(sb.toString());
+                    }
+                    db.execSQL("drop table " + RecordData.getTableNameStatic() + "_old;");
+
                     break;
 
                 default:
