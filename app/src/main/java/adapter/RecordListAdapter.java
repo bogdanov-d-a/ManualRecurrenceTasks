@@ -98,10 +98,7 @@ public class RecordListAdapter extends BaseAdapter {
         });
 
         holder.label.setText(record.label);
-        holder.nextAppear.setText(
-                SimpleDateFormat.getDateTimeInstance().format(new Date(record.nextAppear)) +
-                (record.needNotice ? " (notification)" : "")
-        );
+        holder.nextAppear.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(record.nextAppear)));
 
         if (holder.checkBox != null) {
             holder.checkBox.setOnCheckedChangeListener(null);

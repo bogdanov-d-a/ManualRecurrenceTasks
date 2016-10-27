@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
 
     private Spinner tagSpinner;
     private CheckBox activeOnlyCheckBox;
-    private CheckBox notificationOnlyCheckBox;
     private ListView recordListView;
     private Button addRecordButton;
 
@@ -73,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             maxTime = calendar.getTimeInMillis();
         }
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : tags.get(position - 1).id, maxTime, notificationOnlyCheckBox.isChecked());
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : tags.get(position - 1).id, maxTime);
         recordListView.setAdapter(new RecordListAdapter(this, tags, records, position == 0 || tags.get(position - 1).isChecklist));
     }
 
@@ -149,15 +148,6 @@ public class MainActivity extends AppCompatActivity {
         activeOnlyCheckBox = (CheckBox) findViewById(R.id.activeOnlyCheckBox);
         assert activeOnlyCheckBox != null;
         activeOnlyCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                refreshRecords(selectedTagPosition);
-            }
-        });
-
-        notificationOnlyCheckBox = (CheckBox) findViewById(R.id.notificationOnlyCheckBox);
-        assert notificationOnlyCheckBox != null;
-        notificationOnlyCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 refreshRecords(selectedTagPosition);

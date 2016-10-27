@@ -47,7 +47,6 @@ public class AddRecordActivity extends AppCompatActivity {
 
     private EditText labelEditText;
     private Button pickDateButton, pickTimeButton;
-    private CheckBox notificationCheckBox;
     private CheckBox checkedCheckBox;
 
     private ArrayList<TagData> tags;
@@ -77,7 +76,6 @@ public class AddRecordActivity extends AppCompatActivity {
                 tags.get(selectedTagPosition).id,
                 labelEditText.getText().toString(),
                 calendar.getTimeInMillis(),
-                notificationCheckBox.isChecked(),
                 useCheckbox && checkedCheckBox.isChecked()
         );
     }
@@ -90,13 +88,11 @@ public class AddRecordActivity extends AppCompatActivity {
         labelEditText = (EditText) findViewById(R.id.labelEditText);
         pickDateButton = (Button) findViewById(R.id.pickDateButton);
         pickTimeButton = (Button) findViewById(R.id.pickTimeButton);
-        notificationCheckBox = (CheckBox) findViewById(R.id.notificationCheckBox);
         checkedCheckBox = (CheckBox) findViewById(R.id.checkedCheckBox);
 
         assert labelEditText != null;
         assert pickDateButton != null;
         assert pickTimeButton != null;
-        assert notificationCheckBox != null;
         assert checkedCheckBox != null;
 
         final Spinner tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
@@ -200,7 +196,6 @@ public class AddRecordActivity extends AppCompatActivity {
                 case OPERATION_EDIT:
                     tagSpinner.setSelection(Utils.getPositionById(tags, editRecord.tagId));
                     labelEditText.setText(editRecord.label);
-                    notificationCheckBox.setChecked(editRecord.needNotice);
                     checkedCheckBox.setChecked(editRecord.isChecked);
                     break;
             }
@@ -218,7 +213,7 @@ public class AddRecordActivity extends AppCompatActivity {
 
                         RecordData newRecord = layoutDataToRecordData(0);
                         newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).add(newRecord);
-                        NotificationUtils.registerRecord(AddRecordActivity.this, newRecord, tags.get(selectedTagPosition).name);
+                        NotificationUtils.registerRecord(AddRecordActivity.this, tags.get(selectedTagPosition), newRecord);
 
                         NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
 
@@ -245,7 +240,7 @@ public class AddRecordActivity extends AppCompatActivity {
                         NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
 
                         NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecordId);
-                        NotificationUtils.registerRecord(AddRecordActivity.this, newEditRecord, tags.get(selectedTagPosition).name);
+                        NotificationUtils.registerRecord(AddRecordActivity.this, tags.get(selectedTagPosition), newEditRecord);
 
                         NotificationUtils.registerTag(AddRecordActivity.this, oldTag);
                         NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));

@@ -117,16 +117,16 @@ public class NotificationUtils {
         alarmMgr.cancel(createAlarmIntent(context, recordRowid));
     }
 
-    public static void registerRecord(Context context, RecordData data, String tagName)
+    public static void registerRecord(Context context, TagData tag, RecordData record)
     {
-        if (data.needNotice)
+        if (tag.isNotification)
         {
             Calendar calendarNow = Calendar.getInstance();
 
-            if (data.nextAppear < calendarNow.getTimeInMillis())
-                show(context, tagName, data.label, data.id);
+            if (record.nextAppear < calendarNow.getTimeInMillis())
+                show(context, tag.name, record.label, record.id);
             else
-                schedule(context, data.id, data.nextAppear);
+                schedule(context, record.id, record.nextAppear);
         }
     }
 
@@ -140,10 +140,10 @@ public class NotificationUtils {
     {
         registerTag(context, tag);
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE, false);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE);
         for (RecordData record : records)
         {
-            registerRecord(context, record, tag.name);
+            registerRecord(context, tag, record);
         }
     }
 
@@ -160,7 +160,7 @@ public class NotificationUtils {
     {
         unregisterTag(context, tag);
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE, false);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE);
         for (RecordData record : records)
         {
             unregisterRecord(context, record.id);

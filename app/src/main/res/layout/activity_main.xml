@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/filterCheckBoxes"
         android:layout_below="@+id/tagSpinner"
-        android:weightSum="2">
+        android:weightSum="1">
 
         <CheckBox
             android:layout_width="0dp"
@@ -29,13 +29,6 @@
             android:layout_height="wrap_content"
             android:text="Active only"
             android:id="@+id/activeOnlyCheckBox" />
-
-        <CheckBox
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Notification only"
-            android:id="@+id/notificationOnlyCheckBox" />
     </LinearLayout>
 
     <ListView

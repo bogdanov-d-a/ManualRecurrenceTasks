@@ -77,7 +77,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.TAG_ID)),
                 cursor.getString(cursor.getColumnIndexOrThrow(RecordData.Rows.LABEL)),
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.NEXT_APPEAR)),
-                cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.NOTIFICATION)) != 0,
                 cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.IS_CHECKED)) != 0
         );
     }
@@ -189,7 +188,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result.toString();
     }
 
-    public ArrayList<RecordData> getRecords(long tagId, long maxDate, boolean notificationOnly)
+    public ArrayList<RecordData> getRecords(long tagId, long maxDate)
     {
         ArrayList<RecordData> result = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -204,11 +203,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (maxDate > Long.MIN_VALUE)
                 maxDateExpr = RecordData.Rows.NEXT_APPEAR + "<" + escapeStr(Long.toString(maxDate));
 
-            String notificationOnlyExpr = "1";
-            if (notificationOnly)
-                notificationOnlyExpr = RecordData.Rows.NOTIFICATION + "=" + escapeStr(Long.toString(1));
-
-            cursor = db.rawQuery("select * from " + RecordData.getTableNameStatic() + " where (" + tagIdExpr + ") and (" + maxDateExpr + ") and (" + notificationOnlyExpr + ") order by " + RecordData.Rows.NEXT_APPEAR + " asc;", null);
+            cursor = db.rawQuery("select * from " + RecordData.getTableNameStatic() + " where (" + tagIdExpr + ") and (" + maxDateExpr + ") order by " + RecordData.Rows.NEXT_APPEAR + " asc;", null);
         }
 
         if (cursor.moveToFirst())

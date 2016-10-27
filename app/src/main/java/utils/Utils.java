@@ -45,7 +45,7 @@ public class Utils {
     }
 
     public static boolean tagHasCheckedRecords(Context context, long tagId) {
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tagId, Long.MIN_VALUE, false);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tagId, Long.MIN_VALUE);
 
         for (RecordData record : records) {
             if (record.isChecked)
