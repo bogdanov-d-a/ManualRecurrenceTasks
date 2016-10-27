@@ -83,6 +83,7 @@ public class TagsActivity extends AppCompatActivity {
                         0,
                         tagNameEditText.getText().toString(),
                         false,
+                        false,
                         false
                 ));
                 tagNameEditText.setText("");
@@ -137,12 +138,16 @@ public class TagsActivity extends AppCompatActivity {
             final CheckBox tagRenameIsInbox = (CheckBox) view.findViewById(R.id.tagRenameIsInbox);
             tagRenameIsInbox.setChecked(pressedTagData.isInbox);
 
+            final CheckBox tagRenameIsNotification = (CheckBox) view.findViewById(R.id.tagRenameIsNotification);
+            tagRenameIsNotification.setChecked(pressedTagData.isNotification);
+
             builder.setView(view)
                     .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             pressedTagData.name = tagRenameEditText.getText().toString();
                             pressedTagData.isChecklist = tagRenameIsChecklist.isChecked();
                             pressedTagData.isInbox = tagRenameIsInbox.isChecked();
+                            pressedTagData.isNotification = tagRenameIsNotification.isChecked();
 
                             NotificationUtils.unregisterTagData(parent, pressedTagData);
                             DatabaseHelper.getInstance(parent.getApplicationContext()).update(pressedTagData);

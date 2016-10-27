@@ -7,12 +7,14 @@ public class TagData implements AbstractData {
     public String name;
     public boolean isChecklist;
     public boolean isInbox;
+    public boolean isNotification;
 
-    public TagData(long id, String name, boolean isChecklist, boolean isInbox) {
+    public TagData(long id, String name, boolean isChecklist, boolean isInbox, boolean isNotification) {
         this.id = id;
         this.name = name;
         this.isChecklist = isChecklist;
         this.isInbox = isInbox;
+        this.isNotification = isNotification;
     }
 
     @Override
@@ -21,6 +23,7 @@ public class TagData implements AbstractData {
         result.add(name);
         result.add(Long.toString(isChecklist ? 1 : 0));
         result.add(Long.toString(isInbox ? 1 : 0));
+        result.add(Long.toString(isNotification ? 1 : 0));
         return result;
     }
 
@@ -37,6 +40,7 @@ public class TagData implements AbstractData {
         public static final String NAME = "name";
         public static final String IS_CHECKLIST = "is_checklist";
         public static final String IS_INBOX = "is_inbox";
+        public static final String IS_NOTIFICATION = "is_notification";
     }
 
     protected static ArrayList<String> getTableRowsStatic() {
@@ -44,6 +48,7 @@ public class TagData implements AbstractData {
         result.add(Rows.NAME);
         result.add(Rows.IS_CHECKLIST);
         result.add(Rows.IS_INBOX);
+        result.add(Rows.IS_NOTIFICATION);
         return result;
     }
 
@@ -63,6 +68,7 @@ public class TagData implements AbstractData {
         result.add("text");
         result.add("integer");
         result.add("integer");
+        result.add("integer");
         return result;
     }
 
@@ -72,6 +78,7 @@ public class TagData implements AbstractData {
         label.append('[');
         label.append(isChecklist ? 'c' : '-');
         label.append(isInbox ? 'i' : '-');
+        label.append(isNotification ? 'n' : '-');
         label.append(']');
 
         label.append(' ');

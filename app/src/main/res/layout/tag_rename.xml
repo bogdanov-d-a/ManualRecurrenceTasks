@@ -32,4 +32,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Inbox" />
+
+    <CheckBox
+        android:id="@+id/tagRenameIsNotification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Notification" />
 </LinearLayout>
