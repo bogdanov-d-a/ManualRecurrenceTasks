@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -78,6 +79,12 @@ public class AddRecordActivity extends AppCompatActivity {
                 calendar.getTimeInMillis(),
                 useCheckbox && checkedCheckBox.isChecked()
         );
+    }
+
+    private static void setButtonWidth(Button button) {
+        ViewGroup.LayoutParams lp = button.getLayoutParams();
+        lp.width = 80;
+        button.setLayoutParams(lp);
     }
 
     @Override
@@ -223,11 +230,12 @@ public class AddRecordActivity extends AppCompatActivity {
             case OPERATION_ADD:
                 addButton.setText("Add");
                 buttonPanel.addView(addButton);
+                setButtonWidth(addButton);
                 break;
 
             case OPERATION_EDIT:
                 final Button updateButton = new Button(AddRecordActivity.this);
-                updateButton.setText("Update");
+                updateButton.setText("Upd");
                 updateButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -250,9 +258,10 @@ public class AddRecordActivity extends AppCompatActivity {
                     }
                 });
                 buttonPanel.addView(updateButton);
+                setButtonWidth(updateButton);
 
                 final Button deleteButton = new Button(AddRecordActivity.this);
-                deleteButton.setText("Delete");
+                deleteButton.setText("Del");
                 deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
@@ -272,12 +281,14 @@ public class AddRecordActivity extends AppCompatActivity {
                     }
                 });
                 buttonPanel.addView(deleteButton);
+                setButtonWidth(deleteButton);
 
-                addButton.setText("Copy");
+                addButton.setText("Cop");
                 buttonPanel.addView(addButton);
+                setButtonWidth(addButton);
 
                 final Button revertButton = new Button(AddRecordActivity.this);
-                revertButton.setText("Revert");
+                revertButton.setText("Rev");
                 revertButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -291,12 +302,13 @@ public class AddRecordActivity extends AppCompatActivity {
                     }
                 });
                 buttonPanel.addView(revertButton);
+                setButtonWidth(revertButton);
 
                 break;
         }
 
         final Button cancelButton = new Button(AddRecordActivity.this);
-        cancelButton.setText("Cancel");
+        cancelButton.setText("Can");
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -304,6 +316,7 @@ public class AddRecordActivity extends AppCompatActivity {
             }
         });
         buttonPanel.addView(cancelButton);
+        setButtonWidth(cancelButton);
 
         updateDateTimeText();
         setResult(0);
