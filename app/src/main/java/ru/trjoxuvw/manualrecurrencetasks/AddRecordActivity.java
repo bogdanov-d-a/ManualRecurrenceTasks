@@ -163,7 +163,7 @@ public class AddRecordActivity extends AppCompatActivity {
         }
 
         final RecordData editRecord;
-        if (savedInstanceState == null && operation == OPERATION_EDIT)
+        if (operation == OPERATION_EDIT)
             editRecord = DatabaseHelper.getInstance(getApplicationContext()).getRecord(editRecordId);
         else
             editRecord = null;
