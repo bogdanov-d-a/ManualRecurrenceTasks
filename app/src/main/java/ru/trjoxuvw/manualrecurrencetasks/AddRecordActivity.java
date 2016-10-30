@@ -276,6 +276,22 @@ public class AddRecordActivity extends AppCompatActivity {
                 addButton.setText("Copy");
                 buttonPanel.addView(addButton);
 
+                final Button revertButton = new Button(AddRecordActivity.this);
+                revertButton.setText("Revert");
+                revertButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tagSpinner.setSelection(Utils.getPositionById(tags, editRecord.tagId));
+                        labelEditText.setText(editRecord.label);
+
+                        calendar.setTimeInMillis(editRecord.nextAppear);
+                        updateDateTimeText();
+
+                        checkedCheckBox.setChecked(editRecord.isChecked);
+                    }
+                });
+                buttonPanel.addView(revertButton);
+
                 break;
         }
 
