@@ -54,12 +54,12 @@ public class NotificationUtils {
     public static void showInbox(Context context, TagData tag, long recordCount)
     {
         int uid = -1 * (int)tag.id;
-        String fullText = tag.name + " has " + recordCount + " pending records in it.";
+        String fullText = recordCount + " pending records.";
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(android.R.drawable.ic_menu_info_details)
-                        .setContentTitle(recordCount + " records in " + tag.name)
+                        .setContentTitle(tag.name)
                         .setContentText(fullText)
                         .setPriority(NotificationCompat.PRIORITY_LOW)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(fullText))
