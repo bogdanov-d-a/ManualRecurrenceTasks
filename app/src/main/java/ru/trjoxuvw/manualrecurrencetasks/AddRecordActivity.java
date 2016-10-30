@@ -201,28 +201,28 @@ public class AddRecordActivity extends AppCompatActivity {
             }
         }
 
+        final Button addButton = new Button(this);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+
+                RecordData newRecord = layoutDataToRecordData(0);
+                newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).add(newRecord);
+                NotificationUtils.registerRecord(AddRecordActivity.this, tags.get(selectedTagPosition), newRecord);
+
+                NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+
+                setResult(1);
+                finish();
+            }
+        });
+
         switch (operation)
         {
             case OPERATION_ADD:
-                final Button addButton = new Button(this);
                 addButton.setText("Add");
-                addButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
-
-                        RecordData newRecord = layoutDataToRecordData(0);
-                        newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).add(newRecord);
-                        NotificationUtils.registerRecord(AddRecordActivity.this, tags.get(selectedTagPosition), newRecord);
-
-                        NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
-
-                        setResult(1);
-                        finish();
-                    }
-                });
                 buttonPanel.addView(addButton);
-
                 break;
 
             case OPERATION_EDIT:
@@ -273,7 +273,8 @@ public class AddRecordActivity extends AppCompatActivity {
                 });
                 buttonPanel.addView(deleteButton);
 
-                // TODO: add copy operation?
+                addButton.setText("Copy");
+                buttonPanel.addView(addButton);
 
                 break;
         }
