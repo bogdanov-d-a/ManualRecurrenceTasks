@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "Tasks.db";
 
     protected static final String ID_ROW = "id";
@@ -144,6 +144,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                     break;
 
+                case 4:
+                    // TODO: upgrade db
+                    break;
+
                 default:
                     break;
             }
@@ -183,7 +187,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         cursor.getString(cursor.getColumnIndexOrThrow(TagData.Rows.NAME)),
                         cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_CHECKLIST)) != 0,
                         cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_INBOX)) != 0,
-                        cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_NOTIFICATION)) != 0
+                        cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_NOTIFICATION)) != 0,
+                        TagData.ID_TO_FILTER_MODE.get((int)cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.FILTER_MODE)))
                 ));
             }
             while (cursor.moveToNext());

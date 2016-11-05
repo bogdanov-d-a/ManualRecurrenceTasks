@@ -10,10 +10,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 
@@ -84,7 +86,8 @@ public class TagsActivity extends AppCompatActivity {
                         tagNameEditText.getText().toString(),
                         false,
                         false,
-                        false
+                        false,
+                        TagData.FilterMode.DEFAULT_ALL
                 ));
                 tagNameEditText.setText("");
                 refreshTags();
@@ -105,6 +108,8 @@ public class TagsActivity extends AppCompatActivity {
     }
 
     public static class TagRenameDialogFragment extends DialogFragment {
+        private int selectedFilterMode;
+
         public static TagRenameDialogFragment newInstance(int tagIndex) {
             TagRenameDialogFragment pickerFragment = new TagRenameDialogFragment();
 
@@ -141,6 +146,23 @@ public class TagsActivity extends AppCompatActivity {
             final CheckBox tagRenameIsNotification = (CheckBox) view.findViewById(R.id.tagRenameIsNotification);
             tagRenameIsNotification.setChecked(pressedTagData.isNotification);
 
+            final Spinner filterModeSpinner = (Spinner) view.findViewById(R.id.filterModeSpinner);
+            filterModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    selectedFilterMode = position;
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    selectedFilterMode = 0;
+                }
+            });
+            ArrayAdapter<String> filterModeStringsAdapter = new ArrayAdapter<>(parent, android.R.layout.simple_spinner_item, TagData.ID_TO_FILTER_MODE_LABEL);
+            filterModeStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            filterModeSpinner.setAdapter(filterModeStringsAdapter);
+            filterModeSpinner.setSelection(TagData.FILTER_MODE_TO_ID.get(pressedTagData.filterMode));
+
             builder.setView(view)
                     .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
@@ -148,6 +170,7 @@ public class TagsActivity extends AppCompatActivity {
                             pressedTagData.isChecklist = tagRenameIsChecklist.isChecked();
                             pressedTagData.isInbox = tagRenameIsInbox.isChecked();
                             pressedTagData.isNotification = tagRenameIsNotification.isChecked();
+                            pressedTagData.filterMode = TagData.ID_TO_FILTER_MODE.get(selectedFilterMode);
 
                             NotificationUtils.unregisterTagData(parent, pressedTagData);
                             DatabaseHelper.getInstance(parent.getApplicationContext()).update(pressedTagData);
