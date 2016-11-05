@@ -61,6 +61,16 @@ public class MainActivity extends AppCompatActivity {
     private void switchTag(int position)
     {
         selectedTagPosition = position;
+
+        if (position == 0) {
+            activeOnlyCheckBox.setEnabled(true);
+            activeOnlyCheckBox.setChecked(false);
+        } else {
+            final TagData.FilterMode fm = tags.get(position - 1).filterMode;
+            activeOnlyCheckBox.setEnabled(fm != TagData.FilterMode.ONLY_ALL);
+            activeOnlyCheckBox.setChecked(fm == TagData.FilterMode.DEFAULT_FILTERED);
+        }
+
         refreshRecords(position);
     }
 
