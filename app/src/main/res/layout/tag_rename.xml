@@ -11,8 +11,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Edit tag"
-        android:textColor="#000000" />
+        android:textColor="#000000"
+        android:id="@+id/captionTextView" />
 
     <EditText
         android:id="@+id/tagRenameEditText"

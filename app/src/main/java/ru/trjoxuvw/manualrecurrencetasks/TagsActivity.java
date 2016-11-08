@@ -16,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -27,7 +28,6 @@ import utils.Utils;
 
 public class TagsActivity extends AppCompatActivity {
     private ListView tagListView;
-    private EditText tagNameEditText;
 
     private static final String TAG_INDEX_TAG = "TAG_INDEX_TAG";
     private static final String RESULT_CODE_TAG = "RESULT_CODE_TAG";
@@ -73,25 +73,12 @@ public class TagsActivity extends AppCompatActivity {
 
         refreshTags();
 
-        tagNameEditText = (EditText) findViewById(R.id.tagNameEditText);
-        assert tagNameEditText != null;
-
         final Button addTagButton = (Button) findViewById(R.id.addTagButton);
         assert addTagButton != null;
         addTagButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseHelper.getInstance(getApplicationContext()).add(new TagData(
-                        0,
-                        tagNameEditText.getText().toString(),
-                        false,
-                        false,
-                        false,
-                        TagData.FilterMode.DEFAULT_ALL
-                ));
-                tagNameEditText.setText("");
-                refreshTags();
-                mySetResult(1);
+                TagRenameDialogFragment.newInstance().show(getSupportFragmentManager(), "tagRenamer");
             }
         });
 
@@ -108,7 +95,16 @@ public class TagsActivity extends AppCompatActivity {
     }
 
     public static class TagRenameDialogFragment extends DialogFragment {
+        private EditText tagRenameEditText;
+        private CheckBox tagRenameIsChecklist;
+        private CheckBox tagRenameIsInbox;
+        private CheckBox tagRenameIsNotification;
+        private Spinner filterModeSpinner;
         private int selectedFilterMode;
+
+        public static TagRenameDialogFragment newInstance() {
+            return new TagRenameDialogFragment();
+        }
 
         public static TagRenameDialogFragment newInstance(int tagIndex) {
             TagRenameDialogFragment pickerFragment = new TagRenameDialogFragment();
@@ -120,33 +116,33 @@ public class TagsActivity extends AppCompatActivity {
             return pickerFragment;
         }
 
+        private TagData tagDataFromLayout(long id) {
+            return new TagData(
+                    id,
+                    tagRenameEditText.getText().toString(),
+                    tagRenameIsChecklist.isChecked(),
+                    tagRenameIsInbox.isChecked(),
+                    tagRenameIsNotification.isChecked(),
+                    TagData.ID_TO_FILTER_MODE.get(selectedFilterMode)
+            );
+        }
+
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             super.onCreateDialog(savedInstanceState);
 
-            final Bundle bundle = getArguments();
             final TagsActivity parent = (TagsActivity) getActivity();
-            final TagData pressedTagData = parent.tags.get(bundle.getInt(TAG_INDEX_TAG));
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(parent);
             LayoutInflater inflater = parent.getLayoutInflater();
             View view = inflater.inflate(R.layout.tag_rename, null);
 
-            final EditText tagRenameEditText = (EditText) view.findViewById(R.id.tagRenameEditText);
-            tagRenameEditText.setText(pressedTagData.name);
+            final TextView captionTextView = (TextView) view.findViewById(R.id.captionTextView);
+            tagRenameEditText = (EditText) view.findViewById(R.id.tagRenameEditText);
+            tagRenameIsChecklist = (CheckBox) view.findViewById(R.id.tagRenameIsChecklist);
+            tagRenameIsInbox = (CheckBox) view.findViewById(R.id.tagRenameIsInbox);
+            tagRenameIsNotification = (CheckBox) view.findViewById(R.id.tagRenameIsNotification);
 
-            final CheckBox tagRenameIsChecklist = (CheckBox) view.findViewById(R.id.tagRenameIsChecklist);
-            tagRenameIsChecklist.setChecked(pressedTagData.isChecklist);
-            tagRenameIsChecklist.setEnabled(!Utils.tagHasCheckedRecords(parent.getApplicationContext(), pressedTagData.id));
-
-            final CheckBox tagRenameIsInbox = (CheckBox) view.findViewById(R.id.tagRenameIsInbox);
-            tagRenameIsInbox.setChecked(pressedTagData.isInbox);
-
-            final CheckBox tagRenameIsNotification = (CheckBox) view.findViewById(R.id.tagRenameIsNotification);
-            tagRenameIsNotification.setChecked(pressedTagData.isNotification);
-
-            final Spinner filterModeSpinner = (Spinner) view.findViewById(R.id.filterModeSpinner);
+            filterModeSpinner = (Spinner) view.findViewById(R.id.filterModeSpinner);
             filterModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -161,26 +157,47 @@ public class TagsActivity extends AppCompatActivity {
             ArrayAdapter<String> filterModeStringsAdapter = new ArrayAdapter<>(parent, android.R.layout.simple_spinner_item, TagData.ID_TO_FILTER_MODE_LABEL);
             filterModeStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             filterModeSpinner.setAdapter(filterModeStringsAdapter);
-            filterModeSpinner.setSelection(TagData.FILTER_MODE_TO_ID.get(pressedTagData.filterMode));
 
-            builder.setView(view)
-                    .setPositiveButton("Edit", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            pressedTagData.name = tagRenameEditText.getText().toString();
-                            pressedTagData.isChecklist = tagRenameIsChecklist.isChecked();
-                            pressedTagData.isInbox = tagRenameIsInbox.isChecked();
-                            pressedTagData.isNotification = tagRenameIsNotification.isChecked();
-                            pressedTagData.filterMode = TagData.ID_TO_FILTER_MODE.get(selectedFilterMode);
+            AlertDialog.Builder builder = new AlertDialog.Builder(parent);
+            builder.setView(view);
 
-                            NotificationUtils.unregisterTagData(parent, pressedTagData);
-                            DatabaseHelper.getInstance(parent.getApplicationContext()).update(pressedTagData);
-                            NotificationUtils.registerTagData(parent, pressedTagData);
+            final Bundle bundle = getArguments();
+            if (bundle != null) {
+                final TagData pressedTagData = parent.tags.get(bundle.getInt(TAG_INDEX_TAG));
 
-                            parent.refreshTags();
-                            parent.mySetResult(1);
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                captionTextView.setText("Edit tag");
+                tagRenameEditText.setText(pressedTagData.name);
+                tagRenameIsChecklist.setChecked(pressedTagData.isChecklist);
+                tagRenameIsChecklist.setEnabled(!Utils.tagHasCheckedRecords(parent.getApplicationContext(), pressedTagData.id));
+                tagRenameIsInbox.setChecked(pressedTagData.isInbox);
+                tagRenameIsNotification.setChecked(pressedTagData.isNotification);
+                filterModeSpinner.setSelection(TagData.FILTER_MODE_TO_ID.get(pressedTagData.filterMode));
+
+                builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                TagData newTagData = tagDataFromLayout(pressedTagData.id);
+
+                                NotificationUtils.unregisterTagData(parent, pressedTagData);
+                                DatabaseHelper.getInstance(parent.getApplicationContext()).update(newTagData);
+                                NotificationUtils.registerTagData(parent, newTagData);
+
+                                parent.refreshTags();
+                                parent.mySetResult(1);
+                            }
+                        });
+            } else {
+                captionTextView.setText("Add tag");
+
+                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                DatabaseHelper.getInstance(parent.getApplicationContext()).add(tagDataFromLayout(0));
+                                parent.refreshTags();
+                                parent.mySetResult(1);
+                            }
+                        });
+            }
+
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             dismiss();
                         }

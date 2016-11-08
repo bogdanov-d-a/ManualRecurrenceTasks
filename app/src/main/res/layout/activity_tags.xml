@@ -13,29 +13,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/tagListView"
-        android:layout_above="@+id/linearLayout" />
+        android:layout_above="@+id/addTagButton" />
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="1"
-        android:layout_alignParentBottom="true"
-        android:id="@+id/linearLayout">
-
-        <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.7"
-            android:id="@+id/tagNameEditText"
-            android:hint="New tag name"
-            android:singleLine="true" />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="0.3"
-            android:layout_height="wrap_content"
-            android:text="Add"
-            android:id="@+id/addTagButton" />
-    </LinearLayout>
+        android:text="Add"
+        android:id="@+id/addTagButton"
+        android:layout_alignParentBottom="true" />
 </RelativeLayout>
