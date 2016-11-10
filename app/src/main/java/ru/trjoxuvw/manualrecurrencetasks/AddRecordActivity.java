@@ -142,6 +142,20 @@ public class AddRecordActivity extends AppCompatActivity {
             }
         });
 
+        pickDateButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Calendar calendarNow = Calendar.getInstance();
+
+                calendar.set(Calendar.YEAR, calendarNow.get(Calendar.YEAR));
+                calendar.set(Calendar.MONTH, calendarNow.get(Calendar.MONTH));
+                calendar.set(Calendar.DAY_OF_MONTH, calendarNow.get(Calendar.DAY_OF_MONTH));
+
+                updateDateTimeText();
+                return true;
+            }
+        });
+
         pickTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -150,6 +164,24 @@ public class AddRecordActivity extends AppCompatActivity {
                         calendar.get(Calendar.MINUTE)
                 );
                 newFragment.show(getSupportFragmentManager(), "timePicker");
+            }
+        });
+
+        pickTimeButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (calendar.get(Calendar.HOUR_OF_DAY) == 0 && calendar.get(Calendar.MINUTE) == 0) {
+                    Calendar calendarNow = Calendar.getInstance();
+
+                    calendar.set(Calendar.HOUR_OF_DAY, calendarNow.get(Calendar.HOUR_OF_DAY));
+                    calendar.set(Calendar.MINUTE, calendarNow.get(Calendar.MINUTE));
+                } else {
+                    calendar.set(Calendar.HOUR_OF_DAY, 0);
+                    calendar.set(Calendar.MINUTE, 0);
+                }
+
+                updateDateTimeText();
+                return true;
             }
         });
 
