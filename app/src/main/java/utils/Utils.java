@@ -18,7 +18,7 @@ public class Utils {
     public static int getPositionById(AbstractDataSource list, long id) {
         for (int pos = 0; pos < list.size(); ++pos)
         {
-            if (list.get(pos).getId() == id)
+            if (list.get(pos).id == id)
                 return pos;
         }
         return -1;

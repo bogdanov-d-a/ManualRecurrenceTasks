@@ -11,73 +11,63 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "Tasks.db";
 
-    protected static final String ID_ROW = "id";
-
-    private static String createGen(String name, ArrayList<String> rows, ArrayList<String> types) {
+    private static String createGen(StaticInfo.Type type) {
         StringBuilder sb = new StringBuilder();
-        sb.append("create table " + name + " (");
+        sb.append("create table " + StaticInfo.getTableName(type) + " (");
 
-        sb.append(ID_ROW + " integer primary key");
-
-        for (int i = 0; i < rows.size(); ++i)
-        {
-            sb.append(",");
-            sb.append(rows.get(i) + " " + types.get(i));
+        for (int i = 0; i < StaticInfo.getRowCount(type); ++i) {
+            if (i != 0)
+                sb.append(",");
+            sb.append(StaticInfo.getRowName(type, i) + " " + StaticInfo.getRowType(type, i));
         }
 
         sb.append(");");
         return sb.toString();
     }
 
-    private static String insertGen(String name, ArrayList<String> rows, ArrayList<String> data) {
+    private static String insertGen(AbstractData data) {
         StringBuilder sb = new StringBuilder();
-        sb.append("insert into " + name + " (");
+        sb.append("insert into " + data.getTableName() + " (");
 
-        for (int i = 0; i < rows.size(); ++i)
-        {
-            if (i != 0) {
+        for (int i = 1; i < data.getRowCount(); ++i) {
+            if (i != 1)
                 sb.append(",");
-            }
-            sb.append(rows.get(i));
+            sb.append(data.getRowName(i));
         }
 
         sb.append(") values (");
 
-        for (int i = 0; i < data.size(); ++i)
-        {
-            if (i != 0) {
+        for (int i = 1; i < data.getRowCount(); ++i) {
+            if (i != 1)
                 sb.append(",");
-            }
-            sb.append(escapeStr(data.get(i)));
+            sb.append(escapeStr(data.getDataString(i)));
         }
 
         sb.append(");");
         return sb.toString();
     }
 
-    private static String updateGen(String name, ArrayList<String> rows, long id, ArrayList<String> data) {
+    private static String updateGen(AbstractData data) {
         StringBuilder sb = new StringBuilder();
-        sb.append("update " + name + " set ");
+        sb.append("update " + data.getTableName() + " set ");
 
-        for (int i = 0; i < rows.size(); ++i)
-        {
-            if (i != 0) {
+        for (int i = 1; i < data.getRowCount(); ++i) {
+            if (i != 1)
                 sb.append(",");
-            }
-            sb.append(rows.get(i) + "=" + escapeStr(data.get(i)));
+            sb.append(data.getRowName(i) + "=" + escapeStr(data.getDataString(i)));
         }
 
-        sb.append(" where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";");
+        sb.append(" where " + data.getRowName(0) + "=" + escapeStr(data.getDataString(0)) + ";");
         return sb.toString();
     }
 
     private static RecordData createRecordDataFromCursor(Cursor cursor) {
         return new RecordData(
-                cursor.getLong(cursor.getColumnIndexOrThrow(ID_ROW)),
-                cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.TAG_ID)),
-                cursor.getString(cursor.getColumnIndexOrThrow(RecordData.Rows.LABEL)),
-                cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.NEXT_APPEAR)),
-                cursor.getLong(cursor.getColumnIndexOrThrow(RecordData.Rows.IS_CHECKED)) != 0
+                cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getRecordRowName(0))),
+                cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getRecordRowName(1))),
+                cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getRecordRowName(2))),
+                cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getRecordRowName(3))),
+                cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getRecordRowName(4))) != 0
         );
     }
 
@@ -100,8 +90,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(createGen(TagData.getTableNameStatic(), TagData.getTableRowsStatic(), TagData.getTableRowsTypes()));
-        db.execSQL(createGen(RecordData.getTableNameStatic(), RecordData.getTableRowsStatic(), RecordData.getTableRowsTypes()));
+        db.execSQL(createGen(StaticInfo.Type.TAG));
+        db.execSQL(createGen(StaticInfo.Type.RECORD));
     }
 
     @Override
@@ -111,41 +101,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         while (curVersion != newVersion) {
             switch (curVersion) {
                 case 1:
-                    db.execSQL("alter table " + TagData.getTableNameStatic() + " add column " + TagData.Rows.IS_CHECKLIST + " integer;");
-                    db.execSQL("alter table " + RecordData.getTableNameStatic() + " add column " + RecordData.Rows.IS_CHECKED + " integer;");
+                    db.execSQL("alter table " + StaticInfo.getTagTableName() +
+                            " add column " + StaticInfo.getTagRowName(StaticInfo.TagRowId.IS_CHECKLIST) + " integer;");
+                    db.execSQL("alter table " + StaticInfo.getRecordTableName() +
+                            " add column " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.IS_CHECKED) + " integer;");
                     break;
 
                 case 2:
-                    db.execSQL("alter table " + TagData.getTableNameStatic() + " add column " + TagData.Rows.IS_INBOX + " integer;");
+                    db.execSQL("alter table " + StaticInfo.getTagTableName() +
+                            " add column " + StaticInfo.getTagRowName(StaticInfo.TagRowId.IS_INBOX) + " integer;");
                     break;
 
                 case 3:
-                    db.execSQL("alter table " + TagData.getTableNameStatic() + " add column " + TagData.Rows.IS_NOTIFICATION + " integer;");
+                    db.execSQL("alter table " + StaticInfo.getTagTableName() +
+                            " add column " + StaticInfo.getTagRowName(StaticInfo.TagRowId.IS_NOTIFICATION) + " integer;");
 
-                    db.execSQL("alter table " + RecordData.getTableNameStatic() + " rename to " + RecordData.getTableNameStatic() + "_old;");
-                    db.execSQL(createGen(RecordData.getTableNameStatic(), RecordData.getTableRowsStatic(), RecordData.getTableRowsTypes()));
+                    db.execSQL("alter table " + StaticInfo.getRecordTableName() +
+                            " rename to " + StaticInfo.getRecordTableName() + "_old;");
+                    db.execSQL(createGen(StaticInfo.Type.RECORD));
                     {
                         StringBuilder sb = new StringBuilder();
-                        sb.append("insert into " + RecordData.getTableNameStatic() + " select ");
+                        sb.append("insert into " + StaticInfo.getRecordTableName() + " select ");
 
-                        sb.append(ID_ROW);
-
-                        ArrayList<String> rows = RecordData.getTableRowsStatic();
-                        for (int i = 0; i < rows.size(); ++i)
-                        {
-                            sb.append(",");
-                            sb.append(rows.get(i));
+                        for (int i = 0; i < StaticInfo.getRecordRowCount(); ++i) {
+                            if (i != 0)
+                                sb.append(",");
+                            sb.append(StaticInfo.getRecordRowName(i));
                         }
 
-                        sb.append(" from " + RecordData.getTableNameStatic() + "_old;");
+                        sb.append(" from " + StaticInfo.getRecordTableName() + "_old;");
                         db.execSQL(sb.toString());
                     }
-                    db.execSQL("drop table " + RecordData.getTableNameStatic() + "_old;");
+                    db.execSQL("drop table " + StaticInfo.getRecordTableName() + "_old;");
 
                     break;
 
                 case 4:
-                    db.execSQL("alter table " + TagData.getTableNameStatic() + " add column " + TagData.Rows.FILTER_MODE + " integer;");
+                    db.execSQL("alter table " + StaticInfo.getTagTableName() +
+                            " add column " + StaticInfo.getTagRowName(StaticInfo.TagRowId.FILTER_MODE) + " integer;");
                     break;
 
                 default:
@@ -177,18 +170,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<TagData> result = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + TagData.getTableNameStatic() + " order by " + TagData.Rows.NAME + " asc;", null);
+        Cursor cursor = db.rawQuery("select * from " + StaticInfo.getTagTableName() +
+                " order by " + StaticInfo.getTagRowName(StaticInfo.TagRowId.NAME) + " asc;", null);
         if (cursor.moveToFirst())
         {
             do
             {
                 result.add(new TagData(
-                        cursor.getLong(cursor.getColumnIndexOrThrow(ID_ROW)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(TagData.Rows.NAME)),
-                        cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_CHECKLIST)) != 0,
-                        cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_INBOX)) != 0,
-                        cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.IS_NOTIFICATION)) != 0,
-                        TagData.ID_TO_FILTER_MODE.get((int)cursor.getLong(cursor.getColumnIndexOrThrow(TagData.Rows.FILTER_MODE)))
+                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(0))),
+                        cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(1))),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(2))) != 0,
+                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(3))) != 0,
+                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(4))) != 0,
+                        TagData.ID_TO_FILTER_MODE.get((int)cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(5))))
                 ));
             }
             while (cursor.moveToNext());
@@ -223,13 +217,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         {
             String tagIdExpr = "1";
             if (tagId != Long.MIN_VALUE)
-                tagIdExpr = RecordData.Rows.TAG_ID + "=" + escapeStr(Long.toString(tagId));
+                tagIdExpr = StaticInfo.getRecordRowName(StaticInfo.RecordRowId.TAG_ID) + "=" + escapeStr(Long.toString(tagId));
 
             String maxDateExpr = "1";
             if (maxDate > Long.MIN_VALUE)
-                maxDateExpr = RecordData.Rows.NEXT_APPEAR + "<" + escapeStr(Long.toString(maxDate));
+                maxDateExpr = StaticInfo.getRecordRowName(StaticInfo.RecordRowId.NEXT_APPEAR) + "<" + escapeStr(Long.toString(maxDate));
 
-            cursor = db.rawQuery("select * from " + RecordData.getTableNameStatic() + " where (" + tagIdExpr + ") and (" + maxDateExpr + ") order by " + RecordData.Rows.NEXT_APPEAR + " asc;", null);
+            cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() +
+                    " where (" + tagIdExpr + ") and (" + maxDateExpr + ")" +
+                    " order by " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.NEXT_APPEAR) + " asc;", null);
         }
 
         if (cursor.moveToFirst())
@@ -248,7 +244,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public long getUndoneTasksCount(TagData tag) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select count(" + ID_ROW + ") from " + RecordData.getTableNameStatic() + " where (" + RecordData.Rows.TAG_ID + "='" + tag.id + "') and (" + RecordData.Rows.IS_CHECKED + "='0');", null);
+        Cursor cursor = db.rawQuery("select count(" + StaticInfo.getRecordRowName(0) + ") from " + StaticInfo.getRecordTableName() +
+                " where (" + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.TAG_ID) + "=" + escapeStr(Long.toString(tag.id)) + ")" +
+                " and (" + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.IS_CHECKED) + "=" + escapeStr(Long.toString(0)) + ");", null);
 
         cursor.moveToFirst();
         long result = cursor.getLong(0);
@@ -261,7 +259,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public long add(AbstractData data)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL(insertGen(data.getTableName(), data.getTableRows(), data.getStringList()));
+        db.execSQL(insertGen(data));
         long id = getLastInsertRowid(db);
         db.close();
         return id;
@@ -270,15 +268,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteTag(long id)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("delete from " + RecordData.getTableNameStatic() + " where " + RecordData.Rows.TAG_ID + "=" + escapeStr(Long.toString(id)) + ";");
-        db.execSQL("delete from " + TagData.getTableNameStatic() + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";");
+        db.execSQL("delete from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.TAG_ID) + "=" + escapeStr(Long.toString(id)) + ";");
+        db.execSQL("delete from " + StaticInfo.getTagTableName() + " where " + StaticInfo.getTagRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
         db.close();
     }
 
     public RecordData getRecord(long id)
     {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + RecordData.getTableNameStatic() + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";", null);
+        Cursor cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";", null);
 
         try
         {
@@ -309,15 +307,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public RecordDataMin getRecordMin(long id)
     {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + RecordData.getTableNameStatic() + " inner join " + TagData.getTableNameStatic() + " on " + RecordData.Rows.TAG_ID + "=" + TagData.getTableNameStatic() + "." + ID_ROW + " where " + RecordData.getTableNameStatic() + "." + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";", null);
+        Cursor cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " inner join " + StaticInfo.getTagTableName() +
+                " on " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.TAG_ID) + "=" + StaticInfo.getTagRowName(0) +
+                " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";", null);
 
         try
         {
             if (cursor.moveToFirst())
             {
                 return new RecordDataMin(
-                        cursor.getString(cursor.getColumnIndexOrThrow(TagData.Rows.NAME)),
-                        cursor.getString(cursor.getColumnIndexOrThrow(RecordData.Rows.LABEL))
+                        cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(StaticInfo.TagRowId.NAME))),
+                        cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getRecordRowName(StaticInfo.RecordRowId.LABEL)))
                 );
             }
             return null;
@@ -332,14 +332,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void update(AbstractData data)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL(updateGen(data.getTableName(), data.getTableRows(), data.getId(), data.getStringList()));
+        db.execSQL(updateGen(data));
         db.close();
     }
 
     public void deleteRecord(long id)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("delete from " + RecordData.getTableNameStatic() + " where " + ID_ROW + "=" + escapeStr(Long.toString(id)) + ";");
+        db.execSQL("delete from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
         db.close();
     }
 }
