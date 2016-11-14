@@ -231,7 +231,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result.toString();
     }
 
-    public ArrayList<RecordData> getRecords(long tagId, long maxDate)
+    public ArrayList<RecordData> getRecords(long tagId, long maxDate, boolean notificationsOnly)
     {
         ArrayList<RecordData> result = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -246,8 +246,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (maxDate > Long.MIN_VALUE)
                 maxDateExpr = StaticInfo.getRecordRowName(StaticInfo.RecordRowId.NEXT_APPEAR) + "<" + escapeStr(Long.toString(maxDate));
 
-            cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() +
-                    " where (" + tagIdExpr + ") and (" + maxDateExpr + ")" +
+            String notificationsOnlyExpr = "1";
+            if (notificationsOnly)
+                notificationsOnlyExpr = StaticInfo.getTagRowName(StaticInfo.TagRowId.IS_NOTIFICATION) + "!=" + escapeStr(Long.toString(0));
+
+            cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " inner join " + StaticInfo.getTagTableName() +
+                    " on " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.TAG_ID) + "=" + StaticInfo.getTagRowName(0) +
+                    " where (" + tagIdExpr + ") and (" + maxDateExpr + ") and (" + notificationsOnlyExpr + ")" +
                     " order by " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.NEXT_APPEAR) + " asc;", null);
         }
 

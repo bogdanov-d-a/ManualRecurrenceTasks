@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         tags = DatabaseHelper.getInstance(getApplicationContext()).getTags();
 
         ArrayList<String> tagStrings = new ArrayList<>();
-        tagStrings.add("All tags");
+        tagStrings.add("Notifications");
         for (TagData tag : tags)
         {
             tagStrings.add(tag.getLabel());
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             maxTime = calendar.getTimeInMillis();
         }
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : tags.get(position - 1).id, maxTime);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : tags.get(position - 1).id, maxTime, position == 0);
         recordListView.setAdapter(new RecordListAdapter(this, tags, records, position == 0 || tags.get(position - 1).isChecklist));
     }
 

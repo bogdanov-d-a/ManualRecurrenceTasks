@@ -140,7 +140,7 @@ public class NotificationUtils {
     {
         registerTag(context, tag);
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE, false);
         for (RecordData record : records)
         {
             registerRecord(context, tag, record);
@@ -160,7 +160,7 @@ public class NotificationUtils {
     {
         unregisterTag(context, tag);
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE, false);
         for (RecordData record : records)
         {
             unregisterRecord(context, record.id);
