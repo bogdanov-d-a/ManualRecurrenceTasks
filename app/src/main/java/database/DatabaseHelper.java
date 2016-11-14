@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "Tasks.db";
 
     private static String createGen(StaticInfo.Type type) {
@@ -140,6 +140,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     db.execSQL("alter table " + StaticInfo.getTagTableName() +
                             " add column " + StaticInfo.getTagRowName(StaticInfo.TagRowId.FILTER_MODE) + " integer;");
                     break;
+
+                case 5:
+                    // rename old tag table
+                    db.execSQL("alter table " + StaticInfo.getTagTableName() +
+                            " rename to " + StaticInfo.getTagTableName() + "_old;");
+
+                    // rename old record table
+                    db.execSQL("alter table " + StaticInfo.getRecordTableName() +
+                            " rename to " + StaticInfo.getRecordTableName() + "_old;");
+
+                    // create new tag table
+                    db.execSQL(createGen(StaticInfo.Type.TAG));
+                    db.execSQL("insert into " + StaticInfo.getTagTableName() + " select * from " + StaticInfo.getTagTableName() + "_old;");
+
+                    // create new record table
+                    db.execSQL(createGen(StaticInfo.Type.RECORD));
+                    db.execSQL("insert into " + StaticInfo.getRecordTableName() + " select * from " + StaticInfo.getRecordTableName() + "_old;");
+
+                    // delete old record table
+                    db.execSQL("drop table " + StaticInfo.getRecordTableName() + "_old;");
+
+                    // delete old tag table
+                    db.execSQL("drop table " + StaticInfo.getTagTableName() + "_old;");
 
                 default:
                     break;

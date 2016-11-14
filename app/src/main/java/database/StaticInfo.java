@@ -74,7 +74,7 @@ public final class StaticInfo {
         return getRowCount(Type.RECORD);
     }
 
-    public static String getRowName(Type type, int id) {
+    private static String getRowNameImpl(Type type, int id) {
         if (id == 0)
             return ID_ROW;
 
@@ -86,6 +86,10 @@ public final class StaticInfo {
             default:
                 return null;
         }
+    }
+
+    public static String getRowName(Type type, int id) {
+        return getTableName(type) + "__" + getRowNameImpl(type, id);
     }
 
     public static String getTagRowName(int id) {
