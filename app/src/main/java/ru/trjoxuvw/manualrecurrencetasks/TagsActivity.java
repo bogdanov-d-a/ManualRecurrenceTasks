@@ -66,7 +66,9 @@ public class TagsActivity extends AppCompatActivity {
         tagListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                TagDeleteDialogFragment.newInstance(position).show(getSupportFragmentManager(), "tagDeleter");
+                if (!Utils.tagHasRecords(getApplicationContext(), tags.get(position).id)) {
+                    TagDeleteDialogFragment.newInstance(position).show(getSupportFragmentManager(), "tagDeleter");
+                }
                 return true;
             }
         });
@@ -227,7 +229,7 @@ public class TagsActivity extends AppCompatActivity {
             final TagData pressedTagData = parent.tags.get(bundle.getInt(TAG_INDEX_TAG));
 
             AlertDialog.Builder builder = new AlertDialog.Builder(parent);
-            builder.setMessage("Delete tag " + pressedTagData.name + " with all its records?")
+            builder.setMessage("Delete tag " + pressedTagData.name + "?")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             NotificationUtils.unregisterTagData(parent, pressedTagData);

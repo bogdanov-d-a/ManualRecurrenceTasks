@@ -54,4 +54,9 @@ public class Utils {
 
         return false;
     }
+
+    public static boolean tagHasRecords(Context context, long tagId) {
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tagId, Long.MIN_VALUE, false);
+        return !records.isEmpty();
+    }
 }
