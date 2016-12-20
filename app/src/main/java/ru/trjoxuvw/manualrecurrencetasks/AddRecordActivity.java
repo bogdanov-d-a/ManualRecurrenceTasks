@@ -293,7 +293,7 @@ public class AddRecordActivity extends AppCompatActivity {
 
             case OPERATION_EDIT:
                 final Button updateButton = new Button(AddRecordActivity.this);
-                updateButton.setText("Update");
+                updateButton.setText("Upd");
                 updateButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -312,7 +312,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 setButtonWidth(updateButton);
 
                 final Button deleteButton = new Button(AddRecordActivity.this);
-                deleteButton.setText("Delete");
+                deleteButton.setText("Del");
                 deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
@@ -334,7 +334,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 buttonPanel.addView(deleteButton);
                 setButtonWidth(deleteButton);
 
-                addButton.setText("Copy");
+                addButton.setText("Cop");
                 buttonPanel.addView(addButton);
                 setButtonWidth(addButton);
 
@@ -342,7 +342,7 @@ public class AddRecordActivity extends AppCompatActivity {
         }
 
         final Button cancelButton = new Button(AddRecordActivity.this);
-        cancelButton.setText("Cancel");
+        cancelButton.setText("Can");
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
