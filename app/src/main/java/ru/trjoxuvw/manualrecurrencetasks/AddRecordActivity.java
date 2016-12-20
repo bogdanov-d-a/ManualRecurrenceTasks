@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import database.AbstractData;
 import database.RecordData;
 import database.TagData;
 import database.DatabaseHelper;
@@ -56,7 +55,7 @@ public class AddRecordActivity extends AppCompatActivity {
 
     private Calendar calendar;
     private int operation;
-    private long editRecordId;
+    private RecordData editRecord;
 
     private void updateDateTimeText()
     {
@@ -83,8 +82,39 @@ public class AddRecordActivity extends AppCompatActivity {
 
     private static void setButtonWidth(Button button) {
         ViewGroup.LayoutParams lp = button.getLayoutParams();
-        lp.width = 80;
+        lp.width = 100;
         button.setLayoutParams(lp);
+    }
+
+    private void addRecord() {
+        NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+
+        RecordData newRecord = layoutDataToRecordData(0);
+        newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).add(newRecord);
+        NotificationUtils.registerRecord(AddRecordActivity.this, tags.get(selectedTagPosition), newRecord);
+
+        NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+
+        setResult(1);
+    }
+
+    private void updateRecord() {
+        TagData oldTag = tags.get(Utils.getPositionById(tags, editRecord.tagId));
+
+        RecordData newEditRecord = layoutDataToRecordData(editRecord.id);
+        DatabaseHelper.getInstance(getApplicationContext()).update(newEditRecord);
+
+        NotificationUtils.unregisterTag(AddRecordActivity.this, oldTag);
+        NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+
+        NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecord.id);
+        NotificationUtils.registerRecord(AddRecordActivity.this, tags.get(selectedTagPosition), newEditRecord);
+
+        NotificationUtils.registerTag(AddRecordActivity.this, oldTag);
+        NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+
+        setResult(1);
+        editRecord = newEditRecord;
     }
 
     @Override
@@ -193,19 +223,16 @@ public class AddRecordActivity extends AppCompatActivity {
         else
             operation = savedInstanceState.getInt(OPERATION);
 
-        if (operation == OPERATION_EDIT)
-        {
+        if (operation == OPERATION_EDIT) {
+            final long editRecordId;
             if (savedInstanceState == null)
                 editRecordId = getIntent().getExtras().getLong(EDIT_RECORD_ID);
             else
                 editRecordId = savedInstanceState.getLong(EDIT_RECORD_ID);
-        }
-
-        final RecordData editRecord;
-        if (operation == OPERATION_EDIT)
             editRecord = DatabaseHelper.getInstance(getApplicationContext()).getRecord(editRecordId);
-        else
+        } else {
             editRecord = null;
+        }
 
         calendar = Calendar.getInstance();
         calendar.set(Calendar.SECOND, 0);
@@ -244,16 +271,15 @@ public class AddRecordActivity extends AppCompatActivity {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
-
-                RecordData newRecord = layoutDataToRecordData(0);
-                newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).add(newRecord);
-                NotificationUtils.registerRecord(AddRecordActivity.this, tags.get(selectedTagPosition), newRecord);
-
-                NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
-
-                setResult(1);
+                addRecord();
                 finish();
+            }
+        });
+        addButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                addRecord();
+                return true;
             }
         });
 
@@ -271,22 +297,15 @@ public class AddRecordActivity extends AppCompatActivity {
                 updateButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        TagData oldTag = tags.get(Utils.getPositionById(tags, editRecord.tagId));
-
-                        RecordData newEditRecord = layoutDataToRecordData(editRecordId);
-                        DatabaseHelper.getInstance(getApplicationContext()).update(newEditRecord);
-
-                        NotificationUtils.unregisterTag(AddRecordActivity.this, oldTag);
-                        NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
-
-                        NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecordId);
-                        NotificationUtils.registerRecord(AddRecordActivity.this, tags.get(selectedTagPosition), newEditRecord);
-
-                        NotificationUtils.registerTag(AddRecordActivity.this, oldTag);
-                        NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
-
-                        setResult(1);
+                        updateRecord();
                         finish();
+                    }
+                });
+                updateButton.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        updateRecord();
+                        return true;
                     }
                 });
                 buttonPanel.addView(updateButton);
@@ -301,8 +320,8 @@ public class AddRecordActivity extends AppCompatActivity {
 
                         NotificationUtils.unregisterTag(AddRecordActivity.this, oldTag);
 
-                        DatabaseHelper.getInstance(getApplicationContext()).deleteRecord(editRecordId);
-                        NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecordId);
+                        DatabaseHelper.getInstance(getApplicationContext()).deleteRecord(editRecord.id);
+                        NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecord.id);
 
                         NotificationUtils.registerTag(AddRecordActivity.this, oldTag);
 
@@ -319,23 +338,6 @@ public class AddRecordActivity extends AppCompatActivity {
                 buttonPanel.addView(addButton);
                 setButtonWidth(addButton);
 
-                final Button revertButton = new Button(AddRecordActivity.this);
-                revertButton.setText("Rev");
-                revertButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        tagSpinner.setSelection(Utils.getPositionById(tags, editRecord.tagId));
-                        labelEditText.setText(editRecord.label);
-
-                        calendar.setTimeInMillis(editRecord.nextAppear);
-                        updateDateTimeText();
-
-                        checkedCheckBox.setChecked(editRecord.isChecked);
-                    }
-                });
-                buttonPanel.addView(revertButton);
-                setButtonWidth(revertButton);
-
                 break;
         }
 
@@ -347,6 +349,21 @@ public class AddRecordActivity extends AppCompatActivity {
                 finish();
             }
         });
+        if (operation == OPERATION_EDIT) {
+            cancelButton.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    tagSpinner.setSelection(Utils.getPositionById(tags, editRecord.tagId));
+                    labelEditText.setText(editRecord.label);
+
+                    calendar.setTimeInMillis(editRecord.nextAppear);
+                    updateDateTimeText();
+
+                    checkedCheckBox.setChecked(editRecord.isChecked);
+                    return true;
+                }
+            });
+        }
         buttonPanel.addView(cancelButton);
         setButtonWidth(cancelButton);
 
@@ -366,7 +383,7 @@ public class AddRecordActivity extends AppCompatActivity {
 
         outState.putInt(OPERATION, operation);
         if (operation == OPERATION_EDIT)
-            outState.putLong(EDIT_RECORD_ID, editRecordId);
+            outState.putLong(EDIT_RECORD_ID, editRecord.id);
     }
 
     public static class DatePickerFragment extends DialogFragment {
