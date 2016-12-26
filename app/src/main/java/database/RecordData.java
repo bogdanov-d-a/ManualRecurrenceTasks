@@ -34,4 +34,12 @@ public final class RecordData extends AbstractData {
                 return null;
         }
     }
+
+    public boolean equalsRecord(RecordData o) {
+        return id == o.id &&
+                tagId == o.tagId &&
+                label.equals(o.label) &&
+                nextAppear == o.nextAppear &&
+                isChecked == o.isChecked;
+    }
 }

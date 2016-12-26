@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -48,6 +51,7 @@ public class AddRecordActivity extends AppCompatActivity {
     private EditText labelEditText;
     private Button pickDateButton, pickTimeButton;
     private CheckBox checkedCheckBox;
+    private Button updateButton;
 
     private ArrayList<TagData> tags;
     private int selectedTagPosition;
@@ -64,10 +68,18 @@ public class AddRecordActivity extends AppCompatActivity {
         pickTimeButton.setText(SimpleDateFormat.getTimeInstance().format(date));
     }
 
+    private void updateUpdateButtonState()
+    {
+        if (updateButton == null)
+            return;
+        updateButton.setEnabled(!layoutDataToRecordData(editRecord.id).equalsRecord(editRecord));
+    }
+
     private void switchTag(int position) {
         selectedTagPosition = position;
         useCheckbox = tags.get(position).isChecklist;
         checkedCheckBox.setEnabled(useCheckbox);
+        updateUpdateButtonState();
     }
 
     private RecordData layoutDataToRecordData(long id) {
@@ -115,6 +127,7 @@ public class AddRecordActivity extends AppCompatActivity {
 
         setResult(1);
         editRecord = newEditRecord;
+        updateUpdateButtonState();
     }
 
     @Override
@@ -131,6 +144,28 @@ public class AddRecordActivity extends AppCompatActivity {
         assert pickDateButton != null;
         assert pickTimeButton != null;
         assert checkedCheckBox != null;
+
+        labelEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                updateUpdateButtonState();
+            }
+        });
+
+        checkedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                updateUpdateButtonState();
+            }
+        });
 
         final Spinner tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
         assert tagSpinner != null;
@@ -182,6 +217,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 calendar.set(Calendar.DAY_OF_MONTH, calendarNow.get(Calendar.DAY_OF_MONTH));
 
                 updateDateTimeText();
+                updateUpdateButtonState();
                 return true;
             }
         });
@@ -211,6 +247,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 }
 
                 updateDateTimeText();
+                updateUpdateButtonState();
                 return true;
             }
         });
@@ -292,7 +329,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 break;
 
             case OPERATION_EDIT:
-                final Button updateButton = new Button(AddRecordActivity.this);
+                updateButton = new Button(AddRecordActivity.this);
                 updateButton.setText("Upd");
                 updateButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -360,6 +397,8 @@ public class AddRecordActivity extends AppCompatActivity {
                     updateDateTimeText();
 
                     checkedCheckBox.setChecked(editRecord.isChecked);
+
+                    updateUpdateButtonState();
                     return true;
                 }
             });
@@ -368,6 +407,7 @@ public class AddRecordActivity extends AppCompatActivity {
         setButtonWidth(cancelButton);
 
         updateDateTimeText();
+        updateUpdateButtonState();;
         setResult(0);
     }
 
@@ -416,6 +456,7 @@ public class AddRecordActivity extends AppCompatActivity {
                             parent.calendar.set(Calendar.MONTH, monthOfYear);
                             parent.calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                             parent.updateDateTimeText();
+                            parent.updateUpdateButtonState();
                         }
                     },
                     bundle.getInt(YEAR_TAG),
@@ -453,6 +494,7 @@ public class AddRecordActivity extends AppCompatActivity {
                             parent.calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                             parent.calendar.set(Calendar.MINUTE, minute);
                             parent.updateDateTimeText();
+                            parent.updateUpdateButtonState();
                         }
                     },
                     bundle.getInt(HOUR_TAG),
