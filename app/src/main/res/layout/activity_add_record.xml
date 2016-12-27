@@ -9,53 +9,52 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity">
 
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tagSpinner"
+        android:layout_alignParentTop="true" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/buttonPanel" >
+        android:layout_below="@+id/tagSpinner"
+        android:layout_above="@+id/linearLayout">
 
-        <LinearLayout
-            android:orientation="vertical"
+        <EditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <Spinner
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/tagSpinner" />
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/labelEditText"
-                android:hint="Label" />
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:weightSum="2">
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/pickDateButton" />
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/pickTimeButton" />
-            </LinearLayout>
-
-            <CheckBox
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Checked"
-                android:id="@+id/checkedCheckBox" />
-        </LinearLayout>
+            android:layout_height="wrap_content"
+            android:id="@+id/labelEditText"
+            android:hint="Label"/>
     </ScrollView>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="3"
+        android:id="@+id/linearLayout"
+        android:layout_above="@+id/buttonPanel">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/pickDateButton" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/pickTimeButton" />
+
+        <CheckBox
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Checked"
+            android:id="@+id/checkedCheckBox" />
+    </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
