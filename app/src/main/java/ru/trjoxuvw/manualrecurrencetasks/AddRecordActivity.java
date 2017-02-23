@@ -108,6 +108,11 @@ public class AddRecordActivity extends AppCompatActivity {
         NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
 
         setResult(1);
+
+        if (operation == OPERATION_EDIT) {
+            editRecord = newRecord;
+            updateUpdateButtonState();
+        }
     }
 
     private void updateRecord() {
