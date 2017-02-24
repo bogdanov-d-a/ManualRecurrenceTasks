@@ -12,7 +12,6 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".MainActivity"
-            android:label="Main"
             android:launchMode="singleTask"
             android:taskAffinity="">
 
@@ -23,7 +22,6 @@
         </activity>
 
         <activity android:name=".TagsActivity"
-            android:label="Tags"
             android:parentActivityName=".MainActivity">
 
             <meta-data
@@ -32,7 +30,6 @@
         </activity>
 
         <activity android:name=".AddRecordActivity"
-            android:label="Add / edit"
             android:parentActivityName=".MainActivity">
 
             <meta-data
@@ -41,7 +38,6 @@
         </activity>
 
         <activity android:name=".DebugActivity"
-            android:label="Debug"
             android:launchMode="singleInstance"
             android:taskAffinity="">
         </activity>
