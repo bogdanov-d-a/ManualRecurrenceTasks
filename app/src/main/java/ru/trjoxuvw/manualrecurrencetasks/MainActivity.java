@@ -167,14 +167,25 @@ public class MainActivity extends AppCompatActivity {
         recordListView = (ListView) findViewById(R.id.recordListView);
         assert recordListView != null;
 
+        handleIntent(savedInstanceState == null ? getIntent() : null);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
         refreshTags();
 
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            long tagId = getIntent().getExtras().getLong(TAG_ID_TAG, -1);
-            getIntent().getExtras().remove(TAG_ID_TAG);
-            if (tagId != -1) {
-                tagSpinner.setSelection(Utils.getPositionById(tags, tagId) + 1);
+        if (intent != null) {
+            Bundle extras = intent.getExtras();
+            if (extras != null) {
+                long tagId = extras.getLong(TAG_ID_TAG, -1);
+                if (tagId != -1) {
+                    tagSpinner.setSelection(Utils.getPositionById(tags, tagId) + 1);
+                }
             }
         }
     }
