@@ -405,7 +405,7 @@ public class AddRecordActivity extends AppCompatActivity {
         }
 
         updateDateTimeText();
-        updateUpdateButtonState();;
+        updateUpdateButtonState();
         setResult(0);
     }
 
