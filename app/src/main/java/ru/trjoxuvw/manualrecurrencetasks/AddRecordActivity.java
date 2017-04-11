@@ -92,12 +92,6 @@ public class AddRecordActivity extends AppCompatActivity {
         );
     }
 
-    private static void setButtonWidth(Button button) {
-        ViewGroup.LayoutParams lp = button.getLayoutParams();
-        lp.width = 100;
-        button.setLayoutParams(lp);
-    }
-
     private void addRecord() {
         NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
 
@@ -257,9 +251,6 @@ public class AddRecordActivity extends AppCompatActivity {
             }
         });
 
-        final LinearLayout buttonPanel = (LinearLayout) findViewById(R.id.buttonPanel);
-        assert buttonPanel != null;
-
         if (savedInstanceState == null)
             operation = getIntent().getExtras().getInt(OPERATION);
         else
@@ -309,15 +300,17 @@ public class AddRecordActivity extends AppCompatActivity {
             }
         }
 
-        final Button addButton = new Button(this);
-        addButton.setOnClickListener(new View.OnClickListener() {
+        final Button dataCreationButton = operation == OPERATION_ADD ?
+                (Button) findViewById(R.id.footerButton1) :
+                (Button) findViewById(R.id.footerButton3);
+        dataCreationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addRecord();
                 finish();
             }
         });
-        addButton.setOnLongClickListener(new View.OnLongClickListener() {
+        dataCreationButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 addRecord();
@@ -328,13 +321,11 @@ public class AddRecordActivity extends AppCompatActivity {
         switch (operation)
         {
             case OPERATION_ADD:
-                addButton.setText("Add");
-                buttonPanel.addView(addButton);
-                setButtonWidth(addButton);
+                dataCreationButton.setText("Add");
                 break;
 
             case OPERATION_EDIT:
-                updateButton = new Button(AddRecordActivity.this);
+                updateButton = (Button) findViewById(R.id.footerButton1);
                 updateButton.setText("Upd");
                 updateButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -350,10 +341,8 @@ public class AddRecordActivity extends AppCompatActivity {
                         return true;
                     }
                 });
-                buttonPanel.addView(updateButton);
-                setButtonWidth(updateButton);
 
-                final Button deleteButton = new Button(AddRecordActivity.this);
+                final Button deleteButton = (Button) findViewById(R.id.footerButton2);
                 deleteButton.setText("Del");
                 deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
@@ -373,17 +362,15 @@ public class AddRecordActivity extends AppCompatActivity {
                         return true;
                     }
                 });
-                buttonPanel.addView(deleteButton);
-                setButtonWidth(deleteButton);
 
-                addButton.setText("Cop");
-                buttonPanel.addView(addButton);
-                setButtonWidth(addButton);
+                dataCreationButton.setText("Cop");
 
                 break;
         }
 
-        final Button cancelButton = new Button(AddRecordActivity.this);
+        final Button cancelButton = operation == OPERATION_ADD ?
+                (Button) findViewById(R.id.footerButton2) :
+                (Button) findViewById(R.id.footerButton4);
         cancelButton.setText("Can");
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -408,8 +395,14 @@ public class AddRecordActivity extends AppCompatActivity {
                 }
             });
         }
-        buttonPanel.addView(cancelButton);
-        setButtonWidth(cancelButton);
+
+        if (operation == OPERATION_ADD)
+        {
+            final Button button3 = (Button) findViewById(R.id.footerButton3);
+            final Button button4 = (Button) findViewById(R.id.footerButton4);
+            button3.setVisibility(View.INVISIBLE);
+            button4.setVisibility(View.INVISIBLE);
+        }
 
         updateDateTimeText();
         updateUpdateButtonState();;
