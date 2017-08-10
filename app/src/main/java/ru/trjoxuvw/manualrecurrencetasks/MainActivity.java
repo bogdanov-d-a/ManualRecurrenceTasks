@@ -118,14 +118,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, OPTIONS_REQUEST);
             }
         });
-
-        final Button debugButton = (Button) findViewById(R.id.debugButton);
-        assert debugButton != null;
-        debugButton.setOnClickListener(new View.OnClickListener() {
+        optionsButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View view) {
                 Intent intent = new Intent(MainActivity.this, DebugActivity.class);
                 startActivity(intent);
+                return true;
             }
         });
 

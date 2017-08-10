@@ -42,7 +42,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="3"
+        android:weightSum="2"
         android:layout_alignParentBottom="true"
         android:id="@+id/bottomLinearLayout">
 
@@ -59,12 +59,5 @@
             android:layout_height="wrap_content"
             android:text="Tags"
             android:id="@+id/optionsButton" />
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Debug"
-            android:id="@+id/debugButton" />
     </LinearLayout>
 </RelativeLayout>
