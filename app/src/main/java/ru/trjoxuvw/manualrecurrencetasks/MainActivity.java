@@ -38,6 +38,11 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<TagData> tags;
     private int selectedTagPosition;
 
+    public ArrayList<TagData> getTags()
+    {
+        return tags;
+    }
+
     private void refreshTags()
     {
         tags = DatabaseHelper.getInstance(getApplicationContext()).getTags();
@@ -83,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         ArrayList<RecordData> records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : tags.get(position - 1).id, maxTime, position == 0);
-        recordListView.setAdapter(new RecordListAdapter(this, tags, records));
+        ((RecordListAdapter)recordListView.getAdapter()).ResetList(records);
     }
 
     @Override
@@ -164,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
 
         recordListView = (ListView) findViewById(R.id.recordListView);
         assert recordListView != null;
+        recordListView.setAdapter(new RecordListAdapter(this));
 
         handleIntent(savedInstanceState == null ? getIntent() : null);
     }

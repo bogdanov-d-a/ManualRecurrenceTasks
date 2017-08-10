@@ -26,15 +26,18 @@ import utils.Utils;
 
 public class RecordListAdapter extends BaseAdapter {
     private final MainActivity parentActivity;
-    private final ArrayList<RecordData> recordsList;
-    private final ArrayList<TagData> tagsList;
+    private ArrayList<RecordData> recordsList = new ArrayList<>();
     private final LayoutInflater mInflater;
 
-    public RecordListAdapter(MainActivity parentActivity, ArrayList<TagData> tagsList, ArrayList<RecordData> recordsList) {
+    public RecordListAdapter(MainActivity parentActivity) {
         this.parentActivity = parentActivity;
-        this.tagsList = tagsList;
-        this.recordsList = recordsList;
         mInflater = LayoutInflater.from(parentActivity);
+    }
+
+    public void ResetList(ArrayList<RecordData> recordsList)
+    {
+        this.recordsList = recordsList;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -93,6 +96,7 @@ public class RecordListAdapter extends BaseAdapter {
         holder.nextAppear.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(record.nextAppear)));
         holder.checkBox.setOnCheckedChangeListener(null);
 
+        final ArrayList<TagData> tagsList = parentActivity.getTags();
         final boolean canBeChecked = Utils.recordCanBeChecked(tagsList, record.tagId);
 
         holder.checkBox.setEnabled(canBeChecked);
