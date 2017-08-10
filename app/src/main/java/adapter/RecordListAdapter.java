@@ -28,14 +28,12 @@ public class RecordListAdapter extends BaseAdapter {
     private final MainActivity parentActivity;
     private final ArrayList<RecordData> recordsList;
     private final ArrayList<TagData> tagsList;
-    private final boolean showCheckboxes;
     private final LayoutInflater mInflater;
 
-    public RecordListAdapter(MainActivity parentActivity, ArrayList<TagData> tagsList, ArrayList<RecordData> recordsList, boolean showCheckboxes) {
+    public RecordListAdapter(MainActivity parentActivity, ArrayList<TagData> tagsList, ArrayList<RecordData> recordsList) {
         this.parentActivity = parentActivity;
         this.tagsList = tagsList;
         this.recordsList = recordsList;
-        this.showCheckboxes = showCheckboxes;
         mInflater = LayoutInflater.from(parentActivity);
     }
 
@@ -56,7 +54,7 @@ public class RecordListAdapter extends BaseAdapter {
 
     private View createView() {
         View convertView = mInflater.inflate(
-                showCheckboxes ? R.layout.record_checklist_item : R.layout.record_list_item,
+                R.layout.record_checklist_item,
                 null
         );
 
@@ -64,7 +62,7 @@ public class RecordListAdapter extends BaseAdapter {
                 (LinearLayout) convertView.findViewById(R.id.textLinearLayout),
                 (TextView) convertView.findViewById(R.id.label),
                 (TextView) convertView.findViewById(R.id.nextAppear),
-                showCheckboxes ? (CheckBox) convertView.findViewById(R.id.checkBox) : null
+                (CheckBox) convertView.findViewById(R.id.checkBox)
         );
 
         convertView.setTag(holder);
@@ -79,12 +77,6 @@ public class RecordListAdapter extends BaseAdapter {
         }
 
         ViewHolder holder = (ViewHolder) convertView.getTag();
-
-        if ((holder.checkBox != null) != showCheckboxes) {
-            convertView = createView();
-            holder = (ViewHolder) convertView.getTag();
-        }
-
         final RecordData record = (RecordData) getItem(position);
 
         holder.textLinearLayout.setOnClickListener(new View.OnClickListener() {
@@ -99,29 +91,26 @@ public class RecordListAdapter extends BaseAdapter {
 
         holder.label.setText(record.label);
         holder.nextAppear.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(record.nextAppear)));
+        holder.checkBox.setOnCheckedChangeListener(null);
 
-        if (holder.checkBox != null) {
-            holder.checkBox.setOnCheckedChangeListener(null);
+        final boolean canBeChecked = Utils.recordCanBeChecked(tagsList, record.tagId);
 
-            final boolean canBeChecked = Utils.recordCanBeChecked(tagsList, record.tagId);
+        holder.checkBox.setEnabled(canBeChecked);
+        holder.checkBox.setChecked(record.isChecked);
 
-            holder.checkBox.setEnabled(canBeChecked);
-            holder.checkBox.setChecked(record.isChecked);
+        if (canBeChecked) {
+            holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    TagData tag = tagsList.get(Utils.getPositionById(tagsList, record.tagId));
+                    NotificationUtils.unregisterTag(parentActivity, tag);
 
-            if (canBeChecked) {
-                holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        TagData tag = tagsList.get(Utils.getPositionById(tagsList, record.tagId));
-                        NotificationUtils.unregisterTag(parentActivity, tag);
+                    record.isChecked = isChecked;
+                    DatabaseHelper.getInstance(parentActivity).update(record);
 
-                        record.isChecked = isChecked;
-                        DatabaseHelper.getInstance(parentActivity).update(record);
-
-                        NotificationUtils.registerTag(parentActivity, tag);
-                    }
-                });
-            }
+                    NotificationUtils.registerTag(parentActivity, tag);
+                }
+            });
         }
 
         return convertView;
