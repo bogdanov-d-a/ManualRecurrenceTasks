@@ -326,7 +326,7 @@ public class AddRecordActivity extends AppCompatActivity {
 
             case OPERATION_EDIT:
                 updateButton = (Button) findViewById(R.id.footerButton1);
-                updateButton.setText("Upd");
+                updateButton.setText("Update");
                 updateButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -343,7 +343,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 });
 
                 final Button deleteButton = (Button) findViewById(R.id.footerButton2);
-                deleteButton.setText("Del");
+                deleteButton.setText("Delete");
                 deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
@@ -363,7 +363,7 @@ public class AddRecordActivity extends AppCompatActivity {
                     }
                 });
 
-                dataCreationButton.setText("Cop");
+                dataCreationButton.setText("Copy");
 
                 break;
         }
@@ -371,7 +371,7 @@ public class AddRecordActivity extends AppCompatActivity {
         final Button cancelButton = operation == OPERATION_ADD ?
                 (Button) findViewById(R.id.footerButton2) :
                 (Button) findViewById(R.id.footerButton4);
-        cancelButton.setText("Can");
+        cancelButton.setText("Cancel");
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
