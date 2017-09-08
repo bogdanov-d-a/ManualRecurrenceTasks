@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -129,6 +130,26 @@ public class TagsActivity extends AppCompatActivity {
             );
         }
 
+        private boolean isStateValid() {
+            if (tagRenameIsNotification.isChecked()) {
+                if (tagRenameIsChecklist.isChecked() || tagRenameIsInbox.isChecked()) {
+                    return false;
+                }
+            }
+
+            if (TagData.ID_TO_FILTER_MODE.get(selectedFilterMode) != TagData.FilterMode.ONLY_ALL) {
+                if (tagRenameIsChecklist.isChecked() || tagRenameIsInbox.isChecked()) {
+                    return false;
+                }
+            } else {
+                if (tagRenameIsNotification.isChecked()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -144,11 +165,43 @@ public class TagsActivity extends AppCompatActivity {
             tagRenameIsInbox = (CheckBox) view.findViewById(R.id.tagRenameIsInbox);
             tagRenameIsNotification = (CheckBox) view.findViewById(R.id.tagRenameIsNotification);
 
+            tagRenameIsChecklist.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    if (!isStateValid()) {
+                        tagRenameIsChecklist.setChecked(!b);
+                    }
+                }
+            });
+
+            tagRenameIsInbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    if (!isStateValid()) {
+                        tagRenameIsInbox.setChecked(!b);
+                    }
+                }
+            });
+
+            tagRenameIsNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    if (!isStateValid()) {
+                        tagRenameIsNotification.setChecked(!b);
+                    }
+                }
+            });
+
             filterModeSpinner = (Spinner) view.findViewById(R.id.filterModeSpinner);
             filterModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    final int oldFilterMode = selectedFilterMode;
                     selectedFilterMode = position;
+                    if (!isStateValid()) {
+                        selectedFilterMode = oldFilterMode;
+                        filterModeSpinner.setSelection(selectedFilterMode);
+                    }
                 }
 
                 @Override
