@@ -71,15 +71,38 @@ public final class TagData extends AbstractData {
 
     public final String getLabel() {
         StringBuilder label = new StringBuilder();
-
         label.append('[');
-        label.append(isChecklist ? 'c' : '-');
-        label.append(isInbox ? 'i' : '-');
-        label.append(isNotification ? 'n' : '-');
+
+        {
+            ArrayList<String> traits = new ArrayList<>();
+
+            if (isChecklist) {
+                traits.add("Cl");
+            }
+            if (isInbox) {
+                traits.add("In");
+            }
+            if (isNotification) {
+                traits.add("Not");
+            }
+
+            if (filterMode == FilterMode.DEFAULT_ALL) {
+                traits.add("Fda");
+            } else if (filterMode == FilterMode.DEFAULT_FILTERED) {
+                traits.add("Fdf");
+            }
+
+            if (traits.isEmpty()) {
+                label.append("Def");
+            } else {
+                for (String trait: traits) {
+                    label.append(trait);
+                }
+            }
+        }
+
         label.append(']');
-
         label.append(' ');
-
         label.append(name);
 
         return label.toString();
