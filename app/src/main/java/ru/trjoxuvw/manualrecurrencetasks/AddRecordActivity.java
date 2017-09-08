@@ -3,8 +3,10 @@ package ru.trjoxuvw.manualrecurrencetasks;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -369,18 +371,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        TagData oldTag = tags.get(Utils.getPositionById(tags, editRecord.tagId));
-
-                        NotificationUtils.unregisterTag(AddRecordActivity.this, oldTag);
-
-                        DatabaseHelper.getInstance(getApplicationContext()).deleteRecord(editRecord.id);
-                        NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecord.id);
-
-                        NotificationUtils.registerTag(AddRecordActivity.this, oldTag);
-
-                        setResult(1);
-                        finish();
-
+                        DeleteFragment.newInstance().show(getSupportFragmentManager(), "recordDeleter");
                         return true;
                     }
                 });
@@ -520,6 +511,44 @@ public class AddRecordActivity extends AppCompatActivity {
                     bundle.getInt(MINUTE_TAG),
                     DateFormat.is24HourFormat(getActivity())
             );
+        }
+    }
+
+    public static class DeleteFragment extends DialogFragment {
+        public static DeleteFragment newInstance() {
+            DeleteFragment fragment = new DeleteFragment();
+            return fragment;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            super.onCreateDialog(savedInstanceState);
+            final AddRecordActivity parent = (AddRecordActivity) getActivity();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(parent);
+            builder.setMessage("Delete record?")
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            TagData oldTag = parent.tags.get(Utils.getPositionById(parent.tags, parent.editRecord.tagId));
+
+                            NotificationUtils.unregisterTag(parent, oldTag);
+
+                            DatabaseHelper.getInstance(parent.getApplicationContext()).deleteRecord(parent.editRecord.id);
+                            NotificationUtils.unregisterRecord(parent, parent.editRecord.id);
+
+                            NotificationUtils.registerTag(parent, oldTag);
+
+                            parent.setResult(1);
+                            parent.finish();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dismiss();
+                        }
+                    });
+            return builder.create();
         }
     }
 }
