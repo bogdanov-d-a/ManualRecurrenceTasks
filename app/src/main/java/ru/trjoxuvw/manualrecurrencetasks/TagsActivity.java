@@ -104,6 +104,7 @@ public class TagsActivity extends AppCompatActivity {
         private CheckBox tagRenameIsNotification;
         private Spinner filterModeSpinner;
         private int selectedFilterMode;
+        private boolean enableValidation = false;
 
         public static TagRenameDialogFragment newInstance() {
             return new TagRenameDialogFragment();
@@ -131,6 +132,10 @@ public class TagsActivity extends AppCompatActivity {
         }
 
         private boolean isStateValid() {
+            if (!enableValidation) {
+                return true;
+            }
+
             if (tagRenameIsNotification.isChecked()) {
                 if (tagRenameIsChecklist.isChecked() || tagRenameIsInbox.isChecked()) {
                     return false;
@@ -257,6 +262,8 @@ public class TagsActivity extends AppCompatActivity {
                             dismiss();
                         }
                     });
+
+            enableValidation = true;
             return builder.create();
         }
     }
