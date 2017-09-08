@@ -11,7 +11,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -19,7 +18,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
@@ -52,6 +50,7 @@ public class AddRecordActivity extends AppCompatActivity {
     private Button pickDateButton, pickTimeButton;
     private CheckBox checkedCheckBox;
     private Button updateButton;
+    private Button cancelButton;
 
     private ArrayList<TagData> tags;
     private int selectedTagPosition;
@@ -68,18 +67,41 @@ public class AddRecordActivity extends AppCompatActivity {
         pickTimeButton.setText(SimpleDateFormat.getTimeInstance().format(date));
     }
 
-    private void updateUpdateButtonState()
+    private Boolean initSameRecord(Boolean data) {
+        if (data == null) {
+            data = layoutDataToRecordData(editRecord.id).equalsRecord(editRecord);
+        }
+        return data;
+    }
+
+    private void updateButtonState()
     {
-        if (updateButton == null)
-            return;
-        updateButton.setEnabled(!layoutDataToRecordData(editRecord.id).equalsRecord(editRecord));
+        Boolean sameRecord = null;
+
+        if (updateButton != null) {
+            sameRecord = initSameRecord(sameRecord);
+            updateButton.setEnabled(!sameRecord);
+        }
+
+        if (cancelButton != null) {
+            boolean unmodified;
+
+            if (operation == OPERATION_ADD) {
+                unmodified = false;
+            } else {
+                sameRecord = initSameRecord(sameRecord);
+                unmodified = sameRecord;
+            }
+
+            cancelButton.setText(unmodified ? "Close" : "Discard");
+        }
     }
 
     private void switchTag(int position) {
         selectedTagPosition = position;
         useCheckbox = tags.get(position).isChecklist;
         checkedCheckBox.setEnabled(useCheckbox);
-        updateUpdateButtonState();
+        updateButtonState();
     }
 
     private RecordData layoutDataToRecordData(long id) {
@@ -105,7 +127,7 @@ public class AddRecordActivity extends AppCompatActivity {
 
         if (operation == OPERATION_EDIT) {
             editRecord = newRecord;
-            updateUpdateButtonState();
+            updateButtonState();
         }
     }
 
@@ -126,13 +148,29 @@ public class AddRecordActivity extends AppCompatActivity {
 
         setResult(1);
         editRecord = newEditRecord;
-        updateUpdateButtonState();
+        updateButtonState();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_record);
+
+        if (savedInstanceState == null)
+            operation = getIntent().getExtras().getInt(OPERATION);
+        else
+            operation = savedInstanceState.getInt(OPERATION);
+
+        if (operation == OPERATION_EDIT) {
+            final long editRecordId;
+            if (savedInstanceState == null)
+                editRecordId = getIntent().getExtras().getLong(EDIT_RECORD_ID);
+            else
+                editRecordId = savedInstanceState.getLong(EDIT_RECORD_ID);
+            editRecord = DatabaseHelper.getInstance(getApplicationContext()).getRecord(editRecordId);
+        } else {
+            editRecord = null;
+        }
 
         labelEditText = (EditText) findViewById(R.id.labelEditText);
         pickDateButton = (Button) findViewById(R.id.pickDateButton);
@@ -155,14 +193,14 @@ public class AddRecordActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                updateUpdateButtonState();
+                updateButtonState();
             }
         });
 
         checkedCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                updateUpdateButtonState();
+                updateButtonState();
             }
         });
 
@@ -216,7 +254,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 calendar.set(Calendar.DAY_OF_MONTH, calendarNow.get(Calendar.DAY_OF_MONTH));
 
                 updateDateTimeText();
-                updateUpdateButtonState();
+                updateButtonState();
                 return true;
             }
         });
@@ -246,26 +284,10 @@ public class AddRecordActivity extends AppCompatActivity {
                 }
 
                 updateDateTimeText();
-                updateUpdateButtonState();
+                updateButtonState();
                 return true;
             }
         });
-
-        if (savedInstanceState == null)
-            operation = getIntent().getExtras().getInt(OPERATION);
-        else
-            operation = savedInstanceState.getInt(OPERATION);
-
-        if (operation == OPERATION_EDIT) {
-            final long editRecordId;
-            if (savedInstanceState == null)
-                editRecordId = getIntent().getExtras().getLong(EDIT_RECORD_ID);
-            else
-                editRecordId = savedInstanceState.getLong(EDIT_RECORD_ID);
-            editRecord = DatabaseHelper.getInstance(getApplicationContext()).getRecord(editRecordId);
-        } else {
-            editRecord = null;
-        }
 
         calendar = Calendar.getInstance();
         calendar.set(Calendar.SECOND, 0);
@@ -321,7 +343,7 @@ public class AddRecordActivity extends AppCompatActivity {
         switch (operation)
         {
             case OPERATION_ADD:
-                dataCreationButton.setText("Add");
+                dataCreationButton.setText("Create");
                 break;
 
             case OPERATION_EDIT:
@@ -368,10 +390,9 @@ public class AddRecordActivity extends AppCompatActivity {
                 break;
         }
 
-        final Button cancelButton = operation == OPERATION_ADD ?
+        cancelButton = operation == OPERATION_ADD ?
                 (Button) findViewById(R.id.footerButton2) :
                 (Button) findViewById(R.id.footerButton4);
-        cancelButton.setText("Cancel");
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -390,7 +411,7 @@ public class AddRecordActivity extends AppCompatActivity {
 
                     checkedCheckBox.setChecked(editRecord.isChecked);
 
-                    updateUpdateButtonState();
+                    updateButtonState();
                     return true;
                 }
             });
@@ -405,7 +426,7 @@ public class AddRecordActivity extends AppCompatActivity {
         }
 
         updateDateTimeText();
-        updateUpdateButtonState();
+        updateButtonState();
         setResult(0);
     }
 
@@ -454,7 +475,7 @@ public class AddRecordActivity extends AppCompatActivity {
                             parent.calendar.set(Calendar.MONTH, monthOfYear);
                             parent.calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                             parent.updateDateTimeText();
-                            parent.updateUpdateButtonState();
+                            parent.updateButtonState();
                         }
                     },
                     bundle.getInt(YEAR_TAG),
@@ -492,7 +513,7 @@ public class AddRecordActivity extends AppCompatActivity {
                             parent.calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                             parent.calendar.set(Calendar.MINUTE, minute);
                             parent.updateDateTimeText();
-                            parent.updateUpdateButtonState();
+                            parent.updateButtonState();
                         }
                     },
                     bundle.getInt(HOUR_TAG),
