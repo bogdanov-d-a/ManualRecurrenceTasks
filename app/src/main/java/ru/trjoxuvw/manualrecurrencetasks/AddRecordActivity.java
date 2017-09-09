@@ -52,7 +52,7 @@ public class AddRecordActivity extends AppCompatActivity {
     private Button pickDateButton, pickTimeButton;
     private CheckBox checkedCheckBox;
     private Button updateButton;
-    private Button cancelButton;
+    private Button dismissRevertButton;
 
     private ArrayList<GroupData> groups;
     private int selectedGroupPosition;
@@ -85,7 +85,7 @@ public class AddRecordActivity extends AppCompatActivity {
             updateButton.setEnabled(!sameRecord);
         }
 
-        if (cancelButton != null) {
+        if (dismissRevertButton != null) {
             boolean unmodified;
 
             if (operation == OPERATION_CREATE) {
@@ -95,7 +95,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 unmodified = sameRecord;
             }
 
-            cancelButton.setText(unmodified ? "Close" : "Discard");
+            dismissRevertButton.setText(unmodified ? "Close" : "Discard");
         }
     }
 
@@ -381,17 +381,17 @@ public class AddRecordActivity extends AppCompatActivity {
                 break;
         }
 
-        cancelButton = operation == OPERATION_CREATE ?
+        dismissRevertButton = operation == OPERATION_CREATE ?
                 (Button) findViewById(R.id.footerButton2) :
                 (Button) findViewById(R.id.footerButton4);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
+        dismissRevertButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
         if (operation == OPERATION_UPDATE) {
-            cancelButton.setOnLongClickListener(new View.OnLongClickListener() {
+            dismissRevertButton.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     groupSpinner.setSelection(Utils.getPositionById(groups, editRecord.groupId));

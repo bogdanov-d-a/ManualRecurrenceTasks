@@ -257,7 +257,7 @@ public class GroupsActivity extends AppCompatActivity {
                         });
             }
 
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             dismiss();
                         }
