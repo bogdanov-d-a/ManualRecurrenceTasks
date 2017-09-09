@@ -1,14 +1,14 @@
 package database;
 
 public final class RecordData extends AbstractData {
-    public long tagId;
+    public long groupId;
     public String label;
     public long nextAppear;
     public boolean isChecked;
 
-    public RecordData(long id, long tagId, String label, long nextAppear, boolean isChecked) {
+    public RecordData(long id, long groupId, String label, long nextAppear, boolean isChecked) {
         super(id);
-        this.tagId = tagId;
+        this.groupId = groupId;
         this.label = label;
         this.nextAppear = nextAppear;
         this.isChecked = isChecked;
@@ -23,7 +23,7 @@ public final class RecordData extends AbstractData {
     protected String getDataStringAux(int id) {
         switch (id) {
             case 1:
-                return Long.toString(tagId);
+                return Long.toString(groupId);
             case 2:
                 return label;
             case 3:
@@ -37,7 +37,7 @@ public final class RecordData extends AbstractData {
 
     public boolean equalsRecord(RecordData o) {
         return id == o.id &&
-                tagId == o.tagId &&
+                groupId == o.groupId &&
                 label.equals(o.label) &&
                 nextAppear == o.nextAppear &&
                 isChecked == o.isChecked;

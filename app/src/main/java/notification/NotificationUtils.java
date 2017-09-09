@@ -13,18 +13,18 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import database.RecordData;
-import database.TagData;
+import database.GroupData;
 import database.DatabaseHelper;
 import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
 import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
 
 public class NotificationUtils {
-    public static void show(Context context, String tagName, String recordLabel, long recordRowid)
+    public static void show(Context context, String groupName, String recordLabel, long recordRowid)
     {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(android.R.drawable.ic_menu_info_details)
-                        .setContentTitle(tagName)
+                        .setContentTitle(groupName)
                         .setContentText(recordLabel)
                         .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -51,22 +51,22 @@ public class NotificationUtils {
         mNotificationManager.notify((int)recordRowid, mBuilder.build());
     }
 
-    public static void showInbox(Context context, TagData tag, long recordCount)
+    public static void showInbox(Context context, GroupData group, long recordCount)
     {
-        int uid = -1 * (int)tag.id;
+        int uid = -1 * (int)group.id;
         String fullText = recordCount + " pending records.";
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(android.R.drawable.ic_menu_info_details)
-                        .setContentTitle(tag.name)
+                        .setContentTitle(group.name)
                         .setContentText(fullText)
                         .setPriority(NotificationCompat.PRIORITY_LOW)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(fullText))
                         .setOngoing(true);
 
         Intent resultIntent = new Intent(context, MainActivity.class);
-        resultIntent.putExtra(MainActivity.TAG_ID_TAG, tag.id);
+        resultIntent.putExtra(MainActivity.GROUP_ID_TAG, group.id);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addParentStack(MainActivity.class);
@@ -91,9 +91,9 @@ public class NotificationUtils {
         mNotificationManager.cancel((int)recordRowid);
     }
 
-    public static void hideInbox(Context context, long tagRowid)
+    public static void hideInbox(Context context, long groupRowid)
     {
-        int uid = -1 * (int)tagRowid;
+        int uid = -1 * (int)groupRowid;
         hide(context, uid);
     }
 
@@ -117,14 +117,14 @@ public class NotificationUtils {
         alarmMgr.cancel(createAlarmIntent(context, recordRowid));
     }
 
-    public static void registerRecord(Context context, TagData tag, RecordData record)
+    public static void registerRecord(Context context, GroupData group, RecordData record)
     {
-        if (tag.isNotification)
+        if (group.isNotification)
         {
             Calendar calendarNow = Calendar.getInstance();
 
             if (record.nextAppear < calendarNow.getTimeInMillis())
-                show(context, tag.name, record.label, record.id);
+                show(context, group.name, record.label, record.id);
             else
                 schedule(context, record.id, record.nextAppear);
         }
@@ -136,31 +136,31 @@ public class NotificationUtils {
         hide(context, recordRowid);
     }
 
-    public static void registerTagData(Context context, TagData tag)
+    public static void registerGroupData(Context context, GroupData group)
     {
-        registerTag(context, tag);
+        registerGroup(context, group);
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE, false);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(group.id, Long.MIN_VALUE, false);
         for (RecordData record : records)
         {
-            registerRecord(context, tag, record);
+            registerRecord(context, group, record);
         }
     }
 
     public static void registerAllData(Context context)
     {
-        ArrayList<TagData> tags = DatabaseHelper.getInstance(context).getTags();
-        for (TagData tag : tags)
+        ArrayList<GroupData> groups = DatabaseHelper.getInstance(context).getGroups();
+        for (GroupData group : groups)
         {
-            registerTagData(context, tag);
+            registerGroupData(context, group);
         }
     }
 
-    public static void unregisterTagData(Context context, TagData tag)
+    public static void unregisterGroupData(Context context, GroupData group)
     {
-        unregisterTag(context, tag);
+        unregisterGroup(context, group);
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tag.id, Long.MIN_VALUE, false);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(group.id, Long.MIN_VALUE, false);
         for (RecordData record : records)
         {
             unregisterRecord(context, record.id);
@@ -169,25 +169,25 @@ public class NotificationUtils {
 
     public static void unregisterAllData(Context context)
     {
-        ArrayList<TagData> tags = DatabaseHelper.getInstance(context).getTags();
-        for (TagData tag : tags)
+        ArrayList<GroupData> groups = DatabaseHelper.getInstance(context).getGroups();
+        for (GroupData group : groups)
         {
-            unregisterTagData(context, tag);
+            unregisterGroupData(context, group);
         }
     }
 
-    public static void registerTag(Context context, TagData tag) {
-        if (tag.isInbox) {
-            long count = DatabaseHelper.getInstance(context).getUndoneTasksCount(tag);
+    public static void registerGroup(Context context, GroupData group) {
+        if (group.isInbox) {
+            long count = DatabaseHelper.getInstance(context).getUndoneTasksCount(group);
             if (count > 0) {
-                showInbox(context, tag, count);
+                showInbox(context, group, count);
             } else {
-                hideInbox(context, tag.id);
+                hideInbox(context, group.id);
             }
         }
     }
 
-    public static void unregisterTag(Context context, TagData tag) {
-        hideInbox(context, tag.id);
+    public static void unregisterGroup(Context context, GroupData group) {
+        hideInbox(context, group.id);
     }
 }

@@ -90,7 +90,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(createGen(StaticInfo.Type.TAG));
+        db.execSQL(createGen(StaticInfo.Type.GROUP));
         db.execSQL(createGen(StaticInfo.Type.RECORD));
     }
 
@@ -101,20 +101,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         while (curVersion != newVersion) {
             switch (curVersion) {
                 case 1:
-                    db.execSQL("alter table " + StaticInfo.getTagTableName() +
-                            " add column " + StaticInfo.getTagRowName(StaticInfo.TagRowId.IS_CHECKLIST) + " integer;");
+                    db.execSQL("alter table " + StaticInfo.getGroupTableName() +
+                            " add column " + StaticInfo.getGroupRowName(StaticInfo.GroupRowId.IS_CHECKLIST) + " integer;");
                     db.execSQL("alter table " + StaticInfo.getRecordTableName() +
                             " add column " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.IS_CHECKED) + " integer;");
                     break;
 
                 case 2:
-                    db.execSQL("alter table " + StaticInfo.getTagTableName() +
-                            " add column " + StaticInfo.getTagRowName(StaticInfo.TagRowId.IS_INBOX) + " integer;");
+                    db.execSQL("alter table " + StaticInfo.getGroupTableName() +
+                            " add column " + StaticInfo.getGroupRowName(StaticInfo.GroupRowId.IS_INBOX) + " integer;");
                     break;
 
                 case 3:
-                    db.execSQL("alter table " + StaticInfo.getTagTableName() +
-                            " add column " + StaticInfo.getTagRowName(StaticInfo.TagRowId.IS_NOTIFICATION) + " integer;");
+                    db.execSQL("alter table " + StaticInfo.getGroupTableName() +
+                            " add column " + StaticInfo.getGroupRowName(StaticInfo.GroupRowId.IS_NOTIFICATION) + " integer;");
 
                     db.execSQL("alter table " + StaticInfo.getRecordTableName() +
                             " rename to " + StaticInfo.getRecordTableName() + "_old;");
@@ -137,22 +137,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     break;
 
                 case 4:
-                    db.execSQL("alter table " + StaticInfo.getTagTableName() +
-                            " add column " + StaticInfo.getTagRowName(StaticInfo.TagRowId.FILTER_MODE) + " integer;");
+                    db.execSQL("alter table " + StaticInfo.getGroupTableName() +
+                            " add column " + StaticInfo.getGroupRowName(StaticInfo.GroupRowId.FILTER_MODE) + " integer;");
                     break;
 
                 case 5:
-                    // rename old tag table
-                    db.execSQL("alter table " + StaticInfo.getTagTableName() +
-                            " rename to " + StaticInfo.getTagTableName() + "_old;");
+                    // rename old group table
+                    db.execSQL("alter table " + StaticInfo.getGroupTableName() +
+                            " rename to " + StaticInfo.getGroupTableName() + "_old;");
 
                     // rename old record table
                     db.execSQL("alter table " + StaticInfo.getRecordTableName() +
                             " rename to " + StaticInfo.getRecordTableName() + "_old;");
 
-                    // create new tag table
-                    db.execSQL(createGen(StaticInfo.Type.TAG));
-                    db.execSQL("insert into " + StaticInfo.getTagTableName() + " select * from " + StaticInfo.getTagTableName() + "_old;");
+                    // create new group table
+                    db.execSQL(createGen(StaticInfo.Type.GROUP));
+                    db.execSQL("insert into " + StaticInfo.getGroupTableName() + " select * from " + StaticInfo.getGroupTableName() + "_old;");
 
                     // create new record table
                     db.execSQL(createGen(StaticInfo.Type.RECORD));
@@ -161,8 +161,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     // delete old record table
                     db.execSQL("drop table " + StaticInfo.getRecordTableName() + "_old;");
 
-                    // delete old tag table
-                    db.execSQL("drop table " + StaticInfo.getTagTableName() + "_old;");
+                    // delete old group table
+                    db.execSQL("drop table " + StaticInfo.getGroupTableName() + "_old;");
 
                 default:
                     break;
@@ -188,24 +188,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<TagData> getTags()
+    public ArrayList<GroupData> getGroups()
     {
-        ArrayList<TagData> result = new ArrayList<>();
+        ArrayList<GroupData> result = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + StaticInfo.getTagTableName() +
-                " order by " + StaticInfo.getTagRowName(StaticInfo.TagRowId.NAME) + " asc;", null);
+        Cursor cursor = db.rawQuery("select * from " + StaticInfo.getGroupTableName() +
+                " order by " + StaticInfo.getGroupRowName(StaticInfo.GroupRowId.NAME) + " asc;", null);
         if (cursor.moveToFirst())
         {
             do
             {
-                result.add(new TagData(
-                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(0))),
-                        cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(1))),
-                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(2))) != 0,
-                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(3))) != 0,
-                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(4))) != 0,
-                        TagData.ID_TO_FILTER_MODE.get((int)cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(5))))
+                result.add(new GroupData(
+                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(0))),
+                        cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(1))),
+                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(2))) != 0,
+                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(3))) != 0,
+                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(4))) != 0,
+                        GroupData.ID_TO_FILTER_MODE.get((int)cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(5))))
                 ));
             }
             while (cursor.moveToNext());
@@ -231,16 +231,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result.toString();
     }
 
-    public ArrayList<RecordData> getRecords(long tagId, long maxDate, boolean notificationsOnly)
+    public ArrayList<RecordData> getRecords(long groupId, long maxDate, boolean notificationsOnly)
     {
         ArrayList<RecordData> result = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
 
         Cursor cursor;
         {
-            String tagIdExpr = "1";
-            if (tagId != Long.MIN_VALUE)
-                tagIdExpr = StaticInfo.getRecordRowName(StaticInfo.RecordRowId.TAG_ID) + "=" + escapeStr(Long.toString(tagId));
+            String groupIdExpr = "1";
+            if (groupId != Long.MIN_VALUE)
+                groupIdExpr = StaticInfo.getRecordRowName(StaticInfo.RecordRowId.GROUP_ID) + "=" + escapeStr(Long.toString(groupId));
 
             String maxDateExpr = "1";
             if (maxDate > Long.MIN_VALUE)
@@ -248,11 +248,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             String notificationsOnlyExpr = "1";
             if (notificationsOnly)
-                notificationsOnlyExpr = StaticInfo.getTagRowName(StaticInfo.TagRowId.IS_NOTIFICATION) + "!=" + escapeStr(Long.toString(0));
+                notificationsOnlyExpr = StaticInfo.getGroupRowName(StaticInfo.GroupRowId.IS_NOTIFICATION) + "!=" + escapeStr(Long.toString(0));
 
-            cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " inner join " + StaticInfo.getTagTableName() +
-                    " on " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.TAG_ID) + "=" + StaticInfo.getTagRowName(0) +
-                    " where (" + tagIdExpr + ") and (" + maxDateExpr + ") and (" + notificationsOnlyExpr + ")" +
+            cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " inner join " + StaticInfo.getGroupTableName() +
+                    " on " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.GROUP_ID) + "=" + StaticInfo.getGroupRowName(0) +
+                    " where (" + groupIdExpr + ") and (" + maxDateExpr + ") and (" + notificationsOnlyExpr + ")" +
                     " order by " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.NEXT_APPEAR) + " asc;", null);
         }
 
@@ -270,10 +270,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public long getUndoneTasksCount(TagData tag) {
+    public long getUndoneTasksCount(GroupData group) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("select count(" + StaticInfo.getRecordRowName(0) + ") from " + StaticInfo.getRecordTableName() +
-                " where (" + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.TAG_ID) + "=" + escapeStr(Long.toString(tag.id)) + ")" +
+                " where (" + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.GROUP_ID) + "=" + escapeStr(Long.toString(group.id)) + ")" +
                 " and (" + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.IS_CHECKED) + "=" + escapeStr(Long.toString(0)) + ");", null);
 
         cursor.moveToFirst();
@@ -293,11 +293,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public void deleteTag(long id)
+    public void deleteGroup(long id)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("delete from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.TAG_ID) + "=" + escapeStr(Long.toString(id)) + ";");
-        db.execSQL("delete from " + StaticInfo.getTagTableName() + " where " + StaticInfo.getTagRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
+        db.execSQL("delete from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.GROUP_ID) + "=" + escapeStr(Long.toString(id)) + ";");
+        db.execSQL("delete from " + StaticInfo.getGroupTableName() + " where " + StaticInfo.getGroupRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
         db.close();
     }
 
@@ -323,20 +323,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static class RecordDataMin
     {
-        public RecordDataMin(String tagName, String label) {
-            this.tagName = tagName;
+        public RecordDataMin(String groupName, String label) {
+            this.groupName = groupName;
             this.label = label;
         }
 
-        public String tagName;
+        public String groupName;
         public String label;
     }
 
     public RecordDataMin getRecordMin(long id)
     {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " inner join " + StaticInfo.getTagTableName() +
-                " on " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.TAG_ID) + "=" + StaticInfo.getTagRowName(0) +
+        Cursor cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " inner join " + StaticInfo.getGroupTableName() +
+                " on " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.GROUP_ID) + "=" + StaticInfo.getGroupRowName(0) +
                 " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";", null);
 
         try
@@ -344,7 +344,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (cursor.moveToFirst())
             {
                 return new RecordDataMin(
-                        cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getTagRowName(StaticInfo.TagRowId.NAME))),
+                        cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(StaticInfo.GroupRowId.NAME))),
                         cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getRecordRowName(StaticInfo.RecordRowId.LABEL)))
                 );
             }

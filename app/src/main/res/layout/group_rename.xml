@@ -15,26 +15,26 @@
         android:id="@+id/captionTextView" />
 
     <EditText
-        android:id="@+id/tagRenameEditText"
+        android:id="@+id/groupRenameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tag name"
+        android:hint="Group name"
         android:singleLine="true" />
 
     <CheckBox
-        android:id="@+id/tagRenameIsChecklist"
+        android:id="@+id/groupRenameIsChecklist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Is checklist" />
 
     <CheckBox
-        android:id="@+id/tagRenameIsInbox"
+        android:id="@+id/groupRenameIsInbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Inbox" />
 
     <CheckBox
-        android:id="@+id/tagRenameIsNotification"
+        android:id="@+id/groupRenameIsNotification"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Notification" />

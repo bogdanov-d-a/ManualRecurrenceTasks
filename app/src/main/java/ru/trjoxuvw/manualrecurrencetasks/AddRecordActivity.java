@@ -29,7 +29,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import database.RecordData;
-import database.TagData;
+import database.GroupData;
 import database.DatabaseHelper;
 import notification.NotificationUtils;
 import utils.Utils;
@@ -45,7 +45,7 @@ public class AddRecordActivity extends AppCompatActivity {
     public static final int OPERATION_ADD = 0;
     public static final int OPERATION_EDIT = 1;
 
-    public static final String INIT_TAG_INDEX = "initTagIndex";
+    public static final String INIT_GROUP_INDEX = "INIT_GROUP_INDEX";
     public static final String EDIT_RECORD_ID = "EDIT_RECORD_ID";
 
     private EditText labelEditText;
@@ -54,8 +54,8 @@ public class AddRecordActivity extends AppCompatActivity {
     private Button updateButton;
     private Button cancelButton;
 
-    private ArrayList<TagData> tags;
-    private int selectedTagPosition;
+    private ArrayList<GroupData> groups;
+    private int selectedGroupPosition;
     private boolean useCheckbox;
 
     private Calendar calendar;
@@ -99,9 +99,9 @@ public class AddRecordActivity extends AppCompatActivity {
         }
     }
 
-    private void switchTag(int position) {
-        selectedTagPosition = position;
-        useCheckbox = tags.get(position).isChecklist;
+    private void switchGroup(int position) {
+        selectedGroupPosition = position;
+        useCheckbox = groups.get(position).isChecklist;
         checkedCheckBox.setEnabled(useCheckbox);
         updateButtonState();
     }
@@ -109,7 +109,7 @@ public class AddRecordActivity extends AppCompatActivity {
     private RecordData layoutDataToRecordData(long id) {
         return new RecordData(
                 id,
-                tags.get(selectedTagPosition).id,
+                groups.get(selectedGroupPosition).id,
                 labelEditText.getText().toString(),
                 calendar.getTimeInMillis(),
                 useCheckbox && checkedCheckBox.isChecked()
@@ -117,13 +117,13 @@ public class AddRecordActivity extends AppCompatActivity {
     }
 
     private void addRecord() {
-        NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+        NotificationUtils.unregisterGroup(AddRecordActivity.this, groups.get(selectedGroupPosition));
 
         RecordData newRecord = layoutDataToRecordData(0);
         newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).add(newRecord);
-        NotificationUtils.registerRecord(AddRecordActivity.this, tags.get(selectedTagPosition), newRecord);
+        NotificationUtils.registerRecord(AddRecordActivity.this, groups.get(selectedGroupPosition), newRecord);
 
-        NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+        NotificationUtils.registerGroup(AddRecordActivity.this, groups.get(selectedGroupPosition));
 
         setResult(1);
 
@@ -134,19 +134,19 @@ public class AddRecordActivity extends AppCompatActivity {
     }
 
     private void updateRecord() {
-        TagData oldTag = tags.get(Utils.getPositionById(tags, editRecord.tagId));
+        GroupData oldGroup = groups.get(Utils.getPositionById(groups, editRecord.groupId));
 
         RecordData newEditRecord = layoutDataToRecordData(editRecord.id);
         DatabaseHelper.getInstance(getApplicationContext()).update(newEditRecord);
 
-        NotificationUtils.unregisterTag(AddRecordActivity.this, oldTag);
-        NotificationUtils.unregisterTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+        NotificationUtils.unregisterGroup(AddRecordActivity.this, oldGroup);
+        NotificationUtils.unregisterGroup(AddRecordActivity.this, groups.get(selectedGroupPosition));
 
         NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecord.id);
-        NotificationUtils.registerRecord(AddRecordActivity.this, tags.get(selectedTagPosition), newEditRecord);
+        NotificationUtils.registerRecord(AddRecordActivity.this, groups.get(selectedGroupPosition), newEditRecord);
 
-        NotificationUtils.registerTag(AddRecordActivity.this, oldTag);
-        NotificationUtils.registerTag(AddRecordActivity.this, tags.get(selectedTagPosition));
+        NotificationUtils.registerGroup(AddRecordActivity.this, oldGroup);
+        NotificationUtils.registerGroup(AddRecordActivity.this, groups.get(selectedGroupPosition));
 
         setResult(1);
         editRecord = newEditRecord;
@@ -206,32 +206,32 @@ public class AddRecordActivity extends AppCompatActivity {
             }
         });
 
-        final Spinner tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
-        assert tagSpinner != null;
-        tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        final Spinner groupSpinner = (Spinner) findViewById(R.id.groupSpinner);
+        assert groupSpinner != null;
+        groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switchTag(position);
+                switchGroup(position);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                switchTag(0);
+                switchGroup(0);
             }
         });
 
         {
-            tags = DatabaseHelper.getInstance(getApplicationContext()).getTags();
+            groups = DatabaseHelper.getInstance(getApplicationContext()).getGroups();
 
-            ArrayList<String> tagStrings = new ArrayList<>();
-            for (TagData tag : tags)
+            ArrayList<String> groupStrings = new ArrayList<>();
+            for (GroupData group : groups)
             {
-                tagStrings.add(tag.getLabel());
+                groupStrings.add(group.getLabel());
             }
 
-            ArrayAdapter<String> tagStringsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tagStrings);
-            tagStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            tagSpinner.setAdapter(tagStringsAdapter);
+            ArrayAdapter<String> groupStringsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, groupStrings);
+            groupStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            groupSpinner.setAdapter(groupStringsAdapter);
         }
 
         pickDateButton.setOnClickListener(new View.OnClickListener() {
@@ -313,11 +313,11 @@ public class AddRecordActivity extends AppCompatActivity {
             switch (operation)
             {
                 case OPERATION_ADD:
-                    tagSpinner.setSelection(getIntent().getExtras().getInt(INIT_TAG_INDEX));
+                    groupSpinner.setSelection(getIntent().getExtras().getInt(INIT_GROUP_INDEX));
                     break;
 
                 case OPERATION_EDIT:
-                    tagSpinner.setSelection(Utils.getPositionById(tags, editRecord.tagId));
+                    groupSpinner.setSelection(Utils.getPositionById(groups, editRecord.groupId));
                     labelEditText.setText(editRecord.label);
                     checkedCheckBox.setChecked(editRecord.isChecked);
                     break;
@@ -394,7 +394,7 @@ public class AddRecordActivity extends AppCompatActivity {
             cancelButton.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    tagSpinner.setSelection(Utils.getPositionById(tags, editRecord.tagId));
+                    groupSpinner.setSelection(Utils.getPositionById(groups, editRecord.groupId));
                     labelEditText.setText(editRecord.label);
 
                     calendar.setTimeInMillis(editRecord.nextAppear);
@@ -530,14 +530,14 @@ public class AddRecordActivity extends AppCompatActivity {
             builder.setMessage("Delete record?")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            TagData oldTag = parent.tags.get(Utils.getPositionById(parent.tags, parent.editRecord.tagId));
+                            GroupData oldGroup = parent.groups.get(Utils.getPositionById(parent.groups, parent.editRecord.groupId));
 
-                            NotificationUtils.unregisterTag(parent, oldTag);
+                            NotificationUtils.unregisterGroup(parent, oldGroup);
 
                             DatabaseHelper.getInstance(parent.getApplicationContext()).deleteRecord(parent.editRecord.id);
                             NotificationUtils.unregisterRecord(parent, parent.editRecord.id);
 
-                            NotificationUtils.registerTag(parent, oldTag);
+                            NotificationUtils.registerGroup(parent, oldGroup);
 
                             parent.setResult(1);
                             parent.finish();

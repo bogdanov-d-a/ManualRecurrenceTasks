@@ -11,30 +11,30 @@ import ru.trjoxuvw.manualrecurrencetasks.R;
 
 import java.util.ArrayList;
 
-import database.TagData;
+import database.GroupData;
 
-public class TagListAdapter extends BaseAdapter {
+public class GroupListAdapter extends BaseAdapter {
     private final LayoutInflater mInflater;
-    private ArrayList<TagData> tagsList = new ArrayList<>();
+    private ArrayList<GroupData> groupsList = new ArrayList<>();
 
-    public TagListAdapter(Context context) {
+    public GroupListAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
     }
 
-    public void ResetList(ArrayList<TagData> tagsList)
+    public void ResetList(ArrayList<GroupData> groupsList)
     {
-        this.tagsList = tagsList;
+        this.groupsList = groupsList;
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return tagsList.size();
+        return groupsList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return tagsList.get(position);
+        return groupsList.get(position);
     }
 
     @Override
@@ -47,15 +47,15 @@ public class TagListAdapter extends BaseAdapter {
         final ViewHolder holder;
 
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.tag_list_item, null);
+            convertView = mInflater.inflate(R.layout.group_list_item, null);
             holder = new ViewHolder((TextView) convertView.findViewById(R.id.name));
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        final TagData tag = (TagData) getItem(position);
-        holder.name.setText(tag.getLabel());
+        final GroupData group = (GroupData) getItem(position);
+        holder.name.setText(group.getLabel());
 
         return convertView;
     }

@@ -12,7 +12,7 @@
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tagSpinner"
+        android:id="@+id/groupSpinner"
         android:layout_alignParentTop="true" />
 
     <LinearLayout
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/filterCheckBoxes"
-        android:layout_below="@+id/tagSpinner"
+        android:layout_below="@+id/groupSpinner"
         android:weightSum="1">
 
         <CheckBox
@@ -57,7 +57,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Tags"
+            android:text="Groups"
             android:id="@+id/optionsButton" />
     </LinearLayout>
 </RelativeLayout>

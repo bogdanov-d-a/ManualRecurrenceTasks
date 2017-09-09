@@ -21,20 +21,20 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import adapter.TagListAdapter;
-import database.TagData;
+import adapter.GroupListAdapter;
+import database.GroupData;
 import database.DatabaseHelper;
 import notification.NotificationUtils;
 import utils.Utils;
 
-public class TagsActivity extends AppCompatActivity {
-    private ListView tagListView;
+public class GroupsActivity extends AppCompatActivity {
+    private ListView groupListView;
 
-    private static final String TAG_INDEX_TAG = "TAG_INDEX_TAG";
+    private static final String GROUP_INDEX_TAG = "GROUP_INDEX_TAG";
     private static final String RESULT_CODE_TAG = "RESULT_CODE_TAG";
     private int resultCode;
 
-    private ArrayList<TagData> tags;
+    private ArrayList<GroupData> groups;
 
     private void mySetResult(int code)
     {
@@ -42,46 +42,46 @@ public class TagsActivity extends AppCompatActivity {
         setResult(code);
     }
 
-    private void refreshTags()
+    private void refreshGroups()
     {
-        tags = DatabaseHelper.getInstance(getApplicationContext()).getTags();
-        ((TagListAdapter)tagListView.getAdapter()).ResetList(tags);
+        groups = DatabaseHelper.getInstance(getApplicationContext()).getGroups();
+        ((GroupListAdapter) groupListView.getAdapter()).ResetList(groups);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tags);
+        setContentView(R.layout.activity_groups);
 
-        tagListView = (ListView) findViewById(R.id.tagListView);
-        assert tagListView != null;
-        tagListView.setAdapter(new TagListAdapter(this));
+        groupListView = (ListView) findViewById(R.id.groupListView);
+        assert groupListView != null;
+        groupListView.setAdapter(new GroupListAdapter(this));
 
-        tagListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        groupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TagRenameDialogFragment.newInstance(position).show(getSupportFragmentManager(), "tagRenamer");
+                GroupRenameDialogFragment.newInstance(position).show(getSupportFragmentManager(), "groupRenamer");
             }
         });
 
-        tagListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        groupListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!Utils.tagHasRecords(getApplicationContext(), tags.get(position).id)) {
-                    TagDeleteDialogFragment.newInstance(position).show(getSupportFragmentManager(), "tagDeleter");
+                if (!Utils.groupHasRecords(getApplicationContext(), groups.get(position).id)) {
+                    GroupDeleteDialogFragment.newInstance(position).show(getSupportFragmentManager(), "groupDeleter");
                 }
                 return true;
             }
         });
 
-        refreshTags();
+        refreshGroups();
 
-        final Button addTagButton = (Button) findViewById(R.id.addTagButton);
-        assert addTagButton != null;
-        addTagButton.setOnClickListener(new View.OnClickListener() {
+        final Button addGroupButton = (Button) findViewById(R.id.addGroupButton);
+        assert addGroupButton != null;
+        addGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TagRenameDialogFragment.newInstance().show(getSupportFragmentManager(), "tagRenamer");
+                GroupRenameDialogFragment.newInstance().show(getSupportFragmentManager(), "groupRenamer");
             }
         });
 
@@ -97,37 +97,37 @@ public class TagsActivity extends AppCompatActivity {
         outState.putInt(RESULT_CODE_TAG, resultCode);
     }
 
-    public static class TagRenameDialogFragment extends DialogFragment {
-        private EditText tagRenameEditText;
-        private CheckBox tagRenameIsChecklist;
-        private CheckBox tagRenameIsInbox;
-        private CheckBox tagRenameIsNotification;
+    public static class GroupRenameDialogFragment extends DialogFragment {
+        private EditText groupRenameEditText;
+        private CheckBox groupRenameIsChecklist;
+        private CheckBox groupRenameIsInbox;
+        private CheckBox groupRenameIsNotification;
         private Spinner filterModeSpinner;
         private int selectedFilterMode;
         private boolean enableValidation = false;
 
-        public static TagRenameDialogFragment newInstance() {
-            return new TagRenameDialogFragment();
+        public static GroupRenameDialogFragment newInstance() {
+            return new GroupRenameDialogFragment();
         }
 
-        public static TagRenameDialogFragment newInstance(int tagIndex) {
-            TagRenameDialogFragment pickerFragment = new TagRenameDialogFragment();
+        public static GroupRenameDialogFragment newInstance(int groupIndex) {
+            GroupRenameDialogFragment pickerFragment = new GroupRenameDialogFragment();
 
             Bundle bundle = new Bundle();
-            bundle.putInt(TAG_INDEX_TAG, tagIndex);
+            bundle.putInt(GROUP_INDEX_TAG, groupIndex);
             pickerFragment.setArguments(bundle);
 
             return pickerFragment;
         }
 
-        private TagData tagDataFromLayout(long id) {
-            return new TagData(
+        private GroupData groupDataFromLayout(long id) {
+            return new GroupData(
                     id,
-                    tagRenameEditText.getText().toString(),
-                    tagRenameIsChecklist.isChecked(),
-                    tagRenameIsInbox.isChecked(),
-                    tagRenameIsNotification.isChecked(),
-                    TagData.ID_TO_FILTER_MODE.get(selectedFilterMode)
+                    groupRenameEditText.getText().toString(),
+                    groupRenameIsChecklist.isChecked(),
+                    groupRenameIsInbox.isChecked(),
+                    groupRenameIsNotification.isChecked(),
+                    GroupData.ID_TO_FILTER_MODE.get(selectedFilterMode)
             );
         }
 
@@ -136,18 +136,18 @@ public class TagsActivity extends AppCompatActivity {
                 return true;
             }
 
-            if (tagRenameIsNotification.isChecked()) {
-                if (tagRenameIsChecklist.isChecked() || tagRenameIsInbox.isChecked()) {
+            if (groupRenameIsNotification.isChecked()) {
+                if (groupRenameIsChecklist.isChecked() || groupRenameIsInbox.isChecked()) {
                     return false;
                 }
             }
 
-            if (TagData.ID_TO_FILTER_MODE.get(selectedFilterMode) != TagData.FilterMode.ONLY_ALL) {
-                if (tagRenameIsChecklist.isChecked() || tagRenameIsInbox.isChecked()) {
+            if (GroupData.ID_TO_FILTER_MODE.get(selectedFilterMode) != GroupData.FilterMode.ONLY_ALL) {
+                if (groupRenameIsChecklist.isChecked() || groupRenameIsInbox.isChecked()) {
                     return false;
                 }
             } else {
-                if (tagRenameIsNotification.isChecked()) {
+                if (groupRenameIsNotification.isChecked()) {
                     return false;
                 }
             }
@@ -160,39 +160,39 @@ public class TagsActivity extends AppCompatActivity {
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             super.onCreateDialog(savedInstanceState);
 
-            final TagsActivity parent = (TagsActivity) getActivity();
+            final GroupsActivity parent = (GroupsActivity) getActivity();
             LayoutInflater inflater = parent.getLayoutInflater();
-            View view = inflater.inflate(R.layout.tag_rename, null);
+            View view = inflater.inflate(R.layout.group_rename, null);
 
             final TextView captionTextView = (TextView) view.findViewById(R.id.captionTextView);
-            tagRenameEditText = (EditText) view.findViewById(R.id.tagRenameEditText);
-            tagRenameIsChecklist = (CheckBox) view.findViewById(R.id.tagRenameIsChecklist);
-            tagRenameIsInbox = (CheckBox) view.findViewById(R.id.tagRenameIsInbox);
-            tagRenameIsNotification = (CheckBox) view.findViewById(R.id.tagRenameIsNotification);
+            groupRenameEditText = (EditText) view.findViewById(R.id.groupRenameEditText);
+            groupRenameIsChecklist = (CheckBox) view.findViewById(R.id.groupRenameIsChecklist);
+            groupRenameIsInbox = (CheckBox) view.findViewById(R.id.groupRenameIsInbox);
+            groupRenameIsNotification = (CheckBox) view.findViewById(R.id.groupRenameIsNotification);
 
-            tagRenameIsChecklist.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            groupRenameIsChecklist.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (!isStateValid()) {
-                        tagRenameIsChecklist.setChecked(!b);
+                        groupRenameIsChecklist.setChecked(!b);
                     }
                 }
             });
 
-            tagRenameIsInbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            groupRenameIsInbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (!isStateValid()) {
-                        tagRenameIsInbox.setChecked(!b);
+                        groupRenameIsInbox.setChecked(!b);
                     }
                 }
             });
 
-            tagRenameIsNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            groupRenameIsNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (!isStateValid()) {
-                        tagRenameIsNotification.setChecked(!b);
+                        groupRenameIsNotification.setChecked(!b);
                     }
                 }
             });
@@ -214,7 +214,7 @@ public class TagsActivity extends AppCompatActivity {
                     selectedFilterMode = 0;
                 }
             });
-            ArrayAdapter<String> filterModeStringsAdapter = new ArrayAdapter<>(parent, android.R.layout.simple_spinner_item, TagData.ID_TO_FILTER_MODE_LABEL);
+            ArrayAdapter<String> filterModeStringsAdapter = new ArrayAdapter<>(parent, android.R.layout.simple_spinner_item, GroupData.ID_TO_FILTER_MODE_LABEL);
             filterModeStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             filterModeSpinner.setAdapter(filterModeStringsAdapter);
 
@@ -223,35 +223,35 @@ public class TagsActivity extends AppCompatActivity {
 
             final Bundle bundle = getArguments();
             if (bundle != null) {
-                final TagData pressedTagData = parent.tags.get(bundle.getInt(TAG_INDEX_TAG));
+                final GroupData pressedGroupData = parent.groups.get(bundle.getInt(GROUP_INDEX_TAG));
 
-                captionTextView.setText("Edit tag");
-                tagRenameEditText.setText(pressedTagData.name);
-                tagRenameIsChecklist.setChecked(pressedTagData.isChecklist);
-                tagRenameIsChecklist.setEnabled(!Utils.tagHasCheckedRecords(parent.getApplicationContext(), pressedTagData.id));
-                tagRenameIsInbox.setChecked(pressedTagData.isInbox);
-                tagRenameIsNotification.setChecked(pressedTagData.isNotification);
-                filterModeSpinner.setSelection(TagData.FILTER_MODE_TO_ID.get(pressedTagData.filterMode));
+                captionTextView.setText("Edit group");
+                groupRenameEditText.setText(pressedGroupData.name);
+                groupRenameIsChecklist.setChecked(pressedGroupData.isChecklist);
+                groupRenameIsChecklist.setEnabled(!Utils.groupHasCheckedRecords(parent.getApplicationContext(), pressedGroupData.id));
+                groupRenameIsInbox.setChecked(pressedGroupData.isInbox);
+                groupRenameIsNotification.setChecked(pressedGroupData.isNotification);
+                filterModeSpinner.setSelection(GroupData.FILTER_MODE_TO_ID.get(pressedGroupData.filterMode));
 
                 builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                TagData newTagData = tagDataFromLayout(pressedTagData.id);
+                                GroupData newGroupData = groupDataFromLayout(pressedGroupData.id);
 
-                                NotificationUtils.unregisterTagData(parent, pressedTagData);
-                                DatabaseHelper.getInstance(parent.getApplicationContext()).update(newTagData);
-                                NotificationUtils.registerTagData(parent, newTagData);
+                                NotificationUtils.unregisterGroupData(parent, pressedGroupData);
+                                DatabaseHelper.getInstance(parent.getApplicationContext()).update(newGroupData);
+                                NotificationUtils.registerGroupData(parent, newGroupData);
 
-                                parent.refreshTags();
+                                parent.refreshGroups();
                                 parent.mySetResult(1);
                             }
                         });
             } else {
-                captionTextView.setText("Add tag");
+                captionTextView.setText("Add group");
 
                 builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                DatabaseHelper.getInstance(parent.getApplicationContext()).add(tagDataFromLayout(0));
-                                parent.refreshTags();
+                                DatabaseHelper.getInstance(parent.getApplicationContext()).add(groupDataFromLayout(0));
+                                parent.refreshGroups();
                                 parent.mySetResult(1);
                             }
                         });
@@ -268,12 +268,12 @@ public class TagsActivity extends AppCompatActivity {
         }
     }
 
-    public static class TagDeleteDialogFragment extends DialogFragment {
-        public static TagDeleteDialogFragment newInstance(int tagIndex) {
-            TagDeleteDialogFragment pickerFragment = new TagDeleteDialogFragment();
+    public static class GroupDeleteDialogFragment extends DialogFragment {
+        public static GroupDeleteDialogFragment newInstance(int groupIndex) {
+            GroupDeleteDialogFragment pickerFragment = new GroupDeleteDialogFragment();
 
             Bundle bundle = new Bundle();
-            bundle.putInt(TAG_INDEX_TAG, tagIndex);
+            bundle.putInt(GROUP_INDEX_TAG, groupIndex);
             pickerFragment.setArguments(bundle);
 
             return pickerFragment;
@@ -285,16 +285,16 @@ public class TagsActivity extends AppCompatActivity {
             super.onCreateDialog(savedInstanceState);
 
             final Bundle bundle = getArguments();
-            final TagsActivity parent = (TagsActivity) getActivity();
-            final TagData pressedTagData = parent.tags.get(bundle.getInt(TAG_INDEX_TAG));
+            final GroupsActivity parent = (GroupsActivity) getActivity();
+            final GroupData pressedGroupData = parent.groups.get(bundle.getInt(GROUP_INDEX_TAG));
 
             AlertDialog.Builder builder = new AlertDialog.Builder(parent);
-            builder.setMessage("Delete tag " + pressedTagData.name + "?")
+            builder.setMessage("Delete group " + pressedGroupData.name + "?")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            NotificationUtils.unregisterTagData(parent, pressedTagData);
-                            DatabaseHelper.getInstance(parent.getApplicationContext()).deleteTag(pressedTagData.id);
-                            parent.refreshTags();
+                            NotificationUtils.unregisterGroupData(parent, pressedGroupData);
+                            DatabaseHelper.getInstance(parent.getApplicationContext()).deleteGroup(pressedGroupData.id);
+                            parent.refreshGroups();
                             parent.mySetResult(1);
                         }
                     })

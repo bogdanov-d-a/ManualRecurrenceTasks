@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import database.DatabaseHelper;
-import database.TagData;
+import database.GroupData;
 import notification.NotificationUtils;
 import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
 import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
@@ -96,8 +96,8 @@ public class RecordListAdapter extends BaseAdapter {
         holder.nextAppear.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(record.nextAppear)));
         holder.checkBox.setOnCheckedChangeListener(null);
 
-        final ArrayList<TagData> tagsList = parentActivity.getTags();
-        final boolean canBeChecked = Utils.recordCanBeChecked(tagsList, record.tagId);
+        final ArrayList<GroupData> groupsList = parentActivity.getGroups();
+        final boolean canBeChecked = Utils.recordCanBeChecked(groupsList, record.groupId);
 
         holder.checkBox.setEnabled(canBeChecked);
         holder.checkBox.setChecked(record.isChecked);
@@ -106,13 +106,13 @@ public class RecordListAdapter extends BaseAdapter {
             holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    TagData tag = tagsList.get(Utils.getPositionById(tagsList, record.tagId));
-                    NotificationUtils.unregisterTag(parentActivity, tag);
+                    GroupData group = groupsList.get(Utils.getPositionById(groupsList, record.groupId));
+                    NotificationUtils.unregisterGroup(parentActivity, group);
 
                     record.isChecked = isChecked;
                     DatabaseHelper.getInstance(parentActivity).update(record);
 
-                    NotificationUtils.registerTag(parentActivity, tag);
+                    NotificationUtils.registerGroup(parentActivity, group);
                 }
             });
         }

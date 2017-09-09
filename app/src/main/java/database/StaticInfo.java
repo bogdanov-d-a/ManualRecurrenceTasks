@@ -5,13 +5,13 @@ import java.util.List;
 
 public final class StaticInfo {
     public enum Type {
-        TAG,
+        GROUP,
         RECORD
     }
 
     public static String getTableName(Type type) {
         switch (type) {
-            case TAG:
+            case GROUP:
                 return "tags";
             case RECORD:
                 return "records";
@@ -20,8 +20,8 @@ public final class StaticInfo {
         }
     }
 
-    public static String getTagTableName() {
-        return getTableName(Type.TAG);
+    public static String getGroupTableName() {
+        return getTableName(Type.GROUP);
     }
 
     public static String getRecordTableName() {
@@ -30,13 +30,13 @@ public final class StaticInfo {
 
     protected static final String ID_ROW = "id";
 
-    private static final List<String> tagRows = Arrays.asList("name", "is_checklist", "is_inbox", "is_notification", "filter_mode");
+    private static final List<String> groupRows = Arrays.asList("name", "is_checklist", "is_inbox", "is_notification", "filter_mode");
     private static final List<String> recordRows = Arrays.asList("tag_id", "label", "next_appear", "is_checked");
 
-    private static final List<String> tagRowTypes = Arrays.asList("text", "integer", "integer", "integer", "integer");
-    private static final List<String> recordRowTypes = Arrays.asList("integer references " + getTagTableName() + "(" + getTagRowName(0) + ")", "text", "integer", "integer");
+    private static final List<String> groupRowTypes = Arrays.asList("text", "integer", "integer", "integer", "integer");
+    private static final List<String> recordRowTypes = Arrays.asList("integer references " + getGroupTableName() + "(" + getGroupRowName(0) + ")", "text", "integer", "integer");
 
-    public static final class TagRowId {
+    public static final class GroupRowId {
         public static final int NAME = 1;
         public static final int IS_CHECKLIST = 2;
         public static final int IS_INBOX = 3;
@@ -45,7 +45,7 @@ public final class StaticInfo {
     }
 
     public static final class RecordRowId {
-        public static final int TAG_ID = 1;
+        public static final int GROUP_ID = 1;
         public static final int LABEL = 2;
         public static final int NEXT_APPEAR = 3;
         public static final int IS_CHECKED = 4;
@@ -53,8 +53,8 @@ public final class StaticInfo {
 
     private static int getRowCountWithoutId(Type type) {
         switch (type) {
-            case TAG:
-                return tagRows.size();
+            case GROUP:
+                return groupRows.size();
             case RECORD:
                 return recordRows.size();
             default:
@@ -66,8 +66,8 @@ public final class StaticInfo {
         return getRowCountWithoutId(type) + 1;
     }
 
-    public static int getTagRowCount() {
-        return getRowCount(Type.TAG);
+    public static int getGroupRowCount() {
+        return getRowCount(Type.GROUP);
     }
 
     public static int getRecordRowCount() {
@@ -79,8 +79,8 @@ public final class StaticInfo {
             return ID_ROW;
 
         switch (type) {
-            case TAG:
-                return tagRows.get(id - 1);
+            case GROUP:
+                return groupRows.get(id - 1);
             case RECORD:
                 return recordRows.get(id - 1);
             default:
@@ -92,8 +92,8 @@ public final class StaticInfo {
         return getTableName(type) + "__" + getRowNameImpl(type, id);
     }
 
-    public static String getTagRowName(int id) {
-        return getRowName(Type.TAG, id);
+    public static String getGroupRowName(int id) {
+        return getRowName(Type.GROUP, id);
     }
 
     public static String getRecordRowName(int id) {
@@ -105,8 +105,8 @@ public final class StaticInfo {
             return "integer primary key";
 
         switch (type) {
-            case TAG:
-                return tagRowTypes.get(id - 1);
+            case GROUP:
+                return groupRowTypes.get(id - 1);
             case RECORD:
                 return recordRowTypes.get(id - 1);
             default:

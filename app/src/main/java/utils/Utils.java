@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import database.AbstractData;
 import database.DatabaseHelper;
 import database.RecordData;
-import database.TagData;
+import database.GroupData;
 
 public class Utils {
     public interface AbstractDataSource {
@@ -24,28 +24,28 @@ public class Utils {
         return -1;
     }
 
-    public static int getPositionById(final ArrayList<TagData> tags, long id) {
+    public static int getPositionById(final ArrayList<GroupData> groups, long id) {
         return Utils.getPositionById(
                 new Utils.AbstractDataSource() {
                     @Override
                     public int size() {
-                        return tags.size();
+                        return groups.size();
                     }
                     @Override
                     public AbstractData get(int pos) {
-                        return tags.get(pos);
+                        return groups.get(pos);
                     }
                 },
                 id
         );
     }
 
-    public static boolean recordCanBeChecked(final ArrayList<TagData> tags, long recordTagId) {
-        return tags.get(getPositionById(tags, recordTagId)).isChecklist;
+    public static boolean recordCanBeChecked(final ArrayList<GroupData> groups, long recordGroupId) {
+        return groups.get(getPositionById(groups, recordGroupId)).isChecklist;
     }
 
-    public static boolean tagHasCheckedRecords(Context context, long tagId) {
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tagId, Long.MIN_VALUE, false);
+    public static boolean groupHasCheckedRecords(Context context, long groupId) {
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(groupId, Long.MIN_VALUE, false);
 
         for (RecordData record : records) {
             if (record.isChecked)
@@ -55,8 +55,8 @@ public class Utils {
         return false;
     }
 
-    public static boolean tagHasRecords(Context context, long tagId) {
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(tagId, Long.MIN_VALUE, false);
+    public static boolean groupHasRecords(Context context, long groupId) {
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(groupId, Long.MIN_VALUE, false);
         return !records.isEmpty();
     }
 }

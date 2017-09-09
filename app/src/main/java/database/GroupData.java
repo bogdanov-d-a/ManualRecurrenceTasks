@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
-public final class TagData extends AbstractData {
+public final class GroupData extends AbstractData {
     public enum FilterMode {
         ONLY_ALL,
         DEFAULT_ALL,
@@ -37,7 +37,7 @@ public final class TagData extends AbstractData {
     public boolean isNotification;
     public FilterMode filterMode;
 
-    public TagData(long id, String name, boolean isChecklist, boolean isInbox, boolean isNotification, FilterMode filterMode) {
+    public GroupData(long id, String name, boolean isChecklist, boolean isInbox, boolean isNotification, FilterMode filterMode) {
         super(id);
         this.name = name;
         this.isChecklist = isChecklist;
@@ -48,7 +48,7 @@ public final class TagData extends AbstractData {
 
     @Override
     public StaticInfo.Type getType() {
-        return StaticInfo.Type.TAG;
+        return StaticInfo.Type.GROUP;
     }
 
     @Override

@@ -7,18 +7,18 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="ru.trjoxuvw.manualrecurrencetasks.TagsActivity">
+    tools:context="ru.trjoxuvw.manualrecurrencetasks.GroupsActivity">
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/tagListView"
-        android:layout_above="@+id/addTagButton" />
+        android:id="@+id/groupListView"
+        android:layout_above="@+id/addGroupButton" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add"
-        android:id="@+id/addTagButton"
+        android:id="@+id/addGroupButton"
         android:layout_alignParentBottom="true" />
 </RelativeLayout>

@@ -12,13 +12,13 @@
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tagSpinner"
+        android:id="@+id/groupSpinner"
         android:layout_alignParentTop="true" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/tagSpinner"
+        android:layout_below="@+id/groupSpinner"
         android:layout_above="@+id/linearLayout">
 
         <EditText

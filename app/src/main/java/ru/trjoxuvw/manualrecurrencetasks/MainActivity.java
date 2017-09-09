@@ -17,7 +17,7 @@ import java.util.Calendar;
 
 import adapter.RecordListAdapter;
 import database.RecordData;
-import database.TagData;
+import database.GroupData;
 import database.DatabaseHelper;
 import utils.Utils;
 
@@ -25,55 +25,55 @@ import utils.Utils;
 // TODO: notify time countdown + show day of week
 
 public class MainActivity extends AppCompatActivity {
-    public static final String TAG_ID_TAG = "TAG_ID_TAG";
+    public static final String GROUP_ID_TAG = "GROUP_ID_TAG";
 
     public static final int ADD_RECORD_REQUEST = 0;
     public static final int OPTIONS_REQUEST = 1;
 
-    private Spinner tagSpinner;
+    private Spinner groupSpinner;
     private CheckBox activeOnlyCheckBox;
     private ListView recordListView;
     private Button addRecordButton;
 
-    private ArrayList<TagData> tags;
-    private int selectedTagPosition;
+    private ArrayList<GroupData> groups;
+    private int selectedGroupPosition;
 
-    public ArrayList<TagData> getTags()
+    public ArrayList<GroupData> getGroups()
     {
-        return tags;
+        return groups;
     }
 
-    private void refreshTags()
+    private void refreshGroups()
     {
-        tags = DatabaseHelper.getInstance(getApplicationContext()).getTags();
+        groups = DatabaseHelper.getInstance(getApplicationContext()).getGroups();
 
-        ArrayList<String> tagStrings = new ArrayList<>();
-        tagStrings.add("Notifications");
-        for (TagData tag : tags)
+        ArrayList<String> groupStrings = new ArrayList<>();
+        groupStrings.add("Notifications");
+        for (GroupData group : groups)
         {
-            tagStrings.add(tag.getLabel());
+            groupStrings.add(group.getLabel());
         }
 
-        ArrayAdapter<String> tagStringsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tagStrings);
-        tagStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        tagSpinner.setAdapter(tagStringsAdapter);
+        ArrayAdapter<String> groupStringsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, groupStrings);
+        groupStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        groupSpinner.setAdapter(groupStringsAdapter);
 
-        addRecordButton.setEnabled(tags.size() > 0);
+        addRecordButton.setEnabled(groups.size() > 0);
 
-        switchTag(0);
+        switchGroup(0);
     }
 
-    private void switchTag(int position)
+    private void switchGroup(int position)
     {
-        selectedTagPosition = position;
+        selectedGroupPosition = position;
 
         if (position == 0) {
             activeOnlyCheckBox.setEnabled(true);
             activeOnlyCheckBox.setChecked(false);
         } else {
-            final TagData.FilterMode fm = tags.get(position - 1).filterMode;
-            activeOnlyCheckBox.setEnabled(fm != TagData.FilterMode.ONLY_ALL);
-            activeOnlyCheckBox.setChecked(fm == TagData.FilterMode.DEFAULT_FILTERED);
+            final GroupData.FilterMode fm = groups.get(position - 1).filterMode;
+            activeOnlyCheckBox.setEnabled(fm != GroupData.FilterMode.ONLY_ALL);
+            activeOnlyCheckBox.setChecked(fm == GroupData.FilterMode.DEFAULT_FILTERED);
         }
 
         refreshRecords(position);
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
             maxTime = calendar.getTimeInMillis();
         }
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : tags.get(position - 1).id, maxTime, position == 0);
+        ArrayList<RecordData> records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : groups.get(position - 1).id, maxTime, position == 0);
         ((RecordListAdapter)recordListView.getAdapter()).ResetList(records);
     }
 
@@ -99,12 +99,12 @@ public class MainActivity extends AppCompatActivity {
         {
             case ADD_RECORD_REQUEST:
                 if (resultCode == 1)
-                    refreshRecords(selectedTagPosition);
+                    refreshRecords(selectedGroupPosition);
                 break;
 
             case OPTIONS_REQUEST:
                 if (resultCode == 1)
-                    refreshTags();
+                    refreshGroups();
                 break;
         }
     }
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         optionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, TagsActivity.class);
+                Intent intent = new Intent(MainActivity.this, GroupsActivity.class);
                 startActivityForResult(intent, OPTIONS_REQUEST);
             }
         });
@@ -139,22 +139,22 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AddRecordActivity.class);
                 intent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_ADD);
-                intent.putExtra(AddRecordActivity.INIT_TAG_INDEX, selectedTagPosition > 0 ? selectedTagPosition - 1 : 0);
+                intent.putExtra(AddRecordActivity.INIT_GROUP_INDEX, selectedGroupPosition > 0 ? selectedGroupPosition - 1 : 0);
                 startActivityForResult(intent, ADD_RECORD_REQUEST);
             }
         });
 
-        tagSpinner = (Spinner) findViewById(R.id.tagSpinner);
-        assert tagSpinner != null;
-        tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        groupSpinner = (Spinner) findViewById(R.id.groupSpinner);
+        assert groupSpinner != null;
+        groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switchTag(position);
+                switchGroup(position);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                switchTag(0);
+                switchGroup(0);
             }
         });
 
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         activeOnlyCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                refreshRecords(selectedTagPosition);
+                refreshRecords(selectedGroupPosition);
             }
         });
 
@@ -181,14 +181,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleIntent(Intent intent) {
-        refreshTags();
+        refreshGroups();
 
         if (intent != null) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                long tagId = extras.getLong(TAG_ID_TAG, -1);
-                if (tagId != -1) {
-                    tagSpinner.setSelection(Utils.getPositionById(tags, tagId) + 1);
+                long groupId = extras.getLong(GROUP_ID_TAG, -1);
+                if (groupId != -1) {
+                    groupSpinner.setSelection(Utils.getPositionById(groups, groupId) + 1);
                 }
             }
         }
@@ -197,6 +197,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        refreshRecords(selectedTagPosition);
+        refreshRecords(selectedGroupPosition);
     }
 }

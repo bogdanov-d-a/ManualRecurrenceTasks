@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".TagsActivity"
+        <activity android:name=".GroupsActivity"
             android:parentActivityName=".MainActivity">
 
             <meta-data
