@@ -32,7 +32,7 @@ public class NotificationUtils {
                         .setOngoing(true);
 
         Intent resultIntent = new Intent(context, AddRecordActivity.class);
-        resultIntent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_EDIT);
+        resultIntent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_UPDATE);
         resultIntent.putExtra(AddRecordActivity.EDIT_RECORD_ID, recordRowid);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);

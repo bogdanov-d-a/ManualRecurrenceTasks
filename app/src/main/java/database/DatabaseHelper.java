@@ -284,7 +284,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public long add(AbstractData data)
+    public long create(AbstractData data)
     {
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL(insertGen(data));

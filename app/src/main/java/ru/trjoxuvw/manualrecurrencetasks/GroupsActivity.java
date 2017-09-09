@@ -76,9 +76,9 @@ public class GroupsActivity extends AppCompatActivity {
 
         refreshGroups();
 
-        final Button addGroupButton = (Button) findViewById(R.id.addGroupButton);
-        assert addGroupButton != null;
-        addGroupButton.setOnClickListener(new View.OnClickListener() {
+        final Button createGroupButton = (Button) findViewById(R.id.createGroupButton);
+        assert createGroupButton != null;
+        createGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 GroupRenameDialogFragment.newInstance().show(getSupportFragmentManager(), "groupRenamer");
@@ -246,11 +246,11 @@ public class GroupsActivity extends AppCompatActivity {
                             }
                         });
             } else {
-                captionTextView.setText("Add group");
+                captionTextView.setText("Create group");
 
-                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                DatabaseHelper.getInstance(parent.getApplicationContext()).add(groupDataFromLayout(0));
+                                DatabaseHelper.getInstance(parent.getApplicationContext()).create(groupDataFromLayout(0));
                                 parent.refreshGroups();
                                 parent.mySetResult(1);
                             }

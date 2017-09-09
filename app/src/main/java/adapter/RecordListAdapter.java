@@ -86,7 +86,7 @@ public class RecordListAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(parentActivity, AddRecordActivity.class);
-                intent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_EDIT);
+                intent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_UPDATE);
                 intent.putExtra(AddRecordActivity.EDIT_RECORD_ID, record.id);
                 parentActivity.startActivityForResult(intent, MainActivity.ADD_RECORD_REQUEST);
             }

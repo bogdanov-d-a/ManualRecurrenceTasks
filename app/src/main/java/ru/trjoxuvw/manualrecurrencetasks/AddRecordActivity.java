@@ -42,8 +42,8 @@ public class AddRecordActivity extends AppCompatActivity {
     private static final String MINUTE_TAG = "minute";
 
     public static final String OPERATION = "ACTIVITY_OPERATION";
-    public static final int OPERATION_ADD = 0;
-    public static final int OPERATION_EDIT = 1;
+    public static final int OPERATION_CREATE = 0;
+    public static final int OPERATION_UPDATE = 1;
 
     public static final String INIT_GROUP_INDEX = "INIT_GROUP_INDEX";
     public static final String EDIT_RECORD_ID = "EDIT_RECORD_ID";
@@ -88,7 +88,7 @@ public class AddRecordActivity extends AppCompatActivity {
         if (cancelButton != null) {
             boolean unmodified;
 
-            if (operation == OPERATION_ADD) {
+            if (operation == OPERATION_CREATE) {
                 unmodified = false;
             } else {
                 sameRecord = initSameRecord(sameRecord);
@@ -116,18 +116,18 @@ public class AddRecordActivity extends AppCompatActivity {
         );
     }
 
-    private void addRecord() {
+    private void createRecord() {
         NotificationUtils.unregisterGroup(AddRecordActivity.this, groups.get(selectedGroupPosition));
 
         RecordData newRecord = layoutDataToRecordData(0);
-        newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).add(newRecord);
+        newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).create(newRecord);
         NotificationUtils.registerRecord(AddRecordActivity.this, groups.get(selectedGroupPosition), newRecord);
 
         NotificationUtils.registerGroup(AddRecordActivity.this, groups.get(selectedGroupPosition));
 
         setResult(1);
 
-        if (operation == OPERATION_EDIT) {
+        if (operation == OPERATION_UPDATE) {
             editRecord = newRecord;
             updateButtonState();
         }
@@ -163,7 +163,7 @@ public class AddRecordActivity extends AppCompatActivity {
         else
             operation = savedInstanceState.getInt(OPERATION);
 
-        if (operation == OPERATION_EDIT) {
+        if (operation == OPERATION_UPDATE) {
             final long editRecordId;
             if (savedInstanceState == null)
                 editRecordId = getIntent().getExtras().getLong(EDIT_RECORD_ID);
@@ -303,7 +303,7 @@ public class AddRecordActivity extends AppCompatActivity {
             calendar.set(Calendar.HOUR_OF_DAY, savedInstanceState.getInt(HOUR_TAG));
             calendar.set(Calendar.MINUTE, savedInstanceState.getInt(MINUTE_TAG));
         }
-        else if (operation == OPERATION_EDIT)
+        else if (operation == OPERATION_UPDATE)
         {
             calendar.setTimeInMillis(editRecord.nextAppear);
         }
@@ -312,11 +312,11 @@ public class AddRecordActivity extends AppCompatActivity {
         {
             switch (operation)
             {
-                case OPERATION_ADD:
+                case OPERATION_CREATE:
                     groupSpinner.setSelection(getIntent().getExtras().getInt(INIT_GROUP_INDEX));
                     break;
 
-                case OPERATION_EDIT:
+                case OPERATION_UPDATE:
                     groupSpinner.setSelection(Utils.getPositionById(groups, editRecord.groupId));
                     labelEditText.setText(editRecord.label);
                     checkedCheckBox.setChecked(editRecord.isChecked);
@@ -324,31 +324,31 @@ public class AddRecordActivity extends AppCompatActivity {
             }
         }
 
-        final Button dataCreationButton = operation == OPERATION_ADD ?
+        final Button dataCreationButton = operation == OPERATION_CREATE ?
                 (Button) findViewById(R.id.footerButton1) :
                 (Button) findViewById(R.id.footerButton3);
         dataCreationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addRecord();
+                createRecord();
                 finish();
             }
         });
         dataCreationButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                addRecord();
+                createRecord();
                 return true;
             }
         });
 
         switch (operation)
         {
-            case OPERATION_ADD:
+            case OPERATION_CREATE:
                 dataCreationButton.setText("Create");
                 break;
 
-            case OPERATION_EDIT:
+            case OPERATION_UPDATE:
                 updateButton = (Button) findViewById(R.id.footerButton1);
                 updateButton.setText("Update");
                 updateButton.setOnClickListener(new View.OnClickListener() {
@@ -381,7 +381,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 break;
         }
 
-        cancelButton = operation == OPERATION_ADD ?
+        cancelButton = operation == OPERATION_CREATE ?
                 (Button) findViewById(R.id.footerButton2) :
                 (Button) findViewById(R.id.footerButton4);
         cancelButton.setOnClickListener(new View.OnClickListener() {
@@ -390,7 +390,7 @@ public class AddRecordActivity extends AppCompatActivity {
                 finish();
             }
         });
-        if (operation == OPERATION_EDIT) {
+        if (operation == OPERATION_UPDATE) {
             cancelButton.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -408,7 +408,7 @@ public class AddRecordActivity extends AppCompatActivity {
             });
         }
 
-        if (operation == OPERATION_ADD)
+        if (operation == OPERATION_CREATE)
         {
             final Button button3 = (Button) findViewById(R.id.footerButton3);
             final Button button4 = (Button) findViewById(R.id.footerButton4);
@@ -432,7 +432,7 @@ public class AddRecordActivity extends AppCompatActivity {
         outState.putInt(MINUTE_TAG, calendar.get(Calendar.MINUTE));
 
         outState.putInt(OPERATION, operation);
-        if (operation == OPERATION_EDIT)
+        if (operation == OPERATION_UPDATE)
             outState.putLong(EDIT_RECORD_ID, editRecord.id);
     }
 

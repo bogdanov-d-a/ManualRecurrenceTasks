@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private Spinner groupSpinner;
     private CheckBox activeOnlyCheckBox;
     private ListView recordListView;
-    private Button addRecordButton;
+    private Button createRecordButton;
 
     private ArrayList<GroupData> groups;
     private int selectedGroupPosition;
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         groupStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         groupSpinner.setAdapter(groupStringsAdapter);
 
-        addRecordButton.setEnabled(groups.size() > 0);
+        createRecordButton.setEnabled(groups.size() > 0);
 
         switchGroup(0);
     }
@@ -132,13 +132,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        addRecordButton = (Button) findViewById(R.id.addRecordButton);
-        assert addRecordButton != null;
-        addRecordButton.setOnClickListener(new View.OnClickListener() {
+        createRecordButton = (Button) findViewById(R.id.createRecordButton);
+        assert createRecordButton != null;
+        createRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AddRecordActivity.class);
-                intent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_ADD);
+                intent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_CREATE);
                 intent.putExtra(AddRecordActivity.INIT_GROUP_INDEX, selectedGroupPosition > 0 ? selectedGroupPosition - 1 : 0);
                 startActivityForResult(intent, ADD_RECORD_REQUEST);
             }
