@@ -57,7 +57,7 @@ public class RecordListAdapter extends BaseAdapter {
 
     private View createView() {
         View convertView = mInflater.inflate(
-                R.layout.record_checklist_item,
+                R.layout.record_list_item,
                 null
         );
 
