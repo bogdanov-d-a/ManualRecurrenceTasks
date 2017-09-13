@@ -60,7 +60,7 @@ public class GroupsActivity extends AppCompatActivity {
         groupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                GroupRenameDialogFragment.newInstance(position).show(getSupportFragmentManager(), "groupRenamer");
+                GroupViewDialogFragment.newInstance(position).show(getSupportFragmentManager(), "groupView");
             }
         });
 
@@ -81,7 +81,7 @@ public class GroupsActivity extends AppCompatActivity {
         createGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GroupRenameDialogFragment.newInstance().show(getSupportFragmentManager(), "groupRenamer");
+                GroupViewDialogFragment.newInstance().show(getSupportFragmentManager(), "groupView");
             }
         });
 
@@ -97,21 +97,21 @@ public class GroupsActivity extends AppCompatActivity {
         outState.putInt(RESULT_CODE_TAG, resultCode);
     }
 
-    public static class GroupRenameDialogFragment extends DialogFragment {
-        private EditText groupRenameEditText;
-        private CheckBox groupRenameIsChecklist;
-        private CheckBox groupRenameIsInbox;
-        private CheckBox groupRenameIsNotification;
+    public static class GroupViewDialogFragment extends DialogFragment {
+        private EditText groupViewEditText;
+        private CheckBox groupViewIsChecklist;
+        private CheckBox groupViewIsInbox;
+        private CheckBox groupViewIsNotification;
         private Spinner filterModeSpinner;
         private int selectedFilterMode;
         private boolean enableValidation = false;
 
-        public static GroupRenameDialogFragment newInstance() {
-            return new GroupRenameDialogFragment();
+        public static GroupViewDialogFragment newInstance() {
+            return new GroupViewDialogFragment();
         }
 
-        public static GroupRenameDialogFragment newInstance(int groupIndex) {
-            GroupRenameDialogFragment pickerFragment = new GroupRenameDialogFragment();
+        public static GroupViewDialogFragment newInstance(int groupIndex) {
+            GroupViewDialogFragment pickerFragment = new GroupViewDialogFragment();
 
             Bundle bundle = new Bundle();
             bundle.putInt(GROUP_INDEX_TAG, groupIndex);
@@ -123,10 +123,10 @@ public class GroupsActivity extends AppCompatActivity {
         private GroupData groupDataFromLayout(long id) {
             return new GroupData(
                     id,
-                    groupRenameEditText.getText().toString(),
-                    groupRenameIsChecklist.isChecked(),
-                    groupRenameIsInbox.isChecked(),
-                    groupRenameIsNotification.isChecked(),
+                    groupViewEditText.getText().toString(),
+                    groupViewIsChecklist.isChecked(),
+                    groupViewIsInbox.isChecked(),
+                    groupViewIsNotification.isChecked(),
                     GroupData.ID_TO_FILTER_MODE.get(selectedFilterMode)
             );
         }
@@ -136,18 +136,18 @@ public class GroupsActivity extends AppCompatActivity {
                 return true;
             }
 
-            if (groupRenameIsNotification.isChecked()) {
-                if (groupRenameIsChecklist.isChecked() || groupRenameIsInbox.isChecked()) {
+            if (groupViewIsNotification.isChecked()) {
+                if (groupViewIsChecklist.isChecked() || groupViewIsInbox.isChecked()) {
                     return false;
                 }
             }
 
             if (GroupData.ID_TO_FILTER_MODE.get(selectedFilterMode) != GroupData.FilterMode.ONLY_ALL) {
-                if (groupRenameIsChecklist.isChecked() || groupRenameIsInbox.isChecked()) {
+                if (groupViewIsChecklist.isChecked() || groupViewIsInbox.isChecked()) {
                     return false;
                 }
             } else {
-                if (groupRenameIsNotification.isChecked()) {
+                if (groupViewIsNotification.isChecked()) {
                     return false;
                 }
             }
@@ -162,37 +162,37 @@ public class GroupsActivity extends AppCompatActivity {
 
             final GroupsActivity parent = (GroupsActivity) getActivity();
             LayoutInflater inflater = parent.getLayoutInflater();
-            View view = inflater.inflate(R.layout.group_rename, null);
+            View view = inflater.inflate(R.layout.group_view, null);
 
             final TextView captionTextView = (TextView) view.findViewById(R.id.captionTextView);
-            groupRenameEditText = (EditText) view.findViewById(R.id.groupRenameEditText);
-            groupRenameIsChecklist = (CheckBox) view.findViewById(R.id.groupRenameIsChecklist);
-            groupRenameIsInbox = (CheckBox) view.findViewById(R.id.groupRenameIsInbox);
-            groupRenameIsNotification = (CheckBox) view.findViewById(R.id.groupRenameIsNotification);
+            groupViewEditText = (EditText) view.findViewById(R.id.groupViewEditText);
+            groupViewIsChecklist = (CheckBox) view.findViewById(R.id.groupViewIsChecklist);
+            groupViewIsInbox = (CheckBox) view.findViewById(R.id.groupViewIsInbox);
+            groupViewIsNotification = (CheckBox) view.findViewById(R.id.groupViewIsNotification);
 
-            groupRenameIsChecklist.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            groupViewIsChecklist.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (!isStateValid()) {
-                        groupRenameIsChecklist.setChecked(!b);
+                        groupViewIsChecklist.setChecked(!b);
                     }
                 }
             });
 
-            groupRenameIsInbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            groupViewIsInbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (!isStateValid()) {
-                        groupRenameIsInbox.setChecked(!b);
+                        groupViewIsInbox.setChecked(!b);
                     }
                 }
             });
 
-            groupRenameIsNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            groupViewIsNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (!isStateValid()) {
-                        groupRenameIsNotification.setChecked(!b);
+                        groupViewIsNotification.setChecked(!b);
                     }
                 }
             });
@@ -226,11 +226,11 @@ public class GroupsActivity extends AppCompatActivity {
                 final GroupData pressedGroupData = parent.groups.get(bundle.getInt(GROUP_INDEX_TAG));
 
                 captionTextView.setText("Edit group");
-                groupRenameEditText.setText(pressedGroupData.name);
-                groupRenameIsChecklist.setChecked(pressedGroupData.isChecklist);
-                groupRenameIsChecklist.setEnabled(!Utils.groupHasCheckedRecords(parent.getApplicationContext(), pressedGroupData.id));
-                groupRenameIsInbox.setChecked(pressedGroupData.isInbox);
-                groupRenameIsNotification.setChecked(pressedGroupData.isNotification);
+                groupViewEditText.setText(pressedGroupData.name);
+                groupViewIsChecklist.setChecked(pressedGroupData.isChecklist);
+                groupViewIsChecklist.setEnabled(!Utils.groupHasCheckedRecords(parent.getApplicationContext(), pressedGroupData.id));
+                groupViewIsInbox.setChecked(pressedGroupData.isInbox);
+                groupViewIsNotification.setChecked(pressedGroupData.isNotification);
                 filterModeSpinner.setSelection(GroupData.FILTER_MODE_TO_ID.get(pressedGroupData.filterMode));
 
                 builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
