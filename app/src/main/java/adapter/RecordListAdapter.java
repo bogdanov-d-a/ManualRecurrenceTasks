@@ -13,7 +13,7 @@ import android.widget.TextView;
 import database.DatabaseHelper;
 import database.GroupData;
 import notification.NotificationUtils;
-import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
+import ru.trjoxuvw.manualrecurrencetasks.RecordActivity;
 import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
 import ru.trjoxuvw.manualrecurrencetasks.R;
 
@@ -85,10 +85,10 @@ public class RecordListAdapter extends BaseAdapter {
         holder.textLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(parentActivity, AddRecordActivity.class);
-                intent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_UPDATE);
-                intent.putExtra(AddRecordActivity.EDIT_RECORD_ID, record.id);
-                parentActivity.startActivityForResult(intent, MainActivity.ADD_RECORD_REQUEST);
+                Intent intent = new Intent(parentActivity, RecordActivity.class);
+                intent.putExtra(RecordActivity.OPERATION, RecordActivity.OPERATION_UPDATE);
+                intent.putExtra(RecordActivity.EDIT_RECORD_ID, record.id);
+                parentActivity.startActivityForResult(intent, MainActivity.VIEW_RECORD_REQUEST);
             }
         });
 

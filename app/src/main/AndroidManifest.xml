@@ -30,7 +30,7 @@
                 android:value=".MainActivity"/>
         </activity>
 
-        <activity android:name=".AddRecordActivity"
+        <activity android:name=".RecordActivity"
             android:parentActivityName=".MainActivity">
 
             <meta-data

@@ -27,7 +27,7 @@ import utils.Utils;
 public class MainActivity extends AppCompatActivity {
     public static final String GROUP_ID_TAG = "GROUP_ID_TAG";
 
-    public static final int ADD_RECORD_REQUEST = 0;
+    public static final int VIEW_RECORD_REQUEST = 0;
     public static final int OPTIONS_REQUEST = 1;
 
     private Spinner groupSpinner;
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch (requestCode)
         {
-            case ADD_RECORD_REQUEST:
+            case VIEW_RECORD_REQUEST:
                 if (resultCode == 1)
                     refreshRecords(selectedGroupPosition);
                 break;
@@ -137,10 +137,10 @@ public class MainActivity extends AppCompatActivity {
         createRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AddRecordActivity.class);
-                intent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_CREATE);
-                intent.putExtra(AddRecordActivity.INIT_GROUP_INDEX, selectedGroupPosition > 0 ? selectedGroupPosition - 1 : 0);
-                startActivityForResult(intent, ADD_RECORD_REQUEST);
+                Intent intent = new Intent(MainActivity.this, RecordActivity.class);
+                intent.putExtra(RecordActivity.OPERATION, RecordActivity.OPERATION_CREATE);
+                intent.putExtra(RecordActivity.INIT_GROUP_INDEX, selectedGroupPosition > 0 ? selectedGroupPosition - 1 : 0);
+                startActivityForResult(intent, VIEW_RECORD_REQUEST);
             }
         });
 

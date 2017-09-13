@@ -15,7 +15,7 @@ import java.util.Calendar;
 import database.RecordData;
 import database.GroupData;
 import database.DatabaseHelper;
-import ru.trjoxuvw.manualrecurrencetasks.AddRecordActivity;
+import ru.trjoxuvw.manualrecurrencetasks.RecordActivity;
 import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
 
 public class NotificationUtils {
@@ -31,12 +31,12 @@ public class NotificationUtils {
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(recordLabel))
                         .setOngoing(true);
 
-        Intent resultIntent = new Intent(context, AddRecordActivity.class);
-        resultIntent.putExtra(AddRecordActivity.OPERATION, AddRecordActivity.OPERATION_UPDATE);
-        resultIntent.putExtra(AddRecordActivity.EDIT_RECORD_ID, recordRowid);
+        Intent resultIntent = new Intent(context, RecordActivity.class);
+        resultIntent.putExtra(RecordActivity.OPERATION, RecordActivity.OPERATION_UPDATE);
+        resultIntent.putExtra(RecordActivity.EDIT_RECORD_ID, recordRowid);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(AddRecordActivity.class);
+        stackBuilder.addParentStack(RecordActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(

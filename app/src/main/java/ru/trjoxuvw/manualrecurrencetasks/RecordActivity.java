@@ -34,7 +34,7 @@ import database.DatabaseHelper;
 import notification.NotificationUtils;
 import utils.Utils;
 
-public class AddRecordActivity extends AppCompatActivity {
+public class RecordActivity extends AppCompatActivity {
     private static final String YEAR_TAG = "year";
     private static final String MONTH_TAG = "monthOfYear";
     private static final String DAY_TAG = "dayOfMonth";
@@ -117,13 +117,13 @@ public class AddRecordActivity extends AppCompatActivity {
     }
 
     private void createRecord() {
-        NotificationUtils.unregisterGroup(AddRecordActivity.this, groups.get(selectedGroupPosition));
+        NotificationUtils.unregisterGroup(RecordActivity.this, groups.get(selectedGroupPosition));
 
         RecordData newRecord = layoutDataToRecordData(0);
         newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).create(newRecord);
-        NotificationUtils.registerRecord(AddRecordActivity.this, groups.get(selectedGroupPosition), newRecord);
+        NotificationUtils.registerRecord(RecordActivity.this, groups.get(selectedGroupPosition), newRecord);
 
-        NotificationUtils.registerGroup(AddRecordActivity.this, groups.get(selectedGroupPosition));
+        NotificationUtils.registerGroup(RecordActivity.this, groups.get(selectedGroupPosition));
 
         setResult(1);
 
@@ -139,14 +139,14 @@ public class AddRecordActivity extends AppCompatActivity {
         RecordData newEditRecord = layoutDataToRecordData(editRecord.id);
         DatabaseHelper.getInstance(getApplicationContext()).update(newEditRecord);
 
-        NotificationUtils.unregisterGroup(AddRecordActivity.this, oldGroup);
-        NotificationUtils.unregisterGroup(AddRecordActivity.this, groups.get(selectedGroupPosition));
+        NotificationUtils.unregisterGroup(RecordActivity.this, oldGroup);
+        NotificationUtils.unregisterGroup(RecordActivity.this, groups.get(selectedGroupPosition));
 
-        NotificationUtils.unregisterRecord(AddRecordActivity.this, editRecord.id);
-        NotificationUtils.registerRecord(AddRecordActivity.this, groups.get(selectedGroupPosition), newEditRecord);
+        NotificationUtils.unregisterRecord(RecordActivity.this, editRecord.id);
+        NotificationUtils.registerRecord(RecordActivity.this, groups.get(selectedGroupPosition), newEditRecord);
 
-        NotificationUtils.registerGroup(AddRecordActivity.this, oldGroup);
-        NotificationUtils.registerGroup(AddRecordActivity.this, groups.get(selectedGroupPosition));
+        NotificationUtils.registerGroup(RecordActivity.this, oldGroup);
+        NotificationUtils.registerGroup(RecordActivity.this, groups.get(selectedGroupPosition));
 
         setResult(1);
         editRecord = newEditRecord;
@@ -156,7 +156,7 @@ public class AddRecordActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_record);
+        setContentView(R.layout.activity_record);
 
         if (savedInstanceState == null)
             operation = getIntent().getExtras().getInt(OPERATION);
@@ -455,7 +455,7 @@ public class AddRecordActivity extends AppCompatActivity {
             super.onCreateDialog(savedInstanceState);
 
             final Bundle bundle = getArguments();
-            final AddRecordActivity parent = (AddRecordActivity) getActivity();
+            final RecordActivity parent = (RecordActivity) getActivity();
 
             return new DatePickerDialog(
                     parent,
@@ -494,7 +494,7 @@ public class AddRecordActivity extends AppCompatActivity {
             super.onCreateDialog(savedInstanceState);
 
             final Bundle bundle = getArguments();
-            final AddRecordActivity parent = (AddRecordActivity) getActivity();
+            final RecordActivity parent = (RecordActivity) getActivity();
 
             return new TimePickerDialog(
                     parent,
@@ -524,7 +524,7 @@ public class AddRecordActivity extends AppCompatActivity {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             super.onCreateDialog(savedInstanceState);
-            final AddRecordActivity parent = (AddRecordActivity) getActivity();
+            final RecordActivity parent = (RecordActivity) getActivity();
 
             AlertDialog.Builder builder = new AlertDialog.Builder(parent);
             builder.setMessage("Delete record?")
