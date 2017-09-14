@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -60,7 +61,7 @@ public class GroupsActivity extends AppCompatActivity {
         groupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                GroupViewDialogFragment.newInstance(position).show(getSupportFragmentManager(), "groupView");
+                GroupViewFragment.createAndShow(getSupportFragmentManager(), position);
             }
         });
 
@@ -68,7 +69,7 @@ public class GroupsActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!Utils.groupHasRecords(getApplicationContext(), groups.get(position).id)) {
-                    GroupDeleteDialogFragment.newInstance(position).show(getSupportFragmentManager(), "groupDeleter");
+                    GroupDeleteFragment.createAndShow(getSupportFragmentManager(), position);
                 }
                 return true;
             }
@@ -81,7 +82,7 @@ public class GroupsActivity extends AppCompatActivity {
         createGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GroupViewDialogFragment.newInstance().show(getSupportFragmentManager(), "groupView");
+                GroupViewFragment.createAndShow(getSupportFragmentManager());
             }
         });
 
@@ -97,7 +98,9 @@ public class GroupsActivity extends AppCompatActivity {
         outState.putInt(RESULT_CODE_TAG, resultCode);
     }
 
-    public static class GroupViewDialogFragment extends DialogFragment {
+    public static class GroupViewFragment extends DialogFragment {
+        private static final String TAG = "GroupViewFragment";
+
         private EditText groupViewEditText;
         private CheckBox groupViewIsChecklist;
         private CheckBox groupViewIsInbox;
@@ -106,18 +109,18 @@ public class GroupsActivity extends AppCompatActivity {
         private int selectedFilterMode;
         private boolean enableValidation = false;
 
-        public static GroupViewDialogFragment newInstance() {
-            return new GroupViewDialogFragment();
+        public static void createAndShow(FragmentManager manager) {
+            (new GroupViewFragment()).show(manager, TAG);
         }
 
-        public static GroupViewDialogFragment newInstance(int groupIndex) {
-            GroupViewDialogFragment pickerFragment = new GroupViewDialogFragment();
+        public static void createAndShow(FragmentManager manager, int groupIndex) {
+            final GroupViewFragment fragment = new GroupViewFragment();
 
-            Bundle bundle = new Bundle();
+            final Bundle bundle = new Bundle();
             bundle.putInt(GROUP_INDEX_TAG, groupIndex);
-            pickerFragment.setArguments(bundle);
+            fragment.setArguments(bundle);
 
-            return pickerFragment;
+            fragment.show(manager, TAG);
         }
 
         private GroupData groupDataFromLayout(long id) {
@@ -161,8 +164,8 @@ public class GroupsActivity extends AppCompatActivity {
             super.onCreateDialog(savedInstanceState);
 
             final GroupsActivity parent = (GroupsActivity) getActivity();
-            LayoutInflater inflater = parent.getLayoutInflater();
-            View view = inflater.inflate(R.layout.group_view, null);
+            final LayoutInflater inflater = parent.getLayoutInflater();
+            final View view = inflater.inflate(R.layout.group_view, null);
 
             final TextView captionTextView = (TextView) view.findViewById(R.id.captionTextView);
             groupViewEditText = (EditText) view.findViewById(R.id.groupViewEditText);
@@ -214,11 +217,11 @@ public class GroupsActivity extends AppCompatActivity {
                     selectedFilterMode = 0;
                 }
             });
-            ArrayAdapter<String> filterModeStringsAdapter = new ArrayAdapter<>(parent, android.R.layout.simple_spinner_item, GroupData.ID_TO_FILTER_MODE_LABEL);
+            final ArrayAdapter<String> filterModeStringsAdapter = new ArrayAdapter<>(parent, android.R.layout.simple_spinner_item, GroupData.ID_TO_FILTER_MODE_LABEL);
             filterModeStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             filterModeSpinner.setAdapter(filterModeStringsAdapter);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(parent);
+            final AlertDialog.Builder builder = new AlertDialog.Builder(parent);
             builder.setView(view);
 
             final Bundle bundle = getArguments();
@@ -235,7 +238,7 @@ public class GroupsActivity extends AppCompatActivity {
 
                 builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                GroupData newGroupData = groupDataFromLayout(pressedGroupData.id);
+                                final GroupData newGroupData = groupDataFromLayout(pressedGroupData.id);
 
                                 NotificationUtils.unregisterGroupData(parent, pressedGroupData);
                                 DatabaseHelper.getInstance(parent.getApplicationContext()).update(newGroupData);
@@ -268,15 +271,15 @@ public class GroupsActivity extends AppCompatActivity {
         }
     }
 
-    public static class GroupDeleteDialogFragment extends DialogFragment {
-        public static GroupDeleteDialogFragment newInstance(int groupIndex) {
-            GroupDeleteDialogFragment pickerFragment = new GroupDeleteDialogFragment();
+    public static class GroupDeleteFragment extends DialogFragment {
+        public static void createAndShow(FragmentManager manager, int groupIndex) {
+            final GroupDeleteFragment fragment = new GroupDeleteFragment();
 
-            Bundle bundle = new Bundle();
+            final Bundle bundle = new Bundle();
             bundle.putInt(GROUP_INDEX_TAG, groupIndex);
-            pickerFragment.setArguments(bundle);
+            fragment.setArguments(bundle);
 
-            return pickerFragment;
+            fragment.show(manager, "GroupDeleteFragment");
         }
 
         @NonNull
@@ -288,7 +291,7 @@ public class GroupsActivity extends AppCompatActivity {
             final GroupsActivity parent = (GroupsActivity) getActivity();
             final GroupData pressedGroupData = parent.groups.get(bundle.getInt(GROUP_INDEX_TAG));
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(parent);
+            final AlertDialog.Builder builder = new AlertDialog.Builder(parent);
             builder.setMessage("Delete group " + pressedGroupData.name + "?")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {

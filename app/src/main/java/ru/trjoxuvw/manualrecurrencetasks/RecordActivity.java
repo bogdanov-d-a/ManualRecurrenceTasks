@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -237,12 +238,12 @@ public class RecordActivity extends AppCompatActivity {
         pickDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogFragment newFragment = DatePickerFragment.newInstance(
+                DatePickerFragment.createAndShow(
+                        getSupportFragmentManager(),
                         calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),
                         calendar.get(Calendar.DAY_OF_MONTH)
                 );
-                newFragment.show(getSupportFragmentManager(), "datePicker");
             }
         });
 
@@ -264,11 +265,11 @@ public class RecordActivity extends AppCompatActivity {
         pickTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogFragment newFragment = TimePickerFragment.newInstance(
+                TimePickerFragment.createAndShow(
+                        getSupportFragmentManager(),
                         calendar.get(Calendar.HOUR_OF_DAY),
                         calendar.get(Calendar.MINUTE)
                 );
-                newFragment.show(getSupportFragmentManager(), "timePicker");
             }
         });
 
@@ -371,7 +372,7 @@ public class RecordActivity extends AppCompatActivity {
                 deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        DeleteFragment.newInstance().show(getSupportFragmentManager(), "recordDeleter");
+                        DeleteRecordFragment.createAndShow(getSupportFragmentManager());
                         return true;
                     }
                 });
@@ -437,16 +438,16 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     public static class DatePickerFragment extends DialogFragment {
-        public static DatePickerFragment newInstance(int year, int monthOfYear, int dayOfMonth) {
-            DatePickerFragment pickerFragment = new DatePickerFragment();
+        public static void createAndShow(FragmentManager manager, int year, int monthOfYear, int dayOfMonth) {
+            final DatePickerFragment fragment = new DatePickerFragment();
 
-            Bundle bundle = new Bundle();
+            final Bundle bundle = new Bundle();
             bundle.putInt(YEAR_TAG, year);
             bundle.putInt(MONTH_TAG, monthOfYear);
             bundle.putInt(DAY_TAG, dayOfMonth);
-            pickerFragment.setArguments(bundle);
+            fragment.setArguments(bundle);
 
-            return pickerFragment;
+            fragment.show(manager, "DatePickerFragment");
         }
 
         @NonNull
@@ -477,15 +478,15 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     public static class TimePickerFragment extends DialogFragment {
-        public static TimePickerFragment newInstance(int hourOfDay, int minute) {
-            TimePickerFragment pickerFragment = new TimePickerFragment();
+        public static void createAndShow(FragmentManager manager, int hourOfDay, int minute) {
+            final TimePickerFragment fragment = new TimePickerFragment();
 
-            Bundle bundle = new Bundle();
+            final Bundle bundle = new Bundle();
             bundle.putInt(HOUR_TAG, hourOfDay);
             bundle.putInt(MINUTE_TAG, minute);
-            pickerFragment.setArguments(bundle);
+            fragment.setArguments(bundle);
 
-            return pickerFragment;
+            fragment.show(manager, "TimePickerFragment");
         }
 
         @NonNull
@@ -509,15 +510,14 @@ public class RecordActivity extends AppCompatActivity {
                     },
                     bundle.getInt(HOUR_TAG),
                     bundle.getInt(MINUTE_TAG),
-                    DateFormat.is24HourFormat(getActivity())
+                    DateFormat.is24HourFormat(parent)
             );
         }
     }
 
-    public static class DeleteFragment extends DialogFragment {
-        public static DeleteFragment newInstance() {
-            DeleteFragment fragment = new DeleteFragment();
-            return fragment;
+    public static class DeleteRecordFragment extends DialogFragment {
+        public static void createAndShow(FragmentManager manager) {
+            (new DeleteRecordFragment()).show(manager, "DeleteRecordFragment");
         }
 
         @NonNull
@@ -526,11 +526,11 @@ public class RecordActivity extends AppCompatActivity {
             super.onCreateDialog(savedInstanceState);
             final RecordActivity parent = (RecordActivity) getActivity();
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(parent);
+            final AlertDialog.Builder builder = new AlertDialog.Builder(parent);
             builder.setMessage("Delete record?")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            GroupData oldGroup = parent.groups.get(Utils.getPositionById(parent.groups, parent.editRecord.groupId));
+                            final GroupData oldGroup = parent.groups.get(Utils.getPositionById(parent.groups, parent.editRecord.groupId));
 
                             NotificationUtils.unregisterGroup(parent, oldGroup);
 
