@@ -173,32 +173,9 @@ public class GroupsActivity extends AppCompatActivity {
             groupViewIsInbox = (CheckBox) view.findViewById(R.id.groupViewIsInbox);
             groupViewIsNotification = (CheckBox) view.findViewById(R.id.groupViewIsNotification);
 
-            groupViewIsChecklist.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    if (!isStateValid()) {
-                        groupViewIsChecklist.setChecked(!b);
-                    }
-                }
-            });
-
-            groupViewIsInbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    if (!isStateValid()) {
-                        groupViewIsInbox.setChecked(!b);
-                    }
-                }
-            });
-
-            groupViewIsNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    if (!isStateValid()) {
-                        groupViewIsNotification.setChecked(!b);
-                    }
-                }
-            });
+            new OnCheckedChangeListenerHook(groupViewIsChecklist);
+            new OnCheckedChangeListenerHook(groupViewIsInbox);
+            new OnCheckedChangeListenerHook(groupViewIsNotification);
 
             filterModeSpinner = (Spinner) view.findViewById(R.id.filterModeSpinner);
             filterModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -268,6 +245,22 @@ public class GroupsActivity extends AppCompatActivity {
 
             enableValidation = true;
             return builder.create();
+        }
+
+        private class OnCheckedChangeListenerHook implements CompoundButton.OnCheckedChangeListener {
+            private final CheckBox checkBox;
+
+            public OnCheckedChangeListenerHook(CheckBox checkBox) {
+                this.checkBox = checkBox;
+                this.checkBox.setOnCheckedChangeListener(this);
+            }
+
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (!isStateValid()) {
+                    checkBox.setChecked(!b);
+                }
+            }
         }
     }
 
