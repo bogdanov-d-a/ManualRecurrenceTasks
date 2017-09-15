@@ -36,11 +36,11 @@ import notification.NotificationUtils;
 import utils.Utils;
 
 public class RecordActivity extends AppCompatActivity {
-    private static final String YEAR_TAG = "year";
-    private static final String MONTH_TAG = "monthOfYear";
-    private static final String DAY_TAG = "dayOfMonth";
-    private static final String HOUR_TAG = "hourOfDay";
-    private static final String MINUTE_TAG = "minute";
+    private static final String YEAR_TAG = "YEAR_TAG";
+    private static final String MONTH_TAG = "MONTH_TAG";
+    private static final String DAY_TAG = "DAY_TAG";
+    private static final String HOUR_TAG = "HOUR_TAG";
+    private static final String MINUTE_TAG = "MINUTE_TAG";
 
     public static final String OPERATION = "ACTIVITY_OPERATION";
     public static final int OPERATION_CREATE = 0;
