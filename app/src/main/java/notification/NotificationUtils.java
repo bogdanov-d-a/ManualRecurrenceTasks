@@ -143,7 +143,7 @@ public class NotificationUtils {
         }
     }
 
-    public static void registerGroupData(Context context, GroupData group)
+    public static void registerGroupWithData(Context context, GroupData group)
     {
         registerGroup(context, group);
 
@@ -154,16 +154,16 @@ public class NotificationUtils {
         }
     }
 
-    public static void registerAllData(Context context)
+    public static void registerAllGroupsWithData(Context context)
     {
         ArrayList<GroupData> groups = DatabaseHelper.getInstance(context).getGroups();
         for (GroupData group : groups)
         {
-            registerGroupData(context, group);
+            registerGroupWithData(context, group);
         }
     }
 
-    public static void unregisterGroupData(Context context, GroupData group)
+    public static void unregisterGroupWithData(Context context, GroupData group)
     {
         unregisterGroup(context, group);
 
@@ -174,12 +174,12 @@ public class NotificationUtils {
         }
     }
 
-    public static void unregisterAllData(Context context)
+    public static void unregisterAllGroupsWithData(Context context)
     {
         ArrayList<GroupData> groups = DatabaseHelper.getInstance(context).getGroups();
         for (GroupData group : groups)
         {
-            unregisterGroupData(context, group);
+            unregisterGroupWithData(context, group);
         }
     }
 
@@ -195,6 +195,8 @@ public class NotificationUtils {
     }
 
     public static void unregisterGroup(Context context, GroupData group) {
-        hideInbox(context, group.id);
+        if (group.isInbox) {
+            hideInbox(context, group.id);
+        }
     }
 }

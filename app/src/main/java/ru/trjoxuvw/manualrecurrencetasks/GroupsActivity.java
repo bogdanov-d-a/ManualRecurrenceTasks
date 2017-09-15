@@ -217,9 +217,9 @@ public class GroupsActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
                                 final GroupData newGroupData = groupDataFromLayout(pressedGroupData.id);
 
-                                NotificationUtils.unregisterGroupData(parent, pressedGroupData);
+                                NotificationUtils.unregisterGroupWithData(parent, pressedGroupData);
                                 DatabaseHelper.getInstance(parent.getApplicationContext()).update(newGroupData);
-                                NotificationUtils.registerGroupData(parent, newGroupData);
+                                NotificationUtils.registerGroupWithData(parent, newGroupData);
 
                                 parent.refreshGroups();
                                 parent.mySetResult(1);
@@ -288,7 +288,7 @@ public class GroupsActivity extends AppCompatActivity {
             builder.setMessage("Delete group " + pressedGroupData.name + "?")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            NotificationUtils.unregisterGroupData(parent, pressedGroupData);
+                            NotificationUtils.unregisterGroupWithData(parent, pressedGroupData);
                             DatabaseHelper.getInstance(parent.getApplicationContext()).deleteGroup(pressedGroupData.id);
                             parent.refreshGroups();
                             parent.mySetResult(1);

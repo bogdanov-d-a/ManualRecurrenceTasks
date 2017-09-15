@@ -19,7 +19,7 @@ public class DebugActivity extends AppCompatActivity {
         regButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NotificationUtils.registerAllData(DebugActivity.this);
+                NotificationUtils.registerAllGroupsWithData(DebugActivity.this);
             }
         });
 
@@ -28,7 +28,7 @@ public class DebugActivity extends AppCompatActivity {
         unregButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NotificationUtils.unregisterAllData(DebugActivity.this);
+                NotificationUtils.unregisterAllGroupsWithData(DebugActivity.this);
             }
         });
     }
