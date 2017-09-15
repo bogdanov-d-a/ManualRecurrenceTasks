@@ -70,33 +70,27 @@ public class RecordActivity extends AppCompatActivity {
         pickTimeButton.setText(SimpleDateFormat.getTimeInstance().format(date));
     }
 
-    private Boolean initSameRecord(Boolean data) {
-        if (data == null) {
-            data = layoutDataToRecordData(editRecord.id).equalsRecord(editRecord);
+    private class IsSameRecordCache {
+        private Boolean sameRecord;
+
+        public boolean get() {
+            if (sameRecord == null) {
+                sameRecord = layoutDataToRecordData(editRecord.id).equalsRecord(editRecord);
+            }
+            return sameRecord;
         }
-        return data;
     }
 
     private void updateButtonState()
     {
-        Boolean sameRecord = null;
+        IsSameRecordCache sameRecord = new IsSameRecordCache();
 
         if (updateButton != null) {
-            sameRecord = initSameRecord(sameRecord);
-            updateButton.setEnabled(!sameRecord);
+            updateButton.setEnabled(!sameRecord.get());
         }
 
         if (dismissRevertButton != null) {
-            boolean unmodified;
-
-            if (operation == OPERATION_CREATE) {
-                unmodified = false;
-            } else {
-                sameRecord = initSameRecord(sameRecord);
-                unmodified = sameRecord;
-            }
-
-            dismissRevertButton.setText(unmodified ? "Close" : "Discard");
+            dismissRevertButton.setText(operation == OPERATION_CREATE || !sameRecord.get() ? "Discard" : "Close");
         }
     }
 
