@@ -130,18 +130,19 @@ public class RecordActivity extends AppCompatActivity {
 
     private void updateRecord() {
         GroupData oldGroup = groups.get(Utils.getPositionById(groups, editRecord.groupId));
+        GroupData newGroup = groups.get(selectedGroupPosition);
 
         RecordData newEditRecord = layoutDataToRecordData(editRecord.id);
         DatabaseHelper.getInstance(getApplicationContext()).update(newEditRecord);
 
         NotificationUtils.unregisterGroup(RecordActivity.this, oldGroup);
-        NotificationUtils.unregisterGroup(RecordActivity.this, groups.get(selectedGroupPosition));
+        NotificationUtils.unregisterGroup(RecordActivity.this, newGroup);
 
-        NotificationUtils.unregisterRecord(RecordActivity.this, editRecord.id);
-        NotificationUtils.registerRecord(RecordActivity.this, groups.get(selectedGroupPosition), newEditRecord);
+        NotificationUtils.unregisterRecord(RecordActivity.this, oldGroup, editRecord.id);
+        NotificationUtils.registerRecord(RecordActivity.this, newGroup, newEditRecord);
 
         NotificationUtils.registerGroup(RecordActivity.this, oldGroup);
-        NotificationUtils.registerGroup(RecordActivity.this, groups.get(selectedGroupPosition));
+        NotificationUtils.registerGroup(RecordActivity.this, newGroup);
 
         setResult(1);
         editRecord = newEditRecord;
@@ -529,7 +530,7 @@ public class RecordActivity extends AppCompatActivity {
                             NotificationUtils.unregisterGroup(parent, oldGroup);
 
                             DatabaseHelper.getInstance(parent.getApplicationContext()).deleteRecord(parent.editRecord.id);
-                            NotificationUtils.unregisterRecord(parent, parent.editRecord.id);
+                            NotificationUtils.unregisterRecord(parent, oldGroup, parent.editRecord.id);
 
                             NotificationUtils.registerGroup(parent, oldGroup);
 

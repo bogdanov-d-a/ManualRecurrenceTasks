@@ -135,10 +135,12 @@ public class NotificationUtils {
         }
     }
 
-    public static void unregisterRecord(Context context, long recordRowid)
+    public static void unregisterRecord(Context context, GroupData group, long recordRowid)
     {
-        unschedule(context, recordRowid);
-        hideRecord(context, recordRowid);
+        if (group.isNotification) {
+            unschedule(context, recordRowid);
+            hideRecord(context, recordRowid);
+        }
     }
 
     public static void registerGroupData(Context context, GroupData group)
@@ -168,7 +170,7 @@ public class NotificationUtils {
         ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(group.id, Long.MIN_VALUE, false);
         for (RecordData record : records)
         {
-            unregisterRecord(context, record.id);
+            unregisterRecord(context, group, record.id);
         }
     }
 
