@@ -27,7 +27,7 @@ public final class GroupData extends AbstractData {
 
         FILTER_MODE_TO_ID = new TreeMap<>();
         for (int i = 0; i < ID_TO_FILTER_MODE.size(); ++i) {
-            FILTER_MODE_TO_ID.put(ID_TO_FILTER_MODE.get(i), new Integer(i));
+            FILTER_MODE_TO_ID.put(ID_TO_FILTER_MODE.get(i), i);
         }
     }
 

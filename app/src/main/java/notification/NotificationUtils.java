@@ -81,7 +81,7 @@ public class NotificationUtils {
 
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify((int)uid, mBuilder.build());
+        mNotificationManager.notify(uid, mBuilder.build());
     }
 
     public static void hide(Context context, long recordRowid)

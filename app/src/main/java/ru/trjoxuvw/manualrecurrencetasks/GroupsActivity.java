@@ -167,17 +167,17 @@ public class GroupsActivity extends AppCompatActivity {
             final LayoutInflater inflater = parent.getLayoutInflater();
             final View view = inflater.inflate(R.layout.group_view, null);
 
-            final TextView captionTextView = (TextView) view.findViewById(R.id.captionTextView);
-            groupViewEditText = (EditText) view.findViewById(R.id.groupViewEditText);
-            groupViewIsChecklist = (CheckBox) view.findViewById(R.id.groupViewIsChecklist);
-            groupViewIsInbox = (CheckBox) view.findViewById(R.id.groupViewIsInbox);
-            groupViewIsNotification = (CheckBox) view.findViewById(R.id.groupViewIsNotification);
+            final TextView captionTextView = view.findViewById(R.id.captionTextView);
+            groupViewEditText = view.findViewById(R.id.groupViewEditText);
+            groupViewIsChecklist = view.findViewById(R.id.groupViewIsChecklist);
+            groupViewIsInbox = view.findViewById(R.id.groupViewIsInbox);
+            groupViewIsNotification = view.findViewById(R.id.groupViewIsNotification);
 
             new OnCheckedChangeListenerHook(groupViewIsChecklist);
             new OnCheckedChangeListenerHook(groupViewIsInbox);
             new OnCheckedChangeListenerHook(groupViewIsNotification);
 
-            filterModeSpinner = (Spinner) view.findViewById(R.id.filterModeSpinner);
+            filterModeSpinner = view.findViewById(R.id.filterModeSpinner);
             filterModeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
