@@ -19,7 +19,7 @@ import ru.trjoxuvw.manualrecurrencetasks.RecordActivity;
 import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
 
 public class NotificationUtils {
-    public static void show(Context context, String groupName, String recordLabel, long recordRowid)
+    public static void notifyRecord(Context context, String groupName, String recordLabel, long recordRowid)
     {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
@@ -51,7 +51,7 @@ public class NotificationUtils {
         mNotificationManager.notify((int)recordRowid, mBuilder.build());
     }
 
-    public static void showInbox(Context context, GroupData group, long recordCount)
+    public static void notifyInbox(Context context, GroupData group, long recordCount)
     {
         int uid = -1 * (int)group.id;
         String fullText = recordCount + " pending records.";
@@ -84,11 +84,16 @@ public class NotificationUtils {
         mNotificationManager.notify(uid, mBuilder.build());
     }
 
-    public static void hide(Context context, long recordRowid)
+    private static void hide(Context context, long uid)
     {
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancel((int)recordRowid);
+        mNotificationManager.cancel((int)uid);
+    }
+
+    public static void hideRecord(Context context, long recordRowid)
+    {
+        hide(context, recordRowid);
     }
 
     public static void hideInbox(Context context, long groupRowid)
@@ -124,7 +129,7 @@ public class NotificationUtils {
             Calendar calendarNow = Calendar.getInstance();
 
             if (record.nextAppear < calendarNow.getTimeInMillis())
-                show(context, group.name, record.label, record.id);
+                notifyRecord(context, group.name, record.label, record.id);
             else
                 schedule(context, record.id, record.nextAppear);
         }
@@ -133,7 +138,7 @@ public class NotificationUtils {
     public static void unregisterRecord(Context context, long recordRowid)
     {
         unschedule(context, recordRowid);
-        hide(context, recordRowid);
+        hideRecord(context, recordRowid);
     }
 
     public static void registerGroupData(Context context, GroupData group)
@@ -180,7 +185,7 @@ public class NotificationUtils {
         if (group.isInbox) {
             long count = DatabaseHelper.getInstance(context).getUndoneTasksCount(group);
             if (count > 0) {
-                showInbox(context, group, count);
+                notifyInbox(context, group, count);
             } else {
                 hideInbox(context, group.id);
             }

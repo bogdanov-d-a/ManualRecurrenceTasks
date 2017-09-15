@@ -13,6 +13,6 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         long id = intent.getLongExtra(RECORD_ROWID, 0);
         DatabaseHelper.RecordDataMin record = DatabaseHelper.getInstance(context).getRecordMin(id);
-        NotificationUtils.show(context, record.groupName, record.label, id);
+        NotificationUtils.notifyRecord(context, record.groupName, record.label, id);
     }
 }
