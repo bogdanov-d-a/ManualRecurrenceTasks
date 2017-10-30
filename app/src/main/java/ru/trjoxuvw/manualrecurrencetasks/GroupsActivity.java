@@ -289,7 +289,7 @@ public class GroupsActivity extends AppCompatActivity {
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             NotificationUtils.unregisterGroupWithData(parent, pressedGroupData);
-                            DatabaseHelper.getInstance(parent.getApplicationContext()).deleteGroup(pressedGroupData.id);
+                            DatabaseHelper.getInstance(parent.getApplicationContext()).deleteEmptyGroup(pressedGroupData.id);
                             parent.refreshGroups();
                             parent.mySetResult(1);
                         }

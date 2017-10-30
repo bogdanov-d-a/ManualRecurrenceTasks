@@ -293,12 +293,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public void deleteGroup(long id)
+    public void deleteEmptyGroup(long id)
     {
-        SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("delete from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.GROUP_ID) + "=" + escapeStr(Long.toString(id)) + ";");
-        db.execSQL("delete from " + StaticInfo.getGroupTableName() + " where " + StaticInfo.getGroupRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
-        db.close();
+        ArrayList<RecordData> records = getRecords(id, Long.MIN_VALUE, false);
+        if (records.isEmpty())
+        {
+            SQLiteDatabase db = getWritableDatabase();
+            db.execSQL("delete from " + StaticInfo.getGroupTableName() + " where " + StaticInfo.getGroupRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
+            db.close();
+        }
     }
 
     public RecordData getRecord(long id)
