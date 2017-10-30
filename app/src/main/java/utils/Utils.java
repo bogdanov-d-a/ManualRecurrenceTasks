@@ -2,7 +2,10 @@ package utils;
 
 import android.content.Context;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import database.AbstractData;
 import database.DatabaseHelper;
@@ -58,5 +61,28 @@ public class Utils {
     public static boolean groupHasRecords(Context context, long groupId) {
         ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(groupId, Long.MIN_VALUE, false);
         return !records.isEmpty();
+    }
+
+    public static class DateTimeFormatted
+    {
+        public final String date;
+        public final String time;
+
+        public DateTimeFormatted(String date, String time)
+        {
+            this.date = date;
+            this.time = time;
+        }
+
+        public String getDateTime()
+        {
+            return date + " " + time;
+        }
+    }
+
+    public static DateTimeFormatted formatDateTime(Date date) {
+        DateFormat df = SimpleDateFormat.getDateInstance();
+        SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
+        return new DateTimeFormatted(df.format(date), tf.format(date));
     }
 }

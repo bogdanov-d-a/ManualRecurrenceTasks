@@ -17,7 +17,6 @@ import ru.trjoxuvw.manualrecurrencetasks.RecordActivity;
 import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
 import ru.trjoxuvw.manualrecurrencetasks.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -93,7 +92,7 @@ public class RecordListAdapter extends BaseAdapter {
         });
 
         holder.label.setText(record.label);
-        holder.nextAppear.setText(SimpleDateFormat.getDateTimeInstance().format(new Date(record.nextAppear)));
+        holder.nextAppear.setText(Utils.formatDateTime(new Date(record.nextAppear)).getDateTime());
         holder.checkBox.setOnCheckedChangeListener(null);
 
         final ArrayList<GroupData> groupsList = parentActivity.getGroups();

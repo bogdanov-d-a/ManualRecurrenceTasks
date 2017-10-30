@@ -24,7 +24,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -66,8 +65,9 @@ public class RecordActivity extends AppCompatActivity {
     private void updateDateTimeText()
     {
         Date date = new Date(calendar.getTimeInMillis());
-        pickDateButton.setText(SimpleDateFormat.getDateInstance().format(date));
-        pickTimeButton.setText(SimpleDateFormat.getTimeInstance().format(date));
+        Utils.DateTimeFormatted formattedDateTime = Utils.formatDateTime(date);
+        pickDateButton.setText(formattedDateTime.date);
+        pickTimeButton.setText(formattedDateTime.time);
     }
 
     private class IsSameRecordCache {
