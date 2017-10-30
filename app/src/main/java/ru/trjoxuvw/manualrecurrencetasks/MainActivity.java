@@ -21,7 +21,6 @@ import database.GroupData;
 import database.DatabaseHelper;
 import utils.Utils;
 
-// TODO: lock database once for operation series
 // TODO: notify time countdown + show day of week
 
 public class MainActivity extends AppCompatActivity {

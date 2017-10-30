@@ -231,10 +231,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result.toString();
     }
 
-    public ArrayList<RecordData> getRecords(long groupId, long maxDate, boolean notificationsOnly)
+    private ArrayList<RecordData> getRecords(SQLiteDatabase db, long groupId, long maxDate, boolean notificationsOnly)
     {
         ArrayList<RecordData> result = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
 
         Cursor cursor;
         {
@@ -265,8 +264,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             while (cursor.moveToNext());
         }
         cursor.close();
-        db.close();
 
+        return result;
+    }
+
+    public ArrayList<RecordData> getRecords(long groupId, long maxDate, boolean notificationsOnly)
+    {
+        SQLiteDatabase db = getReadableDatabase();
+        ArrayList<RecordData> result = getRecords(db, groupId, maxDate, notificationsOnly);
+        db.close();
         return result;
     }
 
@@ -295,13 +301,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void deleteEmptyGroup(long id)
     {
-        ArrayList<RecordData> records = getRecords(id, Long.MIN_VALUE, false);
+        SQLiteDatabase db = getWritableDatabase();
+
+        ArrayList<RecordData> records = getRecords(db, id, Long.MIN_VALUE, false);
         if (records.isEmpty())
         {
-            SQLiteDatabase db = getWritableDatabase();
             db.execSQL("delete from " + StaticInfo.getGroupTableName() + " where " + StaticInfo.getGroupRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
-            db.close();
         }
+
+        db.close();
     }
 
     public RecordData getRecord(long id)
