@@ -268,18 +268,24 @@ public class RecordActivity extends AppCompatActivity {
         pickTimeButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                final int hour;
+                final int minute;
+
                 if (calendar.get(Calendar.HOUR_OF_DAY) == 0 && calendar.get(Calendar.MINUTE) == 0) {
                     Calendar calendarNow = Calendar.getInstance();
-
-                    calendar.set(Calendar.HOUR_OF_DAY, calendarNow.get(Calendar.HOUR_OF_DAY));
-                    calendar.set(Calendar.MINUTE, calendarNow.get(Calendar.MINUTE));
+                    hour = calendarNow.get(Calendar.HOUR_OF_DAY);
+                    minute = calendarNow.get(Calendar.MINUTE);
                 } else {
-                    calendar.set(Calendar.HOUR_OF_DAY, 0);
-                    calendar.set(Calendar.MINUTE, 0);
+                    hour = 0;
+                    minute = 0;
                 }
 
-                updateDateTimeText();
-                updateButtonState();
+                TimePickerFragment.createAndShow(
+                        getSupportFragmentManager(),
+                        hour,
+                        minute
+                );
+
                 return true;
             }
         });
