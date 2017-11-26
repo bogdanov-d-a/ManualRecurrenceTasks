@@ -19,16 +19,19 @@ import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
 import ru.trjoxuvw.manualrecurrencetasks.RecordActivity;
 
 public class NotificationUtils {
-    public static void notifyRecord(Context context, String groupName, String recordLabel, long recordRowid) {
+    public static void notifyRecord(Context context, String groupName, String recordLabel, long recordRowid, boolean setSound) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(android.R.drawable.ic_menu_info_details)
                         .setContentTitle(groupName)
                         .setContentText(recordLabel)
-                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setStyle(new NotificationCompat.BigTextStyle().bigText(recordLabel))
                         .setOngoing(true);
+
+        if (setSound) {
+            mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+        }
 
         Intent resultIntent = new Intent(context, RecordActivity.class);
         resultIntent.putExtra(RecordActivity.OPERATION, RecordActivity.OPERATION_UPDATE);
@@ -119,7 +122,7 @@ public class NotificationUtils {
             Calendar calendarNow = Calendar.getInstance();
 
             if (record.nextAppear < calendarNow.getTimeInMillis())
-                notifyRecord(context, group.name, record.label, record.id);
+                notifyRecord(context, group.name, record.label, record.id, false);
             else
                 schedule(context, record.id, record.nextAppear);
         }
