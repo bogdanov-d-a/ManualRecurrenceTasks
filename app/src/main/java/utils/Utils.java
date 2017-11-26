@@ -79,7 +79,7 @@ public class Utils {
     }
 
     public static DateTimeFormatted formatDateTime(Date date) {
-        DateFormat df = SimpleDateFormat.getDateInstance();
+        SimpleDateFormat df = new SimpleDateFormat("E, MMM d, yyyy");
         SimpleDateFormat tf = new SimpleDateFormat("HH:mm");
         return new DateTimeFormatted(df.format(date), tf.format(date));
     }
