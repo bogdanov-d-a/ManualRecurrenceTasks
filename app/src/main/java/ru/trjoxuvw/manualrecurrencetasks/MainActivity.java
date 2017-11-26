@@ -21,8 +21,6 @@ import database.GroupData;
 import database.RecordData;
 import utils.Utils;
 
-// TODO: notify time countdown + show day of week
-
 public class MainActivity extends AppCompatActivity {
     public static final String GROUP_ID_TAG = "GROUP_ID_TAG";
 
