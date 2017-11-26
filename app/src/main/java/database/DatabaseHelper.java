@@ -190,30 +190,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public ArrayList<GroupData> getGroups()
     {
-        ArrayList<GroupData> result = new ArrayList<>();
-
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + StaticInfo.getGroupTableName() +
-                " order by " + StaticInfo.getGroupRowName(StaticInfo.GroupRowId.NAME) + " asc;", null);
-        if (cursor.moveToFirst())
-        {
-            do
-            {
-                result.add(new GroupData(
-                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(0))),
-                        cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(1))),
-                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(2))) != 0,
-                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(3))) != 0,
-                        cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(4))) != 0,
-                        GroupData.ID_TO_FILTER_MODE.get((int)cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(5))))
-                ));
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
-        db.close();
+        try {
+            Cursor cursor = db.rawQuery("select * from " + StaticInfo.getGroupTableName() +
+                    " order by " + StaticInfo.getGroupRowName(StaticInfo.GroupRowId.NAME) + " asc;", null);
+            try {
+                ArrayList<GroupData> result = new ArrayList<>();
 
-        return result;
+                if (cursor.moveToFirst())
+                {
+                    do
+                    {
+                        result.add(new GroupData(
+                                cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(0))),
+                                cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(1))),
+                                cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(2))) != 0,
+                                cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(3))) != 0,
+                                cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(4))) != 0,
+                                GroupData.ID_TO_FILTER_MODE.get((int)cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(5))))
+                        ));
+                    }
+                    while (cursor.moveToNext());
+                }
+
+                return result;
+            } finally {
+                cursor.close();
+            }
+        } finally {
+            db.close();
+        }
     }
 
     private static String escapeStr(String str)
@@ -233,8 +239,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private ArrayList<RecordData> getRecords(SQLiteDatabase db, long groupId, long maxDate, boolean notificationsOnly)
     {
-        ArrayList<RecordData> result = new ArrayList<>();
-
         Cursor cursor;
         {
             String groupIdExpr = "1";
@@ -255,79 +259,91 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     " order by " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.NEXT_APPEAR) + " asc;", null);
         }
 
-        if (cursor.moveToFirst())
-        {
-            do
-            {
-                result.add(createRecordDataFromCursor(cursor));
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
+        try {
+            ArrayList<RecordData> result = new ArrayList<>();
 
-        return result;
+            if (cursor.moveToFirst())
+            {
+                do
+                {
+                    result.add(createRecordDataFromCursor(cursor));
+                }
+                while (cursor.moveToNext());
+            }
+
+            return result;
+        } finally {
+            cursor.close();
+        }
     }
 
     public ArrayList<RecordData> getRecords(long groupId, long maxDate, boolean notificationsOnly)
     {
         SQLiteDatabase db = getReadableDatabase();
-        ArrayList<RecordData> result = getRecords(db, groupId, maxDate, notificationsOnly);
-        db.close();
-        return result;
+        try {
+            return getRecords(db, groupId, maxDate, notificationsOnly);
+        } finally {
+            db.close();
+        }
     }
 
     public long getUndoneTasksCount(GroupData group) {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select count(" + StaticInfo.getRecordRowName(0) + ") from " + StaticInfo.getRecordTableName() +
-                " where (" + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.GROUP_ID) + "=" + escapeStr(Long.toString(group.id)) + ")" +
-                " and (" + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.IS_CHECKED) + "=" + escapeStr(Long.toString(0)) + ");", null);
-
-        cursor.moveToFirst();
-        long result = cursor.getLong(0);
-
-        cursor.close();
-        db.close();
-        return result;
+        try {
+            Cursor cursor = db.rawQuery("select count(" + StaticInfo.getRecordRowName(0) + ") from " + StaticInfo.getRecordTableName() +
+                    " where (" + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.GROUP_ID) + "=" + escapeStr(Long.toString(group.id)) + ")" +
+                    " and (" + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.IS_CHECKED) + "=" + escapeStr(Long.toString(0)) + ");", null);
+            try {
+                cursor.moveToFirst();
+                return cursor.getLong(0);
+            } finally {
+                cursor.close();
+            }
+        } finally {
+            db.close();
+        }
     }
 
     public long create(AbstractData data)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL(insertGen(data));
-        long id = getLastInsertRowid(db);
-        db.close();
-        return id;
+        try {
+            db.execSQL(insertGen(data));
+            return getLastInsertRowid(db);
+        } finally {
+            db.close();
+        }
     }
 
     public void deleteEmptyGroup(long id)
     {
         SQLiteDatabase db = getWritableDatabase();
-
-        ArrayList<RecordData> records = getRecords(db, id, Long.MIN_VALUE, false);
-        if (records.isEmpty())
-        {
-            db.execSQL("delete from " + StaticInfo.getGroupTableName() + " where " + StaticInfo.getGroupRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
+        try {
+            ArrayList<RecordData> records = getRecords(db, id, Long.MIN_VALUE, false);
+            if (records.isEmpty())
+            {
+                db.execSQL("delete from " + StaticInfo.getGroupTableName() + " where " + StaticInfo.getGroupRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
+            }
+        } finally {
+            db.close();
         }
-
-        db.close();
     }
 
     public RecordData getRecord(long id)
     {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";", null);
-
-        try
-        {
-            if (cursor.moveToFirst())
-            {
-                return createRecordDataFromCursor(cursor);
+        try {
+            Cursor cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";", null);
+            try {
+                if (cursor.moveToFirst())
+                {
+                    return createRecordDataFromCursor(cursor);
+                }
+                return null;
+            } finally {
+                cursor.close();
             }
-            return null;
-        }
-        finally
-        {
-            cursor.close();
+        } finally {
             db.close();
         }
     }
@@ -346,24 +362,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public RecordDataMin getRecordMin(long id)
     {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " inner join " + StaticInfo.getGroupTableName() +
-                " on " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.GROUP_ID) + "=" + StaticInfo.getGroupRowName(0) +
-                " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";", null);
-
-        try
-        {
-            if (cursor.moveToFirst())
-            {
-                return new RecordDataMin(
-                        cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(StaticInfo.GroupRowId.NAME))),
-                        cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getRecordRowName(StaticInfo.RecordRowId.LABEL)))
-                );
+        try {
+            Cursor cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " inner join " + StaticInfo.getGroupTableName() +
+                    " on " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.GROUP_ID) + "=" + StaticInfo.getGroupRowName(0) +
+                    " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";", null);
+            try {
+                if (cursor.moveToFirst())
+                {
+                    return new RecordDataMin(
+                            cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(StaticInfo.GroupRowId.NAME))),
+                            cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getRecordRowName(StaticInfo.RecordRowId.LABEL)))
+                    );
+                }
+                return null;
+            } finally {
+                cursor.close();
             }
-            return null;
-        }
-        finally
-        {
-            cursor.close();
+        } finally {
             db.close();
         }
     }
@@ -371,14 +386,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void update(AbstractData data)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL(updateGen(data));
-        db.close();
+        try {
+            db.execSQL(updateGen(data));
+        } finally {
+            db.close();
+        }
     }
 
     public void deleteRecord(long id)
     {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("delete from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
-        db.close();
+        try {
+            db.execSQL("delete from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
+        } finally {
+            db.close();
+        }
     }
 }
