@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Button optionsButton = (Button) findViewById(R.id.optionsButton);
+        final Button optionsButton = findViewById(R.id.optionsButton);
         assert optionsButton != null;
         optionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        createRecordButton = (Button) findViewById(R.id.createRecordButton);
+        createRecordButton = findViewById(R.id.createRecordButton);
         assert createRecordButton != null;
         createRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        groupSpinner = (Spinner) findViewById(R.id.groupSpinner);
+        groupSpinner = findViewById(R.id.groupSpinner);
         assert groupSpinner != null;
         groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        activeOnlyCheckBox = (CheckBox) findViewById(R.id.activeOnlyCheckBox);
+        activeOnlyCheckBox = findViewById(R.id.activeOnlyCheckBox);
         assert activeOnlyCheckBox != null;
         activeOnlyCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        recordListView = (ListView) findViewById(R.id.recordListView);
+        recordListView = findViewById(R.id.recordListView);
         assert recordListView != null;
         recordListView.setAdapter(new RecordListAdapter(this));
 

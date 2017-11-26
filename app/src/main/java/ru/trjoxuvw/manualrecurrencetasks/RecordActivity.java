@@ -170,10 +170,10 @@ public class RecordActivity extends AppCompatActivity {
             editRecord = null;
         }
 
-        labelEditText = (EditText) findViewById(R.id.labelEditText);
-        pickDateButton = (Button) findViewById(R.id.pickDateButton);
-        pickTimeButton = (Button) findViewById(R.id.pickTimeButton);
-        checkedCheckBox = (CheckBox) findViewById(R.id.checkedCheckBox);
+        labelEditText = findViewById(R.id.labelEditText);
+        pickDateButton = findViewById(R.id.pickDateButton);
+        pickTimeButton = findViewById(R.id.pickTimeButton);
+        checkedCheckBox = findViewById(R.id.checkedCheckBox);
 
         assert labelEditText != null;
         assert pickDateButton != null;
@@ -202,7 +202,7 @@ public class RecordActivity extends AppCompatActivity {
             }
         });
 
-        final Spinner groupSpinner = (Spinner) findViewById(R.id.groupSpinner);
+        final Spinner groupSpinner = findViewById(R.id.groupSpinner);
         assert groupSpinner != null;
         groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -345,7 +345,7 @@ public class RecordActivity extends AppCompatActivity {
                 break;
 
             case OPERATION_UPDATE:
-                updateButton = (Button) findViewById(R.id.footerButton1);
+                updateButton = findViewById(R.id.footerButton1);
                 updateButton.setText("Update");
                 updateButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -362,7 +362,7 @@ public class RecordActivity extends AppCompatActivity {
                     }
                 });
 
-                final Button deleteButton = (Button) findViewById(R.id.footerButton2);
+                final Button deleteButton = findViewById(R.id.footerButton2);
                 deleteButton.setText("Delete");
                 deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
@@ -406,8 +406,8 @@ public class RecordActivity extends AppCompatActivity {
 
         if (operation == OPERATION_CREATE)
         {
-            final Button button3 = (Button) findViewById(R.id.footerButton3);
-            final Button button4 = (Button) findViewById(R.id.footerButton4);
+            final Button button3 = findViewById(R.id.footerButton3);
+            final Button button4 = findViewById(R.id.footerButton4);
             button3.setVisibility(View.INVISIBLE);
             button4.setVisibility(View.INVISIBLE);
         }

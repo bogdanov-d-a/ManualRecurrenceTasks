@@ -54,7 +54,7 @@ public class GroupsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_groups);
 
-        groupListView = (ListView) findViewById(R.id.groupListView);
+        groupListView = findViewById(R.id.groupListView);
         assert groupListView != null;
         groupListView.setAdapter(new GroupListAdapter(this));
 
@@ -77,7 +77,7 @@ public class GroupsActivity extends AppCompatActivity {
 
         refreshGroups();
 
-        final Button createGroupButton = (Button) findViewById(R.id.createGroupButton);
+        final Button createGroupButton = findViewById(R.id.createGroupButton);
         assert createGroupButton != null;
         createGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override

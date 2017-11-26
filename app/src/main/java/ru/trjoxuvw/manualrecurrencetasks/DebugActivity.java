@@ -14,7 +14,7 @@ public class DebugActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_debug);
 
-        final Button regButton = (Button) findViewById(R.id.regButton);
+        final Button regButton = findViewById(R.id.regButton);
         assert regButton != null;
         regButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -23,7 +23,7 @@ public class DebugActivity extends AppCompatActivity {
             }
         });
 
-        final Button unregButton = (Button) findViewById(R.id.unregButton);
+        final Button unregButton = findViewById(R.id.unregButton);
         assert unregButton != null;
         unregButton.setOnClickListener(new View.OnClickListener() {
             @Override
