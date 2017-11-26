@@ -4,12 +4,12 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
@@ -28,9 +28,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import database.RecordData;
-import database.GroupData;
 import database.DatabaseHelper;
+import database.GroupData;
+import database.RecordData;
 import notification.NotificationUtils;
 import utils.Utils;
 
@@ -62,8 +62,7 @@ public class RecordActivity extends AppCompatActivity {
     private int operation;
     private RecordData editRecord;
 
-    private void updateDateTimeText()
-    {
+    private void updateDateTimeText() {
         Date date = new Date(calendar.getTimeInMillis());
         Utils.DateTimeFormatted formattedDateTime = Utils.formatDateTime(date);
         pickDateButton.setText(formattedDateTime.date);
@@ -81,8 +80,7 @@ public class RecordActivity extends AppCompatActivity {
         }
     }
 
-    private void updateButtonState()
-    {
+    private void updateButtonState() {
         IsSameRecordCache sameRecord = new IsSameRecordCache();
 
         if (updateButton != null) {
@@ -220,8 +218,7 @@ public class RecordActivity extends AppCompatActivity {
             groups = DatabaseHelper.getInstance(getApplicationContext()).getGroups();
 
             ArrayList<String> groupStrings = new ArrayList<>();
-            for (GroupData group : groups)
-            {
+            for (GroupData group : groups) {
                 groupStrings.add(group.getLabel());
             }
 
@@ -291,23 +288,18 @@ public class RecordActivity extends AppCompatActivity {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
-        if (savedInstanceState != null)
-        {
+        if (savedInstanceState != null) {
             calendar.set(Calendar.YEAR, savedInstanceState.getInt(YEAR_TAG));
             calendar.set(Calendar.MONTH, savedInstanceState.getInt(MONTH_TAG));
             calendar.set(Calendar.DAY_OF_MONTH, savedInstanceState.getInt(DAY_TAG));
             calendar.set(Calendar.HOUR_OF_DAY, savedInstanceState.getInt(HOUR_TAG));
             calendar.set(Calendar.MINUTE, savedInstanceState.getInt(MINUTE_TAG));
-        }
-        else if (operation == OPERATION_UPDATE)
-        {
+        } else if (operation == OPERATION_UPDATE) {
             calendar.setTimeInMillis(editRecord.nextAppear);
         }
 
-        if (savedInstanceState == null)
-        {
-            switch (operation)
-            {
+        if (savedInstanceState == null) {
+            switch (operation) {
                 case OPERATION_CREATE:
                     groupSpinner.setSelection(getIntent().getExtras().getInt(INIT_GROUP_INDEX));
                     break;
@@ -338,8 +330,7 @@ public class RecordActivity extends AppCompatActivity {
             }
         });
 
-        switch (operation)
-        {
+        switch (operation) {
             case OPERATION_CREATE:
                 dataCreationButton.setText("Create");
                 break;
@@ -404,8 +395,7 @@ public class RecordActivity extends AppCompatActivity {
             });
         }
 
-        if (operation == OPERATION_CREATE)
-        {
+        if (operation == OPERATION_CREATE) {
             final Button button3 = findViewById(R.id.footerButton3);
             final Button button4 = findViewById(R.id.footerButton4);
             button3.setVisibility(View.INVISIBLE);

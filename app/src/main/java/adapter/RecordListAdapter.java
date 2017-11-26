@@ -10,17 +10,16 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import database.DatabaseHelper;
-import database.GroupData;
-import notification.NotificationUtils;
-import ru.trjoxuvw.manualrecurrencetasks.RecordActivity;
-import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
-import ru.trjoxuvw.manualrecurrencetasks.R;
-
 import java.util.ArrayList;
 import java.util.Date;
 
+import database.DatabaseHelper;
+import database.GroupData;
 import database.RecordData;
+import notification.NotificationUtils;
+import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
+import ru.trjoxuvw.manualrecurrencetasks.R;
+import ru.trjoxuvw.manualrecurrencetasks.RecordActivity;
 import utils.Utils;
 
 public class RecordListAdapter extends BaseAdapter {
@@ -33,8 +32,7 @@ public class RecordListAdapter extends BaseAdapter {
         mInflater = LayoutInflater.from(parentActivity);
     }
 
-    public void ResetList(ArrayList<RecordData> recordsList)
-    {
+    public void ResetList(ArrayList<RecordData> recordsList) {
         this.recordsList = recordsList;
         notifyDataSetChanged();
     }

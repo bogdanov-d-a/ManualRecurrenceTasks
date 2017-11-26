@@ -26,5 +26,6 @@ public abstract class AbstractData {
             return Long.toString(this.id);
         return getDataStringAux(id);
     }
+
     protected abstract String getDataStringAux(int id);
 }

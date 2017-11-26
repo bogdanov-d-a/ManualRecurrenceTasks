@@ -1,8 +1,8 @@
 package ru.trjoxuvw.manualrecurrencetasks;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import adapter.RecordListAdapter;
-import database.RecordData;
-import database.GroupData;
 import database.DatabaseHelper;
+import database.GroupData;
+import database.RecordData;
 import utils.Utils;
 
 // TODO: notify time countdown + show day of week
@@ -37,19 +37,16 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<GroupData> groups;
     private int selectedGroupPosition;
 
-    public ArrayList<GroupData> getGroups()
-    {
+    public ArrayList<GroupData> getGroups() {
         return groups;
     }
 
-    private void refreshGroups()
-    {
+    private void refreshGroups() {
         groups = DatabaseHelper.getInstance(getApplicationContext()).getGroups();
 
         ArrayList<String> groupStrings = new ArrayList<>();
         groupStrings.add("Notifications");
-        for (GroupData group : groups)
-        {
+        for (GroupData group : groups) {
             groupStrings.add(group.getLabel());
         }
 
@@ -62,8 +59,7 @@ public class MainActivity extends AppCompatActivity {
         switchGroup(0);
     }
 
-    private void switchGroup(int position)
-    {
+    private void switchGroup(int position) {
         selectedGroupPosition = position;
 
         if (position == 0) {
@@ -80,22 +76,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void refreshRecords(int position) {
         long maxTime = Long.MIN_VALUE;
-        if (activeOnlyCheckBox.isChecked())
-        {
+        if (activeOnlyCheckBox.isChecked()) {
             Calendar calendar = Calendar.getInstance();
             maxTime = calendar.getTimeInMillis();
         }
 
         ArrayList<RecordData> records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : groups.get(position - 1).id, maxTime, position == 0);
-        ((RecordListAdapter)recordListView.getAdapter()).ResetList(records);
+        ((RecordListAdapter) recordListView.getAdapter()).ResetList(records);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode)
-        {
+        switch (requestCode) {
             case VIEW_RECORD_REQUEST:
                 if (resultCode == 1)
                     refreshRecords(selectedGroupPosition);

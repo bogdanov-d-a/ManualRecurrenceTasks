@@ -74,10 +74,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static DatabaseHelper instance = null;
     private static final Object instanceLock = new Object();
 
-    public static DatabaseHelper getInstance(Context context)
-    {
-        synchronized (instanceLock)
-        {
+    public static DatabaseHelper getInstance(Context context) {
+        synchronized (instanceLock) {
             if (instance == null)
                 instance = new DatabaseHelper(context);
             return instance;
@@ -119,22 +117,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     db.execSQL("alter table " + StaticInfo.getRecordTableName() +
                             " rename to " + StaticInfo.getRecordTableName() + "_old;");
                     db.execSQL(createGen(StaticInfo.Type.RECORD));
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("insert into " + StaticInfo.getRecordTableName() + " select ");
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("insert into " + StaticInfo.getRecordTableName() + " select ");
 
-                        for (int i = 0; i < StaticInfo.getRecordRowCount(); ++i) {
-                            if (i != 0)
-                                sb.append(",");
-                            sb.append(StaticInfo.getRecordRowName(i));
-                        }
-
-                        sb.append(" from " + StaticInfo.getRecordTableName() + "_old;");
-                        db.execSQL(sb.toString());
+                    for (int i = 0; i < StaticInfo.getRecordRowCount(); ++i) {
+                        if (i != 0)
+                            sb.append(",");
+                        sb.append(StaticInfo.getRecordRowName(i));
                     }
-                    db.execSQL("drop table " + StaticInfo.getRecordTableName() + "_old;");
 
-                    break;
+                    sb.append(" from " + StaticInfo.getRecordTableName() + "_old;");
+                    db.execSQL(sb.toString());
+                }
+                db.execSQL("drop table " + StaticInfo.getRecordTableName() + "_old;");
+
+                break;
 
                 case 4:
                     db.execSQL("alter table " + StaticInfo.getGroupTableName() +
@@ -172,24 +170,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    private static long getLastInsertRowid(SQLiteDatabase db)
-    {
+    private static long getLastInsertRowid(SQLiteDatabase db) {
         Cursor cursor = db.rawQuery("select last_insert_rowid();", null);
-
-        try
-        {
+        try {
             if (cursor.moveToFirst())
                 return cursor.getLong(0);
             return 0;
-        }
-        finally
-        {
+        } finally {
             cursor.close();
         }
     }
 
-    public ArrayList<GroupData> getGroups()
-    {
+    public ArrayList<GroupData> getGroups() {
         SQLiteDatabase db = getReadableDatabase();
         try {
             Cursor cursor = db.rawQuery("select * from " + StaticInfo.getGroupTableName() +
@@ -197,17 +189,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 ArrayList<GroupData> result = new ArrayList<>();
 
-                if (cursor.moveToFirst())
-                {
-                    do
-                    {
+                if (cursor.moveToFirst()) {
+                    do {
                         result.add(new GroupData(
                                 cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(0))),
                                 cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(1))),
                                 cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(2))) != 0,
                                 cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(3))) != 0,
                                 cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(4))) != 0,
-                                GroupData.ID_TO_FILTER_MODE.get((int)cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(5))))
+                                GroupData.ID_TO_FILTER_MODE.get((int) cursor.getLong(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(5))))
                         ));
                     }
                     while (cursor.moveToNext());
@@ -222,8 +212,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    private static String escapeStr(String str)
-    {
+    private static String escapeStr(String str) {
         StringBuilder result = new StringBuilder();
         result.append('\'');
 
@@ -237,8 +226,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result.toString();
     }
 
-    private ArrayList<RecordData> getRecords(SQLiteDatabase db, long groupId, long maxDate, boolean notificationsOnly)
-    {
+    private ArrayList<RecordData> getRecords(SQLiteDatabase db, long groupId, long maxDate, boolean notificationsOnly) {
         Cursor cursor;
         {
             String groupIdExpr = "1";
@@ -262,10 +250,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             ArrayList<RecordData> result = new ArrayList<>();
 
-            if (cursor.moveToFirst())
-            {
-                do
-                {
+            if (cursor.moveToFirst()) {
+                do {
                     result.add(createRecordDataFromCursor(cursor));
                 }
                 while (cursor.moveToNext());
@@ -277,8 +263,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public ArrayList<RecordData> getRecords(long groupId, long maxDate, boolean notificationsOnly)
-    {
+    public ArrayList<RecordData> getRecords(long groupId, long maxDate, boolean notificationsOnly) {
         SQLiteDatabase db = getReadableDatabase();
         try {
             return getRecords(db, groupId, maxDate, notificationsOnly);
@@ -304,8 +289,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public long create(AbstractData data)
-    {
+    public long create(AbstractData data) {
         SQLiteDatabase db = getWritableDatabase();
         try {
             db.execSQL(insertGen(data));
@@ -315,13 +299,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteEmptyGroup(long id)
-    {
+    public void deleteEmptyGroup(long id) {
         SQLiteDatabase db = getWritableDatabase();
         try {
             ArrayList<RecordData> records = getRecords(db, id, Long.MIN_VALUE, false);
-            if (records.isEmpty())
-            {
+            if (records.isEmpty()) {
                 db.execSQL("delete from " + StaticInfo.getGroupTableName() + " where " + StaticInfo.getGroupRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");
             }
         } finally {
@@ -329,14 +311,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public RecordData getRecord(long id)
-    {
+    public RecordData getRecord(long id) {
         SQLiteDatabase db = getReadableDatabase();
         try {
             Cursor cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";", null);
             try {
-                if (cursor.moveToFirst())
-                {
+                if (cursor.moveToFirst()) {
                     return createRecordDataFromCursor(cursor);
                 }
                 return null;
@@ -348,8 +328,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public static class RecordDataMin
-    {
+    public static class RecordDataMin {
         public RecordDataMin(String groupName, String label) {
             this.groupName = groupName;
             this.label = label;
@@ -359,16 +338,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public String label;
     }
 
-    public RecordDataMin getRecordMin(long id)
-    {
+    public RecordDataMin getRecordMin(long id) {
         SQLiteDatabase db = getReadableDatabase();
         try {
             Cursor cursor = db.rawQuery("select * from " + StaticInfo.getRecordTableName() + " inner join " + StaticInfo.getGroupTableName() +
                     " on " + StaticInfo.getRecordRowName(StaticInfo.RecordRowId.GROUP_ID) + "=" + StaticInfo.getGroupRowName(0) +
                     " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";", null);
             try {
-                if (cursor.moveToFirst())
-                {
+                if (cursor.moveToFirst()) {
                     return new RecordDataMin(
                             cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getGroupRowName(StaticInfo.GroupRowId.NAME))),
                             cursor.getString(cursor.getColumnIndexOrThrow(StaticInfo.getRecordRowName(StaticInfo.RecordRowId.LABEL)))
@@ -383,8 +360,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void update(AbstractData data)
-    {
+    public void update(AbstractData data) {
         SQLiteDatabase db = getWritableDatabase();
         try {
             db.execSQL(updateGen(data));
@@ -393,8 +369,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteRecord(long id)
-    {
+    public void deleteRecord(long id) {
         SQLiteDatabase db = getWritableDatabase();
         try {
             db.execSQL("delete from " + StaticInfo.getRecordTableName() + " where " + StaticInfo.getRecordRowName(0) + "=" + escapeStr(Long.toString(id)) + ";");

@@ -14,6 +14,7 @@ public final class GroupData extends AbstractData {
     public static final ArrayList<FilterMode> ID_TO_FILTER_MODE;
     public static final ArrayList<String> ID_TO_FILTER_MODE_LABEL;
     public static final Map<FilterMode, Integer> FILTER_MODE_TO_ID;
+
     static {
         ID_TO_FILTER_MODE = new ArrayList<>();
         ID_TO_FILTER_MODE.add(FilterMode.ONLY_ALL);
@@ -95,7 +96,7 @@ public final class GroupData extends AbstractData {
             if (traits.isEmpty()) {
                 label.append("Def");
             } else {
-                for (String trait: traits) {
+                for (String trait : traits) {
                     label.append(trait);
                 }
             }

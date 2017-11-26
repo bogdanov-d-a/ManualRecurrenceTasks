@@ -2,12 +2,12 @@ package ru.trjoxuvw.manualrecurrencetasks;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -23,8 +23,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import adapter.GroupListAdapter;
-import database.GroupData;
 import database.DatabaseHelper;
+import database.GroupData;
 import notification.NotificationUtils;
 import utils.Utils;
 
@@ -37,14 +37,12 @@ public class GroupsActivity extends AppCompatActivity {
 
     private ArrayList<GroupData> groups;
 
-    private void mySetResult(int code)
-    {
+    private void mySetResult(int code) {
         resultCode = code;
         setResult(code);
     }
 
-    private void refreshGroups()
-    {
+    private void refreshGroups() {
         groups = DatabaseHelper.getInstance(getApplicationContext()).getGroups();
         ((GroupListAdapter) groupListView.getAdapter()).ResetList(groups);
     }
@@ -214,34 +212,34 @@ public class GroupsActivity extends AppCompatActivity {
                 filterModeSpinner.setSelection(GroupData.FILTER_MODE_TO_ID.get(pressedGroupData.filterMode));
 
                 builder.setPositiveButton("Edit", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                final GroupData newGroupData = groupDataFromLayout(pressedGroupData.id);
+                    public void onClick(DialogInterface dialog, int id) {
+                        final GroupData newGroupData = groupDataFromLayout(pressedGroupData.id);
 
-                                NotificationUtils.unregisterGroupWithData(parent, pressedGroupData);
-                                DatabaseHelper.getInstance(parent.getApplicationContext()).update(newGroupData);
-                                NotificationUtils.registerGroupWithData(parent, newGroupData);
+                        NotificationUtils.unregisterGroupWithData(parent, pressedGroupData);
+                        DatabaseHelper.getInstance(parent.getApplicationContext()).update(newGroupData);
+                        NotificationUtils.registerGroupWithData(parent, newGroupData);
 
-                                parent.refreshGroups();
-                                parent.mySetResult(1);
-                            }
-                        });
+                        parent.refreshGroups();
+                        parent.mySetResult(1);
+                    }
+                });
             } else {
                 captionTextView.setText("Create group");
 
                 builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                DatabaseHelper.getInstance(parent.getApplicationContext()).create(groupDataFromLayout(0));
-                                parent.refreshGroups();
-                                parent.mySetResult(1);
-                            }
-                        });
+                    public void onClick(DialogInterface dialog, int id) {
+                        DatabaseHelper.getInstance(parent.getApplicationContext()).create(groupDataFromLayout(0));
+                        parent.refreshGroups();
+                        parent.mySetResult(1);
+                    }
+                });
             }
 
             builder.setNegativeButton("Discard", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dismiss();
-                        }
-                    });
+                public void onClick(DialogInterface dialog, int id) {
+                    dismiss();
+                }
+            });
 
             enableValidation = true;
             return builder.create();

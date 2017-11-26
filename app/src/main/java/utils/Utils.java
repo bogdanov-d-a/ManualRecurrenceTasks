@@ -9,18 +9,18 @@ import java.util.Date;
 
 import database.AbstractData;
 import database.DatabaseHelper;
-import database.RecordData;
 import database.GroupData;
+import database.RecordData;
 
 public class Utils {
     public interface AbstractDataSource {
         int size();
+
         AbstractData get(int pos);
     }
 
     public static int getPositionById(AbstractDataSource list, long id) {
-        for (int pos = 0; pos < list.size(); ++pos)
-        {
+        for (int pos = 0; pos < list.size(); ++pos) {
             if (list.get(pos).id == id)
                 return pos;
         }
@@ -34,6 +34,7 @@ public class Utils {
                     public int size() {
                         return groups.size();
                     }
+
                     @Override
                     public AbstractData get(int pos) {
                         return groups.get(pos);
@@ -63,19 +64,16 @@ public class Utils {
         return !records.isEmpty();
     }
 
-    public static class DateTimeFormatted
-    {
+    public static class DateTimeFormatted {
         public final String date;
         public final String time;
 
-        public DateTimeFormatted(String date, String time)
-        {
+        public DateTimeFormatted(String date, String time) {
             this.date = date;
             this.time = time;
         }
 
-        public String getDateTime()
-        {
+        public String getDateTime() {
             return date + " " + time;
         }
     }

@@ -7,11 +7,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import ru.trjoxuvw.manualrecurrencetasks.R;
-
 import java.util.ArrayList;
 
 import database.GroupData;
+import ru.trjoxuvw.manualrecurrencetasks.R;
 
 public class GroupListAdapter extends BaseAdapter {
     private final LayoutInflater mInflater;
@@ -21,8 +20,7 @@ public class GroupListAdapter extends BaseAdapter {
         mInflater = LayoutInflater.from(context);
     }
 
-    public void ResetList(ArrayList<GroupData> groupsList)
-    {
+    public void ResetList(ArrayList<GroupData> groupsList) {
         this.groupsList = groupsList;
         notifyDataSetChanged();
     }
