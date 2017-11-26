@@ -244,12 +244,13 @@ public class RecordActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 Calendar calendarNow = Calendar.getInstance();
 
-                calendar.set(Calendar.YEAR, calendarNow.get(Calendar.YEAR));
-                calendar.set(Calendar.MONTH, calendarNow.get(Calendar.MONTH));
-                calendar.set(Calendar.DAY_OF_MONTH, calendarNow.get(Calendar.DAY_OF_MONTH));
+                DatePickerFragment.createAndShow(
+                        getSupportFragmentManager(),
+                        calendarNow.get(Calendar.YEAR),
+                        calendarNow.get(Calendar.MONTH),
+                        calendarNow.get(Calendar.DAY_OF_MONTH)
+                );
 
-                updateDateTimeText();
-                updateButtonState();
                 return true;
             }
         });
