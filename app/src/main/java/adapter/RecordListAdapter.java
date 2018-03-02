@@ -163,15 +163,16 @@ public class RecordListAdapter extends BaseAdapter {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             super.onCreateDialog(savedInstanceState);
+
+            final Bundle bundle = getArguments();
             final MainActivity parent = (MainActivity) getActivity();
+            final long recordId = bundle.getLong(RECORD_INDEX_TAG);
+            final RecordData record = DatabaseHelper.getInstance(parent.getApplicationContext()).getRecord(recordId);
+
             final AlertDialog.Builder builder = new AlertDialog.Builder(parent);
-            builder.setMessage("Delete record?")
+            builder.setMessage("Delete record?\n" + record.label)
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            final Bundle bundle = getArguments();
-                            final long recordId = bundle.getLong(RECORD_INDEX_TAG);
-
-                            final RecordData record = DatabaseHelper.getInstance(parent.getApplicationContext()).getRecord(recordId);
                             final ArrayList<GroupData> groupsList = parent.getGroups();
                             final GroupData recordGroup = groupsList.get(Utils.getPositionById(groupsList, record.groupId));
 
