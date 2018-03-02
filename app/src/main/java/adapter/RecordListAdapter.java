@@ -1,6 +1,13 @@
 package adapter;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,6 +96,14 @@ public class RecordListAdapter extends BaseAdapter {
             }
         });
 
+        holder.textLinearLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                DeleteRecordFragment.createAndShow(parentActivity.getSupportFragmentManager(), record.id);
+                return true;
+            }
+        });
+
         holder.label.setText(record.label);
         holder.nextAppear.setText(Utils.formatDateTime(new Date(record.nextAppear)).getDateTime());
         holder.checkBox.setOnCheckedChangeListener(null);
@@ -128,6 +143,53 @@ public class RecordListAdapter extends BaseAdapter {
             this.label = label;
             this.nextAppear = nextAppear;
             this.checkBox = checkBox;
+        }
+    }
+
+    public static class DeleteRecordFragment extends DialogFragment {
+        private static final String RECORD_INDEX_TAG = "RECORD_INDEX_TAG";
+
+        public static void createAndShow(FragmentManager manager, long recordId) {
+            final DeleteRecordFragment fragment = new DeleteRecordFragment();
+
+            final Bundle bundle = new Bundle();
+            bundle.putLong(RECORD_INDEX_TAG, recordId);
+            fragment.setArguments(bundle);
+
+            fragment.show(manager, "DeleteRecordFragment");
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            super.onCreateDialog(savedInstanceState);
+            final MainActivity parent = (MainActivity) getActivity();
+            final AlertDialog.Builder builder = new AlertDialog.Builder(parent);
+            builder.setMessage("Delete record?")
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            final Bundle bundle = getArguments();
+                            final long recordId = bundle.getLong(RECORD_INDEX_TAG);
+
+                            final RecordData record = DatabaseHelper.getInstance(parent.getApplicationContext()).getRecord(recordId);
+                            final ArrayList<GroupData> groupsList = parent.getGroups();
+                            final GroupData recordGroup = groupsList.get(Utils.getPositionById(groupsList, record.groupId));
+
+                            NotificationUtils.unregisterGroup(parent, recordGroup);
+
+                            DatabaseHelper.getInstance(parent.getApplicationContext()).deleteRecord(record.id);
+                            NotificationUtils.unregisterRecord(parent, recordGroup, record.id);
+
+                            NotificationUtils.registerGroup(parent, recordGroup);
+                            parent.refreshRecords();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dismiss();
+                        }
+                    });
+            return builder.create();
         }
     }
 }

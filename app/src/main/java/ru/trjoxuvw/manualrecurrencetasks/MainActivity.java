@@ -83,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
         ((RecordListAdapter) recordListView.getAdapter()).ResetList(records);
     }
 
+    public void refreshRecords() {
+        refreshRecords(selectedGroupPosition);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -90,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case VIEW_RECORD_REQUEST:
                 if (resultCode == 1)
-                    refreshRecords(selectedGroupPosition);
+                    refreshRecords();
                 break;
 
             case OPTIONS_REQUEST:
@@ -154,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         activeOnlyCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                refreshRecords(selectedGroupPosition);
+                refreshRecords();
             }
         });
 
@@ -188,6 +192,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        refreshRecords(selectedGroupPosition);
+        refreshRecords();
     }
 }
