@@ -44,6 +44,10 @@ public class RecordListAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public ArrayList<RecordData> GetList() {
+        return this.recordsList;
+    }
+
     @Override
     public int getCount() {
         return recordsList.size();

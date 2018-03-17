@@ -42,7 +42,7 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="2"
+        android:weightSum="3"
         android:layout_alignParentBottom="true"
         android:id="@+id/bottomLinearLayout">
 
@@ -52,6 +52,13 @@
             android:layout_height="wrap_content"
             android:text="Create"
             android:id="@+id/createRecordButton" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Toolbox"
+            android:id="@+id/toolboxButton" />
 
         <Button
             android:layout_width="0dp"

@@ -1,7 +1,14 @@
 package ru.trjoxuvw.manualrecurrencetasks;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -9,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.Spinner;
 
@@ -127,6 +135,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        final Button toolboxButton = findViewById(R.id.toolboxButton);
+        assert toolboxButton != null;
+        toolboxButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToolboxFragment.createAndShow(getSupportFragmentManager());
+            }
+        });
+
         createRecordButton = findViewById(R.id.createRecordButton);
         assert createRecordButton != null;
         createRecordButton.setOnClickListener(new View.OnClickListener() {
@@ -193,5 +210,91 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         refreshRecords();
+    }
+
+    private ArrayList<RecordData> getRecords() {
+        return ((RecordListAdapter) recordListView.getAdapter()).GetList();
+    }
+
+    public static class ToolboxFragment extends DialogFragment {
+        public static void createAndShow(FragmentManager manager) {
+            new ToolboxFragment().show(manager, "ToolboxFragment");
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            super.onCreateDialog(savedInstanceState);
+            final MainActivity parent = (MainActivity) getActivity();
+            final AlertDialog.Builder builder = new AlertDialog.Builder(parent);
+            builder.setTitle("Choose tool to use")
+                    .setItems(R.array.toolbox_items, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case 0:
+                                    Calendar calendarNow = Calendar.getInstance();
+                                    DatePickerFragment.createAndShow(
+                                            parent.getSupportFragmentManager(),
+                                            calendarNow.get(Calendar.YEAR),
+                                            calendarNow.get(Calendar.MONTH),
+                                            calendarNow.get(Calendar.DAY_OF_MONTH)
+                                    );
+                            }
+                        }})
+                    .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dismiss();
+                        }
+                    });
+            return builder.create();
+        }
+    }
+
+    public static class DatePickerFragment extends DialogFragment {
+        private static final String YEAR_TAG = "YEAR_TAG";
+        private static final String MONTH_TAG = "MONTH_TAG";
+        private static final String DAY_TAG = "DAY_TAG";
+
+        public static void createAndShow(FragmentManager manager, int year, int monthOfYear, int dayOfMonth) {
+            final DatePickerFragment fragment = new DatePickerFragment();
+
+            final Bundle bundle = new Bundle();
+            bundle.putInt(YEAR_TAG, year);
+            bundle.putInt(MONTH_TAG, monthOfYear);
+            bundle.putInt(DAY_TAG, dayOfMonth);
+            fragment.setArguments(bundle);
+
+            fragment.show(manager, "DatePickerFragment");
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            super.onCreateDialog(savedInstanceState);
+
+            final Bundle bundle = getArguments();
+            final MainActivity parent = (MainActivity) getActivity();
+
+            return new DatePickerDialog(
+                    parent,
+                    new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            ArrayList<RecordData> records = parent.getRecords();
+                            for (RecordData record: records) {
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.setTimeInMillis(record.nextAppear);
+                                calendar.set(year, monthOfYear, dayOfMonth);
+                                record.nextAppear = calendar.getTimeInMillis();
+                                DatabaseHelper.getInstance(parent.getApplicationContext()).update(record);
+                            }
+                            parent.refreshRecords();
+                        }
+                    },
+                    bundle.getInt(YEAR_TAG),
+                    bundle.getInt(MONTH_TAG),
+                    bundle.getInt(DAY_TAG)
+            );
+        }
     }
 }
