@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import database.AbstractData;
-import database.DatabaseHelper;
 import database.GroupData;
 import database.RecordData;
 
@@ -59,7 +58,7 @@ public class Utils {
     }
 
     public static boolean groupHasCheckedRecords(Context context, long groupId) {
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(groupId, Long.MIN_VALUE, false);
+        ArrayList<RecordData> records = ObjectCache.getDbInstance(context).getRecords(groupId, Long.MIN_VALUE, false);
 
         for (RecordData record : records) {
             if (record.isChecked)
@@ -70,7 +69,7 @@ public class Utils {
     }
 
     public static boolean groupHasRecords(Context context, long groupId) {
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(groupId, Long.MIN_VALUE, false);
+        ArrayList<RecordData> records = ObjectCache.getDbInstance(context).getRecords(groupId, Long.MIN_VALUE, false);
         return !records.isEmpty();
     }
 

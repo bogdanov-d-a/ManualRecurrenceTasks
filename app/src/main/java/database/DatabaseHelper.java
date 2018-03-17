@@ -71,17 +71,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
     }
 
-    private static DatabaseHelper instance = null;
-    private static final Object instanceLock = new Object();
-
-    public static DatabaseHelper getInstance(Context context) {
-        synchronized (instanceLock) {
-            if (instance == null)
-                instance = new DatabaseHelper(context);
-            return instance;
-        }
-    }
-
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }

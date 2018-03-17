@@ -20,13 +20,13 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Date;
 
-import database.DatabaseHelper;
 import database.GroupData;
 import database.RecordData;
 import notification.NotificationUtils;
 import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
 import ru.trjoxuvw.manualrecurrencetasks.R;
 import ru.trjoxuvw.manualrecurrencetasks.RecordActivity;
+import utils.ObjectCache;
 import utils.Utils;
 
 public class RecordListAdapter extends BaseAdapter {
@@ -126,7 +126,7 @@ public class RecordListAdapter extends BaseAdapter {
                     NotificationUtils.unregisterGroup(parentActivity, group);
 
                     record.isChecked = isChecked;
-                    DatabaseHelper.getInstance(parentActivity).update(record);
+                    ObjectCache.getDbInstance(parentActivity).update(record);
 
                     NotificationUtils.registerGroup(parentActivity, group);
                 }
@@ -171,7 +171,7 @@ public class RecordListAdapter extends BaseAdapter {
             final Bundle bundle = getArguments();
             final MainActivity parent = (MainActivity) getActivity();
             final long recordId = bundle.getLong(RECORD_INDEX_TAG);
-            final RecordData record = DatabaseHelper.getInstance(parent.getApplicationContext()).getRecord(recordId);
+            final RecordData record = ObjectCache.getDbInstance(parent.getApplicationContext()).getRecord(recordId);
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(parent);
             builder.setMessage("Delete record?\n" + record.label)
@@ -182,7 +182,7 @@ public class RecordListAdapter extends BaseAdapter {
 
                             NotificationUtils.unregisterGroup(parent, recordGroup);
 
-                            DatabaseHelper.getInstance(parent.getApplicationContext()).deleteRecord(record.id);
+                            ObjectCache.getDbInstance(parent.getApplicationContext()).deleteRecord(record.id);
                             NotificationUtils.unregisterRecord(parent, recordGroup, record.id);
 
                             NotificationUtils.registerGroup(parent, recordGroup);

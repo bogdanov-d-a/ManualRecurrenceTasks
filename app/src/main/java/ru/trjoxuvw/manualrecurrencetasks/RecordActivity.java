@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import database.DatabaseHelper;
 import database.GroupData;
 import database.RecordData;
 import notification.NotificationUtils;
+import utils.ObjectCache;
 import utils.Utils;
 
 public class RecordActivity extends AppCompatActivity {
@@ -51,13 +51,16 @@ public class RecordActivity extends AppCompatActivity {
     private Button updateButton;
     private Button dismissRevertButton;
 
-    private ArrayList<GroupData> groups;
     private int selectedGroupPosition;
     private boolean useCheckbox;
 
     private Calendar calendar;
     private int operation;
     private RecordData editRecord;
+
+    private ArrayList<GroupData> getGroups() {
+        return ObjectCache.getGroups(getApplicationContext());
+    }
 
     private void updateDateTimeText() {
         Date date = new Date(calendar.getTimeInMillis());
@@ -91,7 +94,7 @@ public class RecordActivity extends AppCompatActivity {
 
     private void switchGroup(int position) {
         selectedGroupPosition = position;
-        useCheckbox = groups.get(position).isChecklist;
+        useCheckbox = getGroups().get(position).isChecklist;
         checkedCheckBox.setEnabled(useCheckbox);
         updateButtonState();
     }
@@ -99,7 +102,7 @@ public class RecordActivity extends AppCompatActivity {
     private RecordData layoutDataToRecordData(long id) {
         return new RecordData(
                 id,
-                groups.get(selectedGroupPosition).id,
+                getGroups().get(selectedGroupPosition).id,
                 labelEditText.getText().toString(),
                 calendar.getTimeInMillis(),
                 useCheckbox && checkedCheckBox.isChecked()
@@ -107,13 +110,15 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     private void createRecord() {
-        NotificationUtils.unregisterGroup(RecordActivity.this, groups.get(selectedGroupPosition));
+        final GroupData selectedGroup = getGroups().get(selectedGroupPosition);
+
+        NotificationUtils.unregisterGroup(RecordActivity.this, selectedGroup);
 
         RecordData newRecord = layoutDataToRecordData(0);
-        newRecord.id = DatabaseHelper.getInstance(getApplicationContext()).create(newRecord);
-        NotificationUtils.registerRecord(RecordActivity.this, groups.get(selectedGroupPosition), newRecord);
+        newRecord.id = ObjectCache.getDbInstance(getApplicationContext()).create(newRecord);
+        NotificationUtils.registerRecord(RecordActivity.this, selectedGroup, newRecord);
 
-        NotificationUtils.registerGroup(RecordActivity.this, groups.get(selectedGroupPosition));
+        NotificationUtils.registerGroup(RecordActivity.this, selectedGroup);
 
         setResult(1);
 
@@ -124,11 +129,11 @@ public class RecordActivity extends AppCompatActivity {
     }
 
     private void updateRecord() {
-        GroupData oldGroup = groups.get(Utils.getPositionById(groups, editRecord.groupId));
-        GroupData newGroup = groups.get(selectedGroupPosition);
+        GroupData oldGroup = getGroups().get(Utils.getPositionById(getGroups(), editRecord.groupId));
+        GroupData newGroup = getGroups().get(selectedGroupPosition);
 
         RecordData newEditRecord = layoutDataToRecordData(editRecord.id);
-        DatabaseHelper.getInstance(getApplicationContext()).update(newEditRecord);
+        ObjectCache.getDbInstance(getApplicationContext()).update(newEditRecord);
 
         NotificationUtils.unregisterGroup(RecordActivity.this, oldGroup);
         NotificationUtils.unregisterGroup(RecordActivity.this, newGroup);
@@ -160,7 +165,7 @@ public class RecordActivity extends AppCompatActivity {
                 editRecordId = getIntent().getExtras().getLong(EDIT_RECORD_ID);
             else
                 editRecordId = savedInstanceState.getLong(EDIT_RECORD_ID);
-            editRecord = DatabaseHelper.getInstance(getApplicationContext()).getRecord(editRecordId);
+            editRecord = ObjectCache.getDbInstance(getApplicationContext()).getRecord(editRecordId);
         } else {
             editRecord = null;
         }
@@ -212,10 +217,8 @@ public class RecordActivity extends AppCompatActivity {
         });
 
         {
-            groups = DatabaseHelper.getInstance(getApplicationContext()).getGroups();
-
             ArrayList<String> groupStrings = new ArrayList<>();
-            for (GroupData group : groups) {
+            for (GroupData group : getGroups()) {
                 groupStrings.add(group.getLabel());
             }
 
@@ -308,7 +311,7 @@ public class RecordActivity extends AppCompatActivity {
                     break;
 
                 case OPERATION_UPDATE:
-                    groupSpinner.setSelection(Utils.getPositionById(groups, editRecord.groupId));
+                    groupSpinner.setSelection(Utils.getPositionById(getGroups(), editRecord.groupId));
                     labelEditText.setText(editRecord.label);
                     checkedCheckBox.setChecked(editRecord.isChecked);
                     break;
@@ -384,7 +387,7 @@ public class RecordActivity extends AppCompatActivity {
             dismissRevertButton.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    groupSpinner.setSelection(Utils.getPositionById(groups, editRecord.groupId));
+                    groupSpinner.setSelection(Utils.getPositionById(getGroups(), editRecord.groupId));
                     labelEditText.setText(editRecord.label);
 
                     calendar.setTimeInMillis(editRecord.nextAppear);
@@ -512,10 +515,10 @@ public class RecordActivity extends AppCompatActivity {
             builder.setMessage("Delete record?")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            final GroupData group = parent.groups.get(Utils.getPositionById(parent.groups, parent.editRecord.groupId));
+                            final GroupData group = parent.getGroups().get(Utils.getPositionById(parent.getGroups(), parent.editRecord.groupId));
                             NotificationUtils.unregisterGroup(parent, group);
 
-                            DatabaseHelper.getInstance(parent.getApplicationContext()).deleteRecord(parent.editRecord.id);
+                            ObjectCache.getDbInstance(parent.getApplicationContext()).deleteRecord(parent.editRecord.id);
                             NotificationUtils.unregisterRecord(parent, group, parent.editRecord.id);
 
                             NotificationUtils.registerGroup(parent, group);

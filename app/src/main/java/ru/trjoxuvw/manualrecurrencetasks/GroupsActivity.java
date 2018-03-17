@@ -23,9 +23,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import adapter.GroupListAdapter;
-import database.DatabaseHelper;
 import database.GroupData;
 import notification.NotificationUtils;
+import utils.ObjectCache;
 import utils.Utils;
 
 public class GroupsActivity extends AppCompatActivity {
@@ -35,16 +35,17 @@ public class GroupsActivity extends AppCompatActivity {
     private static final String RESULT_CODE_TAG = "RESULT_CODE_TAG";
     private int resultCode;
 
-    private ArrayList<GroupData> groups;
-
     private void mySetResult(int code) {
         resultCode = code;
         setResult(code);
     }
 
-    private void refreshGroups() {
-        groups = DatabaseHelper.getInstance(getApplicationContext()).getGroups();
-        ((GroupListAdapter) groupListView.getAdapter()).ResetList(groups);
+    private ArrayList<GroupData> getGroups() {
+        return ObjectCache.getGroups(getApplicationContext());
+    }
+
+    private void refreshGroupListView() {
+        ((GroupListAdapter) groupListView.getAdapter()).ResetList(getGroups());
     }
 
     @Override
@@ -66,14 +67,14 @@ public class GroupsActivity extends AppCompatActivity {
         groupListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (!Utils.groupHasRecords(getApplicationContext(), groups.get(position).id)) {
+                if (!Utils.groupHasRecords(getApplicationContext(), getGroups().get(position).id)) {
                     GroupDeleteFragment.createAndShow(getSupportFragmentManager(), position);
                 }
                 return true;
             }
         });
 
-        refreshGroups();
+        refreshGroupListView();
 
         final Button createGroupButton = findViewById(R.id.createGroupButton);
         assert createGroupButton != null;
@@ -201,7 +202,7 @@ public class GroupsActivity extends AppCompatActivity {
 
             final Bundle bundle = getArguments();
             if (bundle != null) {
-                final GroupData pressedGroupData = parent.groups.get(bundle.getInt(GROUP_INDEX_TAG));
+                final GroupData pressedGroupData = parent.getGroups().get(bundle.getInt(GROUP_INDEX_TAG));
 
                 captionTextView.setText("Edit group");
                 groupViewEditText.setText(pressedGroupData.name);
@@ -216,10 +217,11 @@ public class GroupsActivity extends AppCompatActivity {
                         final GroupData newGroupData = groupDataFromLayout(pressedGroupData.id);
 
                         NotificationUtils.unregisterGroupWithData(parent, pressedGroupData);
-                        DatabaseHelper.getInstance(parent.getApplicationContext()).update(newGroupData);
+                        ObjectCache.getDbInstance(parent.getApplicationContext()).update(newGroupData);
+                        ObjectCache.invalidateCachedGroups();
                         NotificationUtils.registerGroupWithData(parent, newGroupData);
 
-                        parent.refreshGroups();
+                        parent.refreshGroupListView();
                         parent.mySetResult(1);
                     }
                 });
@@ -228,8 +230,9 @@ public class GroupsActivity extends AppCompatActivity {
 
                 builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        DatabaseHelper.getInstance(parent.getApplicationContext()).create(groupDataFromLayout(0));
-                        parent.refreshGroups();
+                        ObjectCache.getDbInstance(parent.getApplicationContext()).create(groupDataFromLayout(0));
+                        ObjectCache.invalidateCachedGroups();
+                        parent.refreshGroupListView();
                         parent.mySetResult(1);
                     }
                 });
@@ -280,15 +283,16 @@ public class GroupsActivity extends AppCompatActivity {
 
             final Bundle bundle = getArguments();
             final GroupsActivity parent = (GroupsActivity) getActivity();
-            final GroupData pressedGroupData = parent.groups.get(bundle.getInt(GROUP_INDEX_TAG));
+            final GroupData pressedGroupData = parent.getGroups().get(bundle.getInt(GROUP_INDEX_TAG));
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(parent);
             builder.setMessage("Delete group " + pressedGroupData.name + "?")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             NotificationUtils.unregisterGroupWithData(parent, pressedGroupData);
-                            DatabaseHelper.getInstance(parent.getApplicationContext()).deleteEmptyGroup(pressedGroupData.id);
-                            parent.refreshGroups();
+                            ObjectCache.getDbInstance(parent.getApplicationContext()).deleteEmptyGroup(pressedGroupData.id);
+                            ObjectCache.invalidateCachedGroups();
+                            parent.refreshGroupListView();
                             parent.mySetResult(1);
                         }
                     })

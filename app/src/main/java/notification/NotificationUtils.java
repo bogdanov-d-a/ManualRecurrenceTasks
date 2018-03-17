@@ -12,11 +12,11 @@ import android.support.v4.app.TaskStackBuilder;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import database.DatabaseHelper;
 import database.GroupData;
 import database.RecordData;
 import ru.trjoxuvw.manualrecurrencetasks.MainActivity;
 import ru.trjoxuvw.manualrecurrencetasks.RecordActivity;
+import utils.ObjectCache;
 
 public class NotificationUtils {
     public static void notifyRecord(Context context, String groupName, String recordLabel, long recordRowid, boolean setSound) {
@@ -138,14 +138,14 @@ public class NotificationUtils {
     public static void registerGroupWithData(Context context, GroupData group) {
         registerGroup(context, group);
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(group.id, Long.MIN_VALUE, false);
+        ArrayList<RecordData> records = ObjectCache.getDbInstance(context).getRecords(group.id, Long.MIN_VALUE, false);
         for (RecordData record : records) {
             registerRecord(context, group, record);
         }
     }
 
     public static void registerAllGroupsWithData(Context context) {
-        ArrayList<GroupData> groups = DatabaseHelper.getInstance(context).getGroups();
+        ArrayList<GroupData> groups = ObjectCache.getGroups(context);
         for (GroupData group : groups) {
             registerGroupWithData(context, group);
         }
@@ -154,14 +154,14 @@ public class NotificationUtils {
     public static void unregisterGroupWithData(Context context, GroupData group) {
         unregisterGroup(context, group);
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(context).getRecords(group.id, Long.MIN_VALUE, false);
+        ArrayList<RecordData> records = ObjectCache.getDbInstance(context).getRecords(group.id, Long.MIN_VALUE, false);
         for (RecordData record : records) {
             unregisterRecord(context, group, record.id);
         }
     }
 
     public static void unregisterAllGroupsWithData(Context context) {
-        ArrayList<GroupData> groups = DatabaseHelper.getInstance(context).getGroups();
+        ArrayList<GroupData> groups = ObjectCache.getGroups(context);
         for (GroupData group : groups) {
             unregisterGroupWithData(context, group);
         }
@@ -169,7 +169,7 @@ public class NotificationUtils {
 
     public static void registerGroup(Context context, GroupData group) {
         if (group.isInbox) {
-            long count = DatabaseHelper.getInstance(context).getUndoneTasksCount(group);
+            long count = ObjectCache.getDbInstance(context).getUndoneTasksCount(group);
             if (count > 0) {
                 notifyInbox(context, group, count);
             } else {

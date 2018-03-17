@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import adapter.RecordListAdapter;
-import database.DatabaseHelper;
 import database.GroupData;
 import database.RecordData;
+import utils.ObjectCache;
 import utils.Utils;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,19 +40,16 @@ public class MainActivity extends AppCompatActivity {
     private ListView recordListView;
     private Button createRecordButton;
 
-    private ArrayList<GroupData> groups;
     private int selectedGroupPosition;
 
     public ArrayList<GroupData> getGroups() {
-        return groups;
+        return ObjectCache.getGroups(getApplicationContext());
     }
 
-    private void refreshGroups() {
-        groups = DatabaseHelper.getInstance(getApplicationContext()).getGroups();
-
+    private void invalidateGroupSpinner() {
         ArrayList<String> groupStrings = new ArrayList<>();
         groupStrings.add("Notifications");
-        for (GroupData group : groups) {
+        for (GroupData group : getGroups()) {
             groupStrings.add(group.getLabel());
         }
 
@@ -60,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         groupStringsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         groupSpinner.setAdapter(groupStringsAdapter);
 
-        createRecordButton.setEnabled(groups.size() > 0);
+        createRecordButton.setEnabled(getGroups().size() > 0);
 
         switchGroup(0);
     }
@@ -72,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             activeOnlyCheckBox.setEnabled(true);
             activeOnlyCheckBox.setChecked(false);
         } else {
-            final GroupData.FilterMode fm = groups.get(position - 1).filterMode;
+            final GroupData.FilterMode fm = getGroups().get(position - 1).filterMode;
             activeOnlyCheckBox.setEnabled(fm != GroupData.FilterMode.ONLY_ALL);
             activeOnlyCheckBox.setChecked(fm == GroupData.FilterMode.DEFAULT_FILTERED);
         }
@@ -87,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             maxTime = calendar.getTimeInMillis();
         }
 
-        ArrayList<RecordData> records = DatabaseHelper.getInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : groups.get(position - 1).id, maxTime, position == 0);
+        ArrayList<RecordData> records = ObjectCache.getDbInstance(getApplicationContext()).getRecords(position == 0 ? Long.MIN_VALUE : getGroups().get(position - 1).id, maxTime, position == 0);
         ((RecordListAdapter) recordListView.getAdapter()).ResetList(records);
     }
 
@@ -107,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
             case OPTIONS_REQUEST:
                 if (resultCode == 1)
-                    refreshGroups();
+                    invalidateGroupSpinner();
                 break;
         }
     }
@@ -193,14 +190,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleIntent(Intent intent) {
-        refreshGroups();
+        invalidateGroupSpinner();
 
         if (intent != null) {
             Bundle extras = intent.getExtras();
             if (extras != null) {
                 long groupId = extras.getLong(GROUP_ID_TAG, -1);
                 if (groupId != -1) {
-                    groupSpinner.setSelection(Utils.getPositionById(groups, groupId) + 1);
+                    groupSpinner.setSelection(Utils.getPositionById(getGroups(), groupId) + 1);
                 }
             }
         }
@@ -280,7 +277,7 @@ public class MainActivity extends AppCompatActivity {
                                 calendar.setTimeInMillis(record.nextAppear);
                                 calendar.set(year, monthOfYear, dayOfMonth);
                                 record.nextAppear = calendar.getTimeInMillis();
-                                DatabaseHelper.getInstance(parent.getApplicationContext()).update(record);
+                                ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
                             }
                             parent.refreshRecords();
                         }
