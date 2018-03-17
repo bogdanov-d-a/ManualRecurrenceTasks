@@ -231,7 +231,7 @@ public class RecordActivity extends AppCompatActivity {
                         getSupportFragmentManager(),
                         calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DAY_OF_MONTH)
+                        calendar.get(Calendar.DATE)
                 );
             }
         });
@@ -245,7 +245,7 @@ public class RecordActivity extends AppCompatActivity {
                         getSupportFragmentManager(),
                         calendarNow.get(Calendar.YEAR),
                         calendarNow.get(Calendar.MONTH),
-                        calendarNow.get(Calendar.DAY_OF_MONTH)
+                        calendarNow.get(Calendar.DATE)
                 );
 
                 return true;
@@ -293,9 +293,8 @@ public class RecordActivity extends AppCompatActivity {
         calendar.set(Calendar.MILLISECOND, 0);
 
         if (savedInstanceState != null) {
-            calendar.set(Calendar.YEAR, savedInstanceState.getInt(Utils.YEAR_TAG));
-            calendar.set(Calendar.MONTH, savedInstanceState.getInt(Utils.MONTH_TAG));
-            calendar.set(Calendar.DAY_OF_MONTH, savedInstanceState.getInt(Utils.DAY_TAG));
+            calendar.set(savedInstanceState.getInt(Utils.YEAR_TAG),
+                    savedInstanceState.getInt(Utils.MONTH_TAG), savedInstanceState.getInt(Utils.DAY_TAG));
             calendar.set(Calendar.HOUR_OF_DAY, savedInstanceState.getInt(HOUR_TAG));
             calendar.set(Calendar.MINUTE, savedInstanceState.getInt(MINUTE_TAG));
         } else if (operation == OPERATION_UPDATE) {
@@ -416,7 +415,7 @@ public class RecordActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
 
         Utils.putDateToBundle(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH), outState);
+                calendar.get(Calendar.DATE), outState);
         outState.putInt(HOUR_TAG, calendar.get(Calendar.HOUR_OF_DAY));
         outState.putInt(MINUTE_TAG, calendar.get(Calendar.MINUTE));
 
@@ -449,9 +448,7 @@ public class RecordActivity extends AppCompatActivity {
                     new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            parent.calendar.set(Calendar.YEAR, year);
-                            parent.calendar.set(Calendar.MONTH, monthOfYear);
-                            parent.calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                            parent.calendar.set(year, monthOfYear, dayOfMonth);
                             parent.updateDateTimeText();
                             parent.updateButtonState();
                         }

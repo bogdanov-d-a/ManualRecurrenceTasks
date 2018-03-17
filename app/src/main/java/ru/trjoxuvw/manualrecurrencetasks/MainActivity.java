@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
                                             parent.getSupportFragmentManager(),
                                             calendarNow.get(Calendar.YEAR),
                                             calendarNow.get(Calendar.MONTH),
-                                            calendarNow.get(Calendar.DAY_OF_MONTH)
+                                            calendarNow.get(Calendar.DATE)
                                     );
                             }
                         }})
