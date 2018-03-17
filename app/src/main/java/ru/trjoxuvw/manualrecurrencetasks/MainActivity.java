@@ -251,17 +251,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static class DatePickerFragment extends DialogFragment {
-        private static final String YEAR_TAG = "YEAR_TAG";
-        private static final String MONTH_TAG = "MONTH_TAG";
-        private static final String DAY_TAG = "DAY_TAG";
-
         public static void createAndShow(FragmentManager manager, int year, int monthOfYear, int dayOfMonth) {
             final DatePickerFragment fragment = new DatePickerFragment();
 
             final Bundle bundle = new Bundle();
-            bundle.putInt(YEAR_TAG, year);
-            bundle.putInt(MONTH_TAG, monthOfYear);
-            bundle.putInt(DAY_TAG, dayOfMonth);
+            Utils.putDateToBundle(year, monthOfYear, dayOfMonth, bundle);
             fragment.setArguments(bundle);
 
             fragment.show(manager, "DatePickerFragment");
@@ -291,9 +285,9 @@ public class MainActivity extends AppCompatActivity {
                             parent.refreshRecords();
                         }
                     },
-                    bundle.getInt(YEAR_TAG),
-                    bundle.getInt(MONTH_TAG),
-                    bundle.getInt(DAY_TAG)
+                    bundle.getInt(Utils.YEAR_TAG),
+                    bundle.getInt(Utils.MONTH_TAG),
+                    bundle.getInt(Utils.DAY_TAG)
             );
         }
     }

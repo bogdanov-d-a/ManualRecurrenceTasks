@@ -1,8 +1,8 @@
 package utils;
 
 import android.content.Context;
+import android.os.Bundle;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,6 +13,16 @@ import database.GroupData;
 import database.RecordData;
 
 public class Utils {
+    public static final String YEAR_TAG = "YEAR_TAG";
+    public static final String MONTH_TAG = "MONTH_TAG";
+    public static final String DAY_TAG = "DAY_TAG";
+
+    public static void putDateToBundle(int year, int monthOfYear, int dayOfMonth, Bundle bundle) {
+        bundle.putInt(YEAR_TAG, year);
+        bundle.putInt(MONTH_TAG, monthOfYear);
+        bundle.putInt(DAY_TAG, dayOfMonth);
+    }
+
     public interface AbstractDataSource {
         int size();
 

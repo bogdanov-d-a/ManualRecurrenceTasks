@@ -35,9 +35,6 @@ import notification.NotificationUtils;
 import utils.Utils;
 
 public class RecordActivity extends AppCompatActivity {
-    private static final String YEAR_TAG = "YEAR_TAG";
-    private static final String MONTH_TAG = "MONTH_TAG";
-    private static final String DAY_TAG = "DAY_TAG";
     private static final String HOUR_TAG = "HOUR_TAG";
     private static final String MINUTE_TAG = "MINUTE_TAG";
 
@@ -296,9 +293,9 @@ public class RecordActivity extends AppCompatActivity {
         calendar.set(Calendar.MILLISECOND, 0);
 
         if (savedInstanceState != null) {
-            calendar.set(Calendar.YEAR, savedInstanceState.getInt(YEAR_TAG));
-            calendar.set(Calendar.MONTH, savedInstanceState.getInt(MONTH_TAG));
-            calendar.set(Calendar.DAY_OF_MONTH, savedInstanceState.getInt(DAY_TAG));
+            calendar.set(Calendar.YEAR, savedInstanceState.getInt(Utils.YEAR_TAG));
+            calendar.set(Calendar.MONTH, savedInstanceState.getInt(Utils.MONTH_TAG));
+            calendar.set(Calendar.DAY_OF_MONTH, savedInstanceState.getInt(Utils.DAY_TAG));
             calendar.set(Calendar.HOUR_OF_DAY, savedInstanceState.getInt(HOUR_TAG));
             calendar.set(Calendar.MINUTE, savedInstanceState.getInt(MINUTE_TAG));
         } else if (operation == OPERATION_UPDATE) {
@@ -418,9 +415,8 @@ public class RecordActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putInt(YEAR_TAG, calendar.get(Calendar.YEAR));
-        outState.putInt(MONTH_TAG, calendar.get(Calendar.MONTH));
-        outState.putInt(DAY_TAG, calendar.get(Calendar.DAY_OF_MONTH));
+        Utils.putDateToBundle(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH), outState);
         outState.putInt(HOUR_TAG, calendar.get(Calendar.HOUR_OF_DAY));
         outState.putInt(MINUTE_TAG, calendar.get(Calendar.MINUTE));
 
@@ -434,9 +430,7 @@ public class RecordActivity extends AppCompatActivity {
             final DatePickerFragment fragment = new DatePickerFragment();
 
             final Bundle bundle = new Bundle();
-            bundle.putInt(YEAR_TAG, year);
-            bundle.putInt(MONTH_TAG, monthOfYear);
-            bundle.putInt(DAY_TAG, dayOfMonth);
+            Utils.putDateToBundle(year, monthOfYear, dayOfMonth, bundle);
             fragment.setArguments(bundle);
 
             fragment.show(manager, "DatePickerFragment");
@@ -462,9 +456,9 @@ public class RecordActivity extends AppCompatActivity {
                             parent.updateButtonState();
                         }
                     },
-                    bundle.getInt(YEAR_TAG),
-                    bundle.getInt(MONTH_TAG),
-                    bundle.getInt(DAY_TAG)
+                    bundle.getInt(Utils.YEAR_TAG),
+                    bundle.getInt(Utils.MONTH_TAG),
+                    bundle.getInt(Utils.DAY_TAG)
             );
         }
     }
