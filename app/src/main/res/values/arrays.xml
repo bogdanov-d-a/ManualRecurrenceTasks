@@ -2,6 +2,7 @@
 <resources>
     <string-array name="toolbox_items">
         <item>Set visible records date</item>
+        <item>Set visible records time</item>
         <item>Uncheck visible records</item>
     </string-array>
 </resources>

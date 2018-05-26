@@ -2,6 +2,7 @@ package ru.trjoxuvw.manualrecurrencetasks;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TimePicker;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,6 +30,7 @@ import database.GroupData;
 import database.RecordData;
 import utils.DatePickerHelper;
 import utils.ObjectCache;
+import utils.TimePickerHelper;
 import utils.Utils;
 
 public class MainActivity extends AppCompatActivity {
@@ -229,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
                     .setItems(R.array.toolbox_items, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             switch (which) {
-                                case 0:
+                                case 0: {
                                     Calendar calendarNow = Calendar.getInstance();
                                     DatePickerHelper.createAndShow(
                                             new DatePickerForSetVisibleRecordsDate(),
@@ -239,15 +242,27 @@ public class MainActivity extends AppCompatActivity {
                                             calendarNow.get(Calendar.DATE)
                                     );
                                     break;
+                                }
 
-                                case 1:
+                                case 1: {
+                                    TimePickerHelper.createAndShow(
+                                            new TimePickerForSetVisibleRecordsTime(),
+                                            parent.getSupportFragmentManager(),
+                                            0,
+                                            0
+                                    );
+                                    break;
+                                }
+
+                                case 2: {
                                     ArrayList<RecordData> records = parent.getRecords();
-                                    for (RecordData record: records) {
+                                    for (RecordData record : records) {
                                         record.isChecked = false;
                                         ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
                                     }
                                     parent.refreshRecords();
                                     break;
+                                }
                             }
                         }})
                     .setNegativeButton("Close", new DialogInterface.OnClickListener() {
@@ -271,6 +286,30 @@ public class MainActivity extends AppCompatActivity {
                         final Calendar calendar = Calendar.getInstance();
                         calendar.setTimeInMillis(record.nextAppear);
                         calendar.set(year, monthOfYear, dayOfMonth);
+
+                        record.nextAppear = calendar.getTimeInMillis();
+                        ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+                    }
+
+                    parent.refreshRecords();
+                }
+            };
+        }
+    }
+
+    public static class TimePickerForSetVisibleRecordsTime extends TimePickerHelper {
+        @Override
+        public TimePickerDialog.OnTimeSetListener getOnTimeSetListener() {
+            return new TimePickerDialog.OnTimeSetListener() {
+                @Override
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    final MainActivity parent = (MainActivity) getActivity();
+
+                    for (final RecordData record: parent.getRecords()) {
+                        final Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(record.nextAppear);
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
 
                         record.nextAppear = calendar.getTimeInMillis();
                         ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
