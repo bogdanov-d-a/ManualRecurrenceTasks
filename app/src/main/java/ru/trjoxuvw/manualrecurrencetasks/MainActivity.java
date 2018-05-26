@@ -28,6 +28,7 @@ import java.util.Calendar;
 import adapter.RecordListAdapter;
 import database.GroupData;
 import database.RecordData;
+import notification.NotificationUtils;
 import utils.DatePickerHelper;
 import utils.ObjectCache;
 import utils.TimePickerHelper;
@@ -255,12 +256,19 @@ public class MainActivity extends AppCompatActivity {
                                 }
 
                                 case 2: {
-                                    ArrayList<RecordData> records = parent.getRecords();
-                                    for (RecordData record : records) {
-                                        record.isChecked = false;
-                                        ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+                                    if (parent.selectedGroupPosition > 0) {
+                                        final GroupData group = parent.getGroups().get(parent.selectedGroupPosition - 1);
+                                        NotificationUtils.unregisterGroup(parent, group);
+
+                                        ArrayList<RecordData> records = parent.getRecords();
+                                        for (RecordData record : records) {
+                                            record.isChecked = false;
+                                            ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+                                        }
+
+                                        NotificationUtils.registerGroup(parent, group);
+                                        parent.refreshRecords();
                                     }
-                                    parent.refreshRecords();
                                     break;
                                 }
                             }
