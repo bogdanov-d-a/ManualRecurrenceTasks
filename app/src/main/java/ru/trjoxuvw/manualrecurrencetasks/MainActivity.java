@@ -289,17 +289,22 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                     final MainActivity parent = (MainActivity) getActivity();
+                    if (parent.selectedGroupPosition > 0) {
+                        final GroupData group = parent.getGroups().get(parent.selectedGroupPosition - 1);
+                        NotificationUtils.unregisterGroup(parent, group);
 
-                    for (final RecordData record: parent.getRecords()) {
-                        final Calendar calendar = Calendar.getInstance();
-                        calendar.setTimeInMillis(record.nextAppear);
-                        calendar.set(year, monthOfYear, dayOfMonth);
+                        for (final RecordData record: parent.getRecords()) {
+                            final Calendar calendar = Calendar.getInstance();
+                            calendar.setTimeInMillis(record.nextAppear);
+                            calendar.set(year, monthOfYear, dayOfMonth);
 
-                        record.nextAppear = calendar.getTimeInMillis();
-                        ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+                            record.nextAppear = calendar.getTimeInMillis();
+                            ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+                        }
+
+                        NotificationUtils.registerGroup(parent, group);
+                        parent.refreshRecords();
                     }
-
-                    parent.refreshRecords();
                 }
             };
         }
@@ -312,18 +317,23 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                     final MainActivity parent = (MainActivity) getActivity();
+                    if (parent.selectedGroupPosition > 0) {
+                        final GroupData group = parent.getGroups().get(parent.selectedGroupPosition - 1);
+                        NotificationUtils.unregisterGroup(parent, group);
 
-                    for (final RecordData record: parent.getRecords()) {
-                        final Calendar calendar = Calendar.getInstance();
-                        calendar.setTimeInMillis(record.nextAppear);
-                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        calendar.set(Calendar.MINUTE, minute);
+                        for (final RecordData record: parent.getRecords()) {
+                            final Calendar calendar = Calendar.getInstance();
+                            calendar.setTimeInMillis(record.nextAppear);
+                            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                            calendar.set(Calendar.MINUTE, minute);
 
-                        record.nextAppear = calendar.getTimeInMillis();
-                        ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+                            record.nextAppear = calendar.getTimeInMillis();
+                            ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+                        }
+
+                        NotificationUtils.registerGroup(parent, group);
+                        parent.refreshRecords();
                     }
-
-                    parent.refreshRecords();
                 }
             };
         }
