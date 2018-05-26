@@ -262,8 +262,12 @@ public class MainActivity extends AppCompatActivity {
 
                                         ArrayList<RecordData> records = parent.getRecords();
                                         for (RecordData record : records) {
+                                            NotificationUtils.unregisterRecord(parent, group, record.id);
+
                                             record.isChecked = false;
                                             ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+
+                                            NotificationUtils.registerRecord(parent, group, record);
                                         }
 
                                         NotificationUtils.registerGroup(parent, group);
@@ -294,12 +298,16 @@ public class MainActivity extends AppCompatActivity {
                         NotificationUtils.unregisterGroup(parent, group);
 
                         for (final RecordData record: parent.getRecords()) {
+                            NotificationUtils.unregisterRecord(parent, group, record.id);
+
                             final Calendar calendar = Calendar.getInstance();
                             calendar.setTimeInMillis(record.nextAppear);
                             calendar.set(year, monthOfYear, dayOfMonth);
 
                             record.nextAppear = calendar.getTimeInMillis();
                             ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+
+                            NotificationUtils.registerRecord(parent, group, record);
                         }
 
                         NotificationUtils.registerGroup(parent, group);
@@ -322,6 +330,8 @@ public class MainActivity extends AppCompatActivity {
                         NotificationUtils.unregisterGroup(parent, group);
 
                         for (final RecordData record: parent.getRecords()) {
+                            NotificationUtils.unregisterRecord(parent, group, record.id);
+
                             final Calendar calendar = Calendar.getInstance();
                             calendar.setTimeInMillis(record.nextAppear);
                             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -329,6 +339,8 @@ public class MainActivity extends AppCompatActivity {
 
                             record.nextAppear = calendar.getTimeInMillis();
                             ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+
+                            NotificationUtils.registerRecord(parent, group, record);
                         }
 
                         NotificationUtils.registerGroup(parent, group);
