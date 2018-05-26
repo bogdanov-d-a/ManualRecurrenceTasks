@@ -26,6 +26,7 @@ import java.util.Calendar;
 import adapter.RecordListAdapter;
 import database.GroupData;
 import database.RecordData;
+import utils.DatePickerHelper;
 import utils.ObjectCache;
 import utils.Utils;
 
@@ -230,7 +231,8 @@ public class MainActivity extends AppCompatActivity {
                             switch (which) {
                                 case 0:
                                     Calendar calendarNow = Calendar.getInstance();
-                                    DatePickerFragment.createAndShow(
+                                    DatePickerHelper.createAndShow(
+                                            new DatePickerForSetVisibleRecordsDate(),
                                             parent.getSupportFragmentManager(),
                                             calendarNow.get(Calendar.YEAR),
                                             calendarNow.get(Calendar.MONTH),
@@ -257,45 +259,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class DatePickerFragment extends DialogFragment {
-        public static void createAndShow(FragmentManager manager, int year, int monthOfYear, int dayOfMonth) {
-            final DatePickerFragment fragment = new DatePickerFragment();
-
-            final Bundle bundle = new Bundle();
-            Utils.putDateToBundle(year, monthOfYear, dayOfMonth, bundle);
-            fragment.setArguments(bundle);
-
-            fragment.show(manager, "DatePickerFragment");
-        }
-
-        @NonNull
+    public static class DatePickerForSetVisibleRecordsDate extends DatePickerHelper {
         @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            super.onCreateDialog(savedInstanceState);
+        public DatePickerDialog.OnDateSetListener getOnDateSetListener() {
+            return new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                    final MainActivity parent = (MainActivity) getActivity();
 
-            final Bundle bundle = getArguments();
-            final MainActivity parent = (MainActivity) getActivity();
+                    for (final RecordData record: parent.getRecords()) {
+                        final Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(record.nextAppear);
+                        calendar.set(year, monthOfYear, dayOfMonth);
 
-            return new DatePickerDialog(
-                    parent,
-                    new DatePickerDialog.OnDateSetListener() {
-                        @Override
-                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            ArrayList<RecordData> records = parent.getRecords();
-                            for (RecordData record: records) {
-                                Calendar calendar = Calendar.getInstance();
-                                calendar.setTimeInMillis(record.nextAppear);
-                                calendar.set(year, monthOfYear, dayOfMonth);
-                                record.nextAppear = calendar.getTimeInMillis();
-                                ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
-                            }
-                            parent.refreshRecords();
-                        }
-                    },
-                    bundle.getInt(Utils.YEAR_TAG),
-                    bundle.getInt(Utils.MONTH_TAG),
-                    bundle.getInt(Utils.DAY_TAG)
-            );
+                        record.nextAppear = calendar.getTimeInMillis();
+                        ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+                    }
+
+                    parent.refreshRecords();
+                }
+            };
         }
     }
 }
