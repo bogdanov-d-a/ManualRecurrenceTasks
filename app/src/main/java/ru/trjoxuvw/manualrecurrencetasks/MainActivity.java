@@ -236,6 +236,16 @@ public class MainActivity extends AppCompatActivity {
                                             calendarNow.get(Calendar.MONTH),
                                             calendarNow.get(Calendar.DATE)
                                     );
+                                    break;
+
+                                case 1:
+                                    ArrayList<RecordData> records = parent.getRecords();
+                                    for (RecordData record: records) {
+                                        record.isChecked = false;
+                                        ObjectCache.getDbInstance(parent.getApplicationContext()).update(record);
+                                    }
+                                    parent.refreshRecords();
+                                    break;
                             }
                         }})
                     .setNegativeButton("Close", new DialogInterface.OnClickListener() {
