@@ -177,15 +177,7 @@ public class RecordListAdapter extends BaseAdapter {
             builder.setMessage("Delete record?\n" + record.label)
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            final ArrayList<GroupData> groupsList = parent.getGroups();
-                            final GroupData recordGroup = groupsList.get(Utils.getPositionById(groupsList, record.groupId));
-
-                            NotificationUtils.unregisterGroup(parent, recordGroup);
-
-                            ObjectCache.getDbInstance(parent.getApplicationContext()).deleteRecord(record.id);
-                            NotificationUtils.unregisterRecord(parent, recordGroup, record.id);
-
-                            NotificationUtils.registerGroup(parent, recordGroup);
+                            Utils.deleteRecord(parent.getApplicationContext(), parent.getGroups(), record);
                             parent.refreshRecords();
                         }
                     })

@@ -10,6 +10,7 @@ import java.util.Date;
 import database.AbstractData;
 import database.GroupData;
 import database.RecordData;
+import notification.NotificationUtils;
 
 public class Utils {
     public static final String YEAR_TAG = "YEAR_TAG";
@@ -73,6 +74,16 @@ public class Utils {
     public static boolean groupHasRecords(Context context, long groupId) {
         ArrayList<RecordData> records = ObjectCache.getDbInstance(context).getRecords(groupId, Long.MIN_VALUE, false);
         return !records.isEmpty();
+    }
+
+    public static void deleteRecord(Context context, ArrayList<GroupData> groupsList, RecordData record) {
+        final GroupData recordGroup = groupsList.get(Utils.getPositionById(groupsList, record.groupId));
+        NotificationUtils.unregisterGroup(context, recordGroup);
+
+        ObjectCache.getDbInstance(context).deleteRecord(record.id);
+        NotificationUtils.unregisterRecord(context, recordGroup, record.id);
+
+        NotificationUtils.registerGroup(context, recordGroup);
     }
 
     public static class DateTimeFormatted {

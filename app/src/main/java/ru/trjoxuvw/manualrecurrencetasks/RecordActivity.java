@@ -475,13 +475,7 @@ public class RecordActivity extends AppCompatActivity {
             builder.setMessage("Delete record?")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            final GroupData group = parent.getGroups().get(Utils.getPositionById(parent.getGroups(), parent.editRecord.groupId));
-                            NotificationUtils.unregisterGroup(parent, group);
-
-                            ObjectCache.getDbInstance(parent.getApplicationContext()).deleteRecord(parent.editRecord.id);
-                            NotificationUtils.unregisterRecord(parent, group, parent.editRecord.id);
-
-                            NotificationUtils.registerGroup(parent, group);
+                            Utils.deleteRecord(parent.getApplicationContext(), parent.getGroups(), parent.editRecord);
 
                             parent.setResult(1);
                             parent.finish();
