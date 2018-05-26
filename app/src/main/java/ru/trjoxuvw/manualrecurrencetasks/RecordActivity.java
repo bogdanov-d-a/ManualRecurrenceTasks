@@ -33,12 +33,10 @@ import database.RecordData;
 import notification.NotificationUtils;
 import utils.DatePickerHelper;
 import utils.ObjectCache;
+import utils.TimePickerHelper;
 import utils.Utils;
 
 public class RecordActivity extends AppCompatActivity {
-    private static final String HOUR_TAG = "HOUR_TAG";
-    private static final String MINUTE_TAG = "MINUTE_TAG";
-
     public static final String OPERATION = "ACTIVITY_OPERATION";
     public static final int OPERATION_CREATE = 0;
     public static final int OPERATION_UPDATE = 1;
@@ -261,7 +259,8 @@ public class RecordActivity extends AppCompatActivity {
         pickTimeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TimePickerFragment.createAndShow(
+                TimePickerHelper.createAndShow(
+                        new TimePickerForSetTime(),
                         getSupportFragmentManager(),
                         calendar.get(Calendar.HOUR_OF_DAY),
                         calendar.get(Calendar.MINUTE)
@@ -284,7 +283,8 @@ public class RecordActivity extends AppCompatActivity {
                     minute = 0;
                 }
 
-                TimePickerFragment.createAndShow(
+                TimePickerHelper.createAndShow(
+                        new TimePickerForSetTime(),
                         getSupportFragmentManager(),
                         hour,
                         minute
@@ -301,8 +301,8 @@ public class RecordActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             calendar.set(savedInstanceState.getInt(Utils.YEAR_TAG),
                     savedInstanceState.getInt(Utils.MONTH_TAG), savedInstanceState.getInt(Utils.DAY_TAG));
-            calendar.set(Calendar.HOUR_OF_DAY, savedInstanceState.getInt(HOUR_TAG));
-            calendar.set(Calendar.MINUTE, savedInstanceState.getInt(MINUTE_TAG));
+            calendar.set(Calendar.HOUR_OF_DAY, savedInstanceState.getInt(Utils.HOUR_TAG));
+            calendar.set(Calendar.MINUTE, savedInstanceState.getInt(Utils.MINUTE_TAG));
         } else if (operation == OPERATION_UPDATE) {
             calendar.setTimeInMillis(editRecord.nextAppear);
         }
@@ -422,8 +422,8 @@ public class RecordActivity extends AppCompatActivity {
 
         Utils.putDateToBundle(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DATE), outState);
-        outState.putInt(HOUR_TAG, calendar.get(Calendar.HOUR_OF_DAY));
-        outState.putInt(MINUTE_TAG, calendar.get(Calendar.MINUTE));
+        outState.putInt(Utils.HOUR_TAG, calendar.get(Calendar.HOUR_OF_DAY));
+        outState.putInt(Utils.MINUTE_TAG, calendar.get(Calendar.MINUTE));
 
         outState.putInt(OPERATION, operation);
         if (operation == OPERATION_UPDATE)
@@ -445,41 +445,19 @@ public class RecordActivity extends AppCompatActivity {
         }
     }
 
-    public static class TimePickerFragment extends DialogFragment {
-        public static void createAndShow(FragmentManager manager, int hourOfDay, int minute) {
-            final TimePickerFragment fragment = new TimePickerFragment();
-
-            final Bundle bundle = new Bundle();
-            bundle.putInt(HOUR_TAG, hourOfDay);
-            bundle.putInt(MINUTE_TAG, minute);
-            fragment.setArguments(bundle);
-
-            fragment.show(manager, "TimePickerFragment");
-        }
-
-        @NonNull
+    public static class TimePickerForSetTime extends TimePickerHelper {
         @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            super.onCreateDialog(savedInstanceState);
-
-            final Bundle bundle = getArguments();
-            final RecordActivity parent = (RecordActivity) getActivity();
-
-            return new TimePickerDialog(
-                    parent,
-                    new TimePickerDialog.OnTimeSetListener() {
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            parent.calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                            parent.calendar.set(Calendar.MINUTE, minute);
-                            parent.updateDateTimeText();
-                            parent.updateButtonState();
-                        }
-                    },
-                    bundle.getInt(HOUR_TAG),
-                    bundle.getInt(MINUTE_TAG),
-                    DateFormat.is24HourFormat(parent)
-            );
+        public TimePickerDialog.OnTimeSetListener getOnTimeSetListener() {
+            return new TimePickerDialog.OnTimeSetListener() {
+                @Override
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    final RecordActivity parent = (RecordActivity) getActivity();
+                    parent.calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    parent.calendar.set(Calendar.MINUTE, minute);
+                    parent.updateDateTimeText();
+                    parent.updateButtonState();
+                }
+            };
         }
     }
 

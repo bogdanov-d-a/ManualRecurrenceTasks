@@ -15,6 +15,8 @@ public class Utils {
     public static final String YEAR_TAG = "YEAR_TAG";
     public static final String MONTH_TAG = "MONTH_TAG";
     public static final String DAY_TAG = "DAY_TAG";
+    public static final String HOUR_TAG = "HOUR_TAG";
+    public static final String MINUTE_TAG = "MINUTE_TAG";
 
     public static void putDateToBundle(int year, int monthOfYear, int dayOfMonth, Bundle bundle) {
         bundle.putInt(YEAR_TAG, year);
