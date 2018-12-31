@@ -3,6 +3,10 @@ package utils;
 import android.content.Context;
 import android.os.Bundle;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,6 +88,25 @@ public class Utils {
         NotificationUtils.unregisterRecord(context, recordGroup, record.id);
 
         NotificationUtils.registerGroup(context, recordGroup);
+    }
+
+    public static void copyFile(String sourcePath, String targetPath) throws Exception {
+        FileInputStream sourceStream = new FileInputStream(new File(sourcePath));
+        try {
+            OutputStream targetStream = new FileOutputStream(targetPath);
+            try {
+                byte[] buffer = new byte[1024];
+                int length;
+                while ((length = sourceStream.read(buffer)) > 0) {
+                    targetStream.write(buffer, 0, length);
+                }
+            } finally {
+                targetStream.flush();
+                targetStream.close();
+            }
+        } finally {
+            sourceStream.close();
+        }
     }
 
     public static class DateTimeFormatted {

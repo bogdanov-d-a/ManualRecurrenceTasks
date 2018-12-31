@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 6;
-    private static final String DATABASE_NAME = "Tasks.db";
+    public static final String DATABASE_NAME = "Tasks.db";
 
     private static String createGen(StaticInfo.Type type) {
         StringBuilder sb = new StringBuilder();

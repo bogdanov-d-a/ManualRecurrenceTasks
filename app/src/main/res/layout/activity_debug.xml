@@ -21,4 +21,22 @@
         android:layout_height="wrap_content"
         android:text="UnRegister"
         android:id="@+id/unregButton" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Backup path"
+        android:id="@+id/backupPathText" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Backup"
+        android:id="@+id/backupButton" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Restore"
+        android:id="@+id/restoreButton" />
 </LinearLayout>
