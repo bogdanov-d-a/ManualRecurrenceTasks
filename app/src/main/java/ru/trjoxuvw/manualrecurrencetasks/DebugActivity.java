@@ -47,7 +47,7 @@ public class DebugActivity extends AppCompatActivity {
 
         backupPathText = findViewById(R.id.backupPathText);
         assert backupPathText != null;
-        backupPathText.setText(Environment.getExternalStorageDirectory() + "/" + defaultBackupName);
+        backupPathText.setText(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS) + "/" + defaultBackupName);
 
         final Button backupButton = findViewById(R.id.backupButton);
         assert backupButton != null;
