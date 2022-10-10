@@ -31,7 +31,9 @@
                 android:value="" />
         </activity>
 
-        <activity android:name=".GroupsActivity"
+        <activity
+            android:name=".GroupsActivity"
+            android:exported="true"
             android:parentActivityName=".MainActivity">
 
             <meta-data
@@ -39,7 +41,9 @@
                 android:value=".MainActivity"/>
         </activity>
 
-        <activity android:name=".RecordActivity"
+        <activity
+            android:name=".RecordActivity"
+            android:exported="true"
             android:parentActivityName=".MainActivity">
 
             <meta-data
@@ -47,18 +51,26 @@
                 android:value=".MainActivity"/>
         </activity>
 
-        <activity android:name=".DebugActivity"
+        <activity
+            android:name=".DebugActivity"
+            android:exported="true"
             android:launchMode="singleInstance"
             android:taskAffinity="">
         </activity>
 
-        <receiver android:name="notification.NotificationBroadcastReceiver">
+        <receiver
+            android:name="notification.NotificationBroadcastReceiver"
+            android:exported="true">
+
             <intent-filter>
                 <action android:name="ru.trjoxuvw.manualrecurrencetasks.SHOW" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name="notification.BootCompletedBroadcastReceiver">
+        <receiver
+            android:name="notification.BootCompletedBroadcastReceiver"
+            android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
