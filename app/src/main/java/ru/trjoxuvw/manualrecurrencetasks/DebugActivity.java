@@ -14,7 +14,7 @@ import utils.Utils;
 
 public class DebugActivity extends AppCompatActivity {
     private static final String dbPath = "/data/data/ru.trjoxuvw.manualrecurrencetasks/databases/" + DatabaseHelper.DATABASE_NAME;
-    private static final String defaultBackupName = "mrt-bk.db";
+    private static final String defaultBackupName = "mrt-bk-db.png";
 
     private EditText backupPathText;
 
